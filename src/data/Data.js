@@ -1,5 +1,6 @@
 import P1 from '../assets/ggta.png'
 import P2 from '../assets/frd.gif'
+import P3 from '../assets/rnld.jpg'
 var  data = [
   {
     img: P1,
@@ -13,7 +14,7 @@ var  data = [
   },
  
   {
-    img: P1,
+    img: P3,
     title: "Sticker 1",
     desc: "GTA-V",
   },
