@@ -1,33 +1,14 @@
-import React from 'react'
-import M from './components/header'
-import A from './components/prac'
+import React from "react";
+import MasonryGallery from "./components/MasonryGallery";
+import data from "./data/Data";
+import Header from './components/header'
 
 function App() {
-  return (
-    <>
-      <M />
-
-      {/* Wrapper to center all cards */}
-      <div
-        className="d-flex flex-column align-items-center"
-        style={{
-          width: "100%",
-          marginTop: "20px",
-          gap: "16px",
-        }}
-      >
-        <A />
-        <A />
-        <A />
-        <A />
-        <A />
-        <A />
-        <A />
-        <A />
-        <A />
-      </div>
-    </>
-  );
+  return(
+  <>
+ <Header/>
+  <MasonryGallery items={data} />;
+  </> )
 }
 
 export default App;
