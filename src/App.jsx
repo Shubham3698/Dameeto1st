@@ -1,14 +1,13 @@
-import React from "react";
 import MasonryGallery from "./components/MasonryGallery";
-import data from "./data/Data";
-import Header from './components/header'
+import Hh from'./components/header'
 
 function App() {
-  return(
-  <>
- <Header/>
-  <MasonryGallery items={data} />;
-  </> )
+  return (
+    <div className="p-4">
+      <Hh/>
+      <MasonryGallery />
+    </div>
+  );
 }
 
 export default App;

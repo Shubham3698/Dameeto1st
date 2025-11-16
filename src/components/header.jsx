@@ -30,7 +30,7 @@ function Header() {
           fontSize: "13px",
         }}
       >
-        Scroll to explore • Tap to flip🪄
+        Scroll to explore🪄
       </div>
     </header>
   );
