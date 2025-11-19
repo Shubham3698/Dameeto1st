@@ -11,6 +11,9 @@ import P8 from '../assets/ndrl.jpg'
 import P9 from '../assets/khl.jpg'
 import P10 from '../assets/rdrp.jpg'
 import P11 from '../assets/tlu.jpg'
+import P12 from '../assets/redx.jpg'
+import P13 from '../assets/6gta.jpg'
+import P14 from '../assets/indx.jpg'
 
 function MasonryGallery() {
   return (
@@ -44,83 +47,18 @@ function MasonryGallery() {
           <img className="img-fluid rounded" src={P11} alt="" />
         </div>
         <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P7} alt="" />
-          <img className="img-fluid rounded" src={P3} alt="" />
-          <img className="img-fluid rounded" src={P6} alt="" />
+          <img className="img-fluid rounded" src= {P12} alt="" />
+          <img className="img-fluid rounded" src={P13} alt="" />
+          <img className="img-fluid rounded" src={P14} alt="" />
         </div>
-
-        {/* Column 2 */}
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P5} alt="" />
-          <img className="img-fluid rounded" src={P4} alt="" />
-          <img className="img-fluid rounded" src={P8} alt="" />
-        </div>
-
-        {/* Column 3 */}
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P9} alt="" />
-          <img className="img-fluid rounded" src={P2} alt="" />
-          <img className="img-fluid rounded" src={P1} alt="" />
-        </div>
-
-        {/* Column 4 */}
         <div className="col-6 col-md-3 d-flex flex-column gap-3">
           <img className="img-fluid rounded" src= {P1} alt="" />
           <img className="img-fluid rounded" src={P10} alt="" />
           <img className="img-fluid rounded" src={P11} alt="" />
         </div>
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P7} alt="" />
-          <img className="img-fluid rounded" src={P3} alt="" />
-          <img className="img-fluid rounded" src={P6} alt="" />
-        </div>
 
-        {/* Column 2 */}
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P5} alt="" />
-          <img className="img-fluid rounded" src={P4} alt="" />
-          <img className="img-fluid rounded" src={P8} alt="" />
-        </div>
 
-        {/* Column 3 */}
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P9} alt="" />
-          <img className="img-fluid rounded" src={P2} alt="" />
-          <img className="img-fluid rounded" src={P1} alt="" />
-        </div>
-
-        {/* Column 4 */}
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src= {P1} alt="" />
-          <img className="img-fluid rounded" src={P10} alt="" />
-          <img className="img-fluid rounded" src={P11} alt="" />
-        </div>
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P7} alt="" />
-          <img className="img-fluid rounded" src={P3} alt="" />
-          <img className="img-fluid rounded" src={P6} alt="" />
-        </div>
-
-        {/* Column 2 */}
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P5} alt="" />
-          <img className="img-fluid rounded" src={P4} alt="" />
-          <img className="img-fluid rounded" src={P8} alt="" />
-        </div>
-
-        {/* Column 3 */}
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src={P9} alt="" />
-          <img className="img-fluid rounded" src={P2} alt="" />
-          <img className="img-fluid rounded" src={P1} alt="" />
-        </div>
-
-        {/* Column 4 */}
-        <div className="col-6 col-md-3 d-flex flex-column gap-3">
-          <img className="img-fluid rounded" src= {P1} alt="" />
-          <img className="img-fluid rounded" src={P10} alt="" />
-          <img className="img-fluid rounded" src={P11} alt="" />
-        </div>
+       
       </div>
     </div>
   );
