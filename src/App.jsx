@@ -11,7 +11,9 @@ function App() {
 
 
       {/* <Hh/> */}
-      <MasonryGallery />
+   <div style={{ marginTop: '50px' }}>
+  <MasonryGallery />
+</div>
     </div>
   );
 }
