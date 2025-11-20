@@ -5,7 +5,7 @@ import Nav from './components/NavbarMain'
 import Tp from './components/tpmenu'
 function App() {
   return (
-    <div className="p-4">
+    <div >
       <Tp/>
       {/* <Nav/> */}
 
