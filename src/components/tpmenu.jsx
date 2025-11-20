@@ -25,7 +25,7 @@ export default function HorizontalTopMenu({ items }) {
         top: 0,
         left: 0,
         width: "100%",
-        height: "40px",       // thoda bada for touch-friendly
+        height: "50px",       // thoda bada for touch-friendly
         backgroundColor: "#fff", // background color
         overflowX: "auto",
         overflowY: "hidden",
@@ -54,8 +54,8 @@ export default function HorizontalTopMenu({ items }) {
         .menu-item {
           display: inline-block;
           margin-right: 16px;
-          font-size: 14px;
-          font-weight: 600;
+          font-size: 16px;
+          font-weight: 700;
           cursor: pointer;
           outline: none;
           padding-bottom: 4px;
