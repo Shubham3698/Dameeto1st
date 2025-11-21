@@ -1,19 +1,20 @@
 // HorizontalTopMenu.jsx
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function HorizontalTopMenu({ items }) {
   const data = items || [
-    "Home",
-    "About us",
-    "Sticker",
-    "Poster",
-    "Heroic",
-    "Marval",
-    "Goodies",
-    "Gadgets",
-    "Photography",
-    "Aeshthetic",
-    "Art",
+    { label: "Home", path: "/" },
+    { label: "About us", path: "/about" },
+    { label: "Sticker", path: "/sticker" },
+    { label: "Poster", path: "/poster" },
+    { label: "Heroic", path: "/heroic" },
+    { label: "Marval", path: "/marvel" },
+    { label: "Goodies", path: "/goodies" },
+    { label: "Gadgets", path: "/gadgets" },
+    { label: "Photography", path: "/photo" },
+    { label: "Aeshthetic", path: "/aesthetic" },
+    { label: "Art", path: "/art" },
   ];
 
   const [activeIndex, setActiveIndex] = useState(null);
@@ -25,30 +26,26 @@ export default function HorizontalTopMenu({ items }) {
         top: 0,
         left: 0,
         width: "100%",
-        height: "50px",       // thoda bada for touch-friendly
-        backgroundColor: "#fff", // background color
+        height: "50px",
+        backgroundColor: "#fff",
         overflowX: "auto",
-        overflowY: "hidden",
         whiteSpace: "nowrap",
         display: "flex",
         alignItems: "center",
         paddingLeft: "8px",
         scrollBehavior: "smooth",
-        outline: "none",
-        zIndex: 9999,         // page ke upar rahe
-       
+        zIndex: 9999,
       }}
       className="horizontal-menu"
       tabIndex={-1}
     >
       <style>{`
-        /* Hide scrollbar completely */
         .horizontal-menu::-webkit-scrollbar {
           display: none;
         }
         .horizontal-menu {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;     /* Firefox */
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
 
         .menu-item {
@@ -59,22 +56,24 @@ export default function HorizontalTopMenu({ items }) {
           cursor: pointer;
           outline: none;
           padding-bottom: 4px;
+          text-decoration: none;
+          color: black;
         }
 
         .menu-item.active {
-          border-bottom: 2px solid red; /* Red underline on active */
+          border-bottom: 2px solid red;
         }
       `}</style>
 
-      {data.map((label, i) => (
-        <div
+      {data.map((item, i) => (
+        <Link
           key={i}
+          to={item.path}
           className={`menu-item ${activeIndex === i ? "active" : ""}`}
           onClick={() => setActiveIndex(i)}
-          tabIndex={-1}
         >
-          {label}
-        </div>
+          {item.label}
+        </Link>
       ))}
     </div>
   );
