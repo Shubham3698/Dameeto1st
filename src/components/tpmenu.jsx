@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function HorizontalTopMenu({ items }) {
   const data = items || [
-    { label: "Home", path: "/" },
+    { label: "Trending", path: "/" },
     { label: "About us", path: "/about" },
     { label: "Sticker", path: "/sticker" },
     { label: "Poster", path: "/poster" },
