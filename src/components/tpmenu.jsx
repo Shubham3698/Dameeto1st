@@ -27,7 +27,7 @@ export default function HorizontalTopMenu({ items }) {
         left: 0,
         width: "100%",
         height: "50px",
-        backgroundColor: "#fff",
+        backgroundColor: "#dedede",
         overflowX: "auto",
         whiteSpace: "nowrap",
         display: "flex",
@@ -35,6 +35,7 @@ export default function HorizontalTopMenu({ items }) {
         paddingLeft: "8px",
         scrollBehavior: "smooth",
         zIndex: 9999,
+      
       }}
       className="horizontal-menu"
       tabIndex={-1}
@@ -49,19 +50,30 @@ export default function HorizontalTopMenu({ items }) {
         }
 
         .menu-item {
+          backgroun: #fffff;
           display: inline-block;
           margin-right: 16px;
           font-size: 16px;
           font-weight: 700;
           cursor: pointer;
           outline: none;
-          padding-bottom: 4px;
+          padding: 6px 10px;
           text-decoration: none;
-          color: black;
+          color: #fe3b01;
+          // border: 1px solid #fe3b01;
+          border-radius: 6px;
+          transition: 0.2s ease;
+
+        }
+
+        .menu-item:hover {
+          background-color: #ffff;
+          // color: #ffffff;
         }
 
         .menu-item.active {
-          border-bottom: 2px solid red;
+          border: 3px solid #fe3b01 !important;
+          color: #000000ff;
         }
       `}</style>
 
