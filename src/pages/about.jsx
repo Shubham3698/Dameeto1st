@@ -90,7 +90,7 @@ export default function About() {
         </Row>
 
         <div className="text-center mt-4">
-          <Button variant="danger" size="lg" className="px-4">
+          <Button style={{background:"white", color:"black", border:"3px solid #fe3b01"}} variant="danger" size="lg" className="px-4">
             Explore Our Products
           </Button>
         </div>
