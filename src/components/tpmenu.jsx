@@ -74,6 +74,7 @@ export default function HorizontalTopMenu({ items }) {
         .menu-item.active {
           border: 3px solid #fe3b01 !important;
           color: #000000ff;
+          background: white
         }
       `}</style>
 

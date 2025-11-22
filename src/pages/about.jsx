@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 
 export default function About() {
   return (
-    <div style={{ marginTop: "80px" }}>
+    <div style={{ }}>
       {/* HERO SECTION */}
       <div
         style={{
@@ -42,7 +42,7 @@ export default function About() {
               <Card.Body>
                 <Card.Title className="fw-bold">Who We Are</Card.Title>
                 <Card.Text style={{ textAlign: "justify" }}>
-                  <b>Dameeto</b> is the only brand that focuses on reflection and helps you  express your foremost vibes and the deep individuality within you through thoughtful crafting and curated goodies.
+                  <b>Dameeto</b> is the only brand that focuses on reflection and helps you to express your foremost vibes and the deep individuality within you through thoughtful crafting and curated goodies.
                 </Card.Text>
               </Card.Body>
             </Card>
