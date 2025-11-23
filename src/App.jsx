@@ -6,7 +6,7 @@ import About from "./pages/about";
 
 function App() {
   return (
-    <div style={{background:"#dedede"}} >
+    <div style={{background:"#fff4f0"}} >
       <BrowserRouter>
         <HorizontalTopMenu />
         <div style={{ marginTop: "60px" }}></div>

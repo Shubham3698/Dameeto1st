@@ -27,7 +27,7 @@ export default function HorizontalTopMenu({ items }) {
         left: 0,
         width: "100%",
         height: "50px",
-        backgroundColor: "#dedede",
+        backgroundColor: "#fff4f0",
         overflowX: "auto",
         whiteSpace: "nowrap",
         display: "flex",
@@ -59,7 +59,7 @@ export default function HorizontalTopMenu({ items }) {
           outline: none;
           padding: 6px 10px;
           text-decoration: none;
-          color: #fe3b01;
+          color: black;
           // border: 1px solid #fe3b01;
           border-radius: 6px;
           transition: 0.2s ease;
