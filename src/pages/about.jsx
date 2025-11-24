@@ -89,12 +89,18 @@ export default function About() {
           </Col>
         </Row>
         <div className="text-center mt-4">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
+    rel="stylesheet"
+  />
   <Button
     style={{
       background: "white",
       color: "black",
       border: "4px solid #fe3d00",
-      borderRadius: "6px",   // Border radius updated
+      borderRadius: "6px",
+      fontFamily: "'Great Vibes', cursive",   // Luxury cursive font
+      fontSize: "22px",                       // Slightly bigger for elegance
     }}
     variant="danger"
     size="lg"
@@ -104,6 +110,7 @@ export default function About() {
   </Button>
 </div>
 
+        
 
               <div style={{ marginTop: "50px" }}></div>
 
