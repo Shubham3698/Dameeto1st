@@ -26,7 +26,7 @@ export default function HorizontalTopMenu({ items }) {
         top: 0,
         left: 0,
         width: "100%",
-        height: "40px",
+        height: "50px",          // UPDATED HEIGHT
         backgroundColor: "#FBF8F6",
         overflowX: "auto",
         whiteSpace: "nowrap",
@@ -53,10 +53,10 @@ export default function HorizontalTopMenu({ items }) {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 0 10px;
+          padding: 0 12px;       /* Slightly more padding for bigger text */
           margin-right: 14px;
-          font-size: 16px;
-          height: 28px;
+          font-size: 18px;       /* Bigger text */
+          height: 36px;          /* Align inside 50px navbar */
           font-weight: 700;
           cursor: pointer;
           text-decoration: none;
@@ -71,7 +71,7 @@ export default function HorizontalTopMenu({ items }) {
           left: 50%;
           transform: translateX(-50%);
           height: 3px;
-          width: 0%;               /* Start hidden */
+          width: 0%;              
           background: black;
           border-radius: 10px;
           transition: width 0.3s ease, opacity 0.3s ease;
@@ -80,7 +80,7 @@ export default function HorizontalTopMenu({ items }) {
 
         /* Hover animation */
         .menu-item:hover::after {
-          width: 60%;              /* Shorter than text width */
+          width: 60%;
           opacity: 0.6;
         }
 
