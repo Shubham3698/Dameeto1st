@@ -88,12 +88,23 @@ export default function About() {
             </Card>
           </Col>
         </Row>
-
         <div className="text-center mt-4">
-          <Button style={{background:"white", color:"black", border:"3px solid #fe3b01"}} variant="danger" size="lg" className="px-4">
-            Explore Our Products
-          </Button>
-        </div>
+  <Button
+    style={{
+      background: "white",
+      color: "black",
+      border: "4px solid #fe3d00",
+      borderRadius: "6px",   // Border radius updated
+    }}
+    variant="danger"
+    size="lg"
+    className="px-4"
+  >
+    Explore Our Products
+  </Button>
+</div>
+
+
               <div style={{ marginTop: "50px" }}></div>
 
       </Container>

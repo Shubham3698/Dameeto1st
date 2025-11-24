@@ -17,7 +17,7 @@ import P14 from "../assets/indx.jpg";
 
 function MasonryGallery() {
   return (
-    <div style={{ background: "#fff4f0" }} className="container mt-4">
+    <div style={{ background: "#FBF8F6" }} className="container mt-4">
       <div className="row g-3">
 
         {/* COLUMN 1 */}

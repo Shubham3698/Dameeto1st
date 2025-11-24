@@ -26,55 +26,68 @@ export default function HorizontalTopMenu({ items }) {
         top: 0,
         left: 0,
         width: "100%",
-        height: "50px",
-        backgroundColor: "#fff4f0",
+        height: "40px",
+        backgroundColor: "#FBF8F6",
         overflowX: "auto",
         whiteSpace: "nowrap",
         display: "flex",
         alignItems: "center",
         paddingLeft: "8px",
-        scrollBehavior: "smooth",
         zIndex: 9999,
-      
       }}
       className="horizontal-menu"
-      tabIndex={-1}
     >
+      <link
+        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap"
+        rel="stylesheet"
+      />
+
       <style>{`
         .horizontal-menu::-webkit-scrollbar {
           display: none;
         }
-        .horizontal-menu {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
 
         .menu-item {
-          backgroun: #fffff;
-          display: inline-block;
-          margin-right: 16px;
+          position: relative;
+          font-family: 'Baloo 2', cursive !important;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 10px;
+          margin-right: 14px;
           font-size: 16px;
+          height: 28px;
           font-weight: 700;
           cursor: pointer;
-          outline: none;
-          padding: 6px 10px;
           text-decoration: none;
-          color: black;
-          // border: 1px solid #fe3b01;
-          border-radius: 6px;
-          transition: 0.2s ease;
-
+          color: #fe3d00;
         }
 
-        .menu-item:hover {
-          background-color: #ffff;
-          // color: #ffffff;
+        /* Underline (centered, short) */
+        .menu-item::after {
+          content: "";
+          position: absolute;
+          bottom: -2px;
+          left: 50%;
+          transform: translateX(-50%);
+          height: 3px;
+          width: 0%;               /* Start hidden */
+          background: black;
+          border-radius: 10px;
+          transition: width 0.3s ease, opacity 0.3s ease;
+          opacity: 0;
         }
 
-        .menu-item.active {
-          border: 3px solid #fe3b01 !important;
-          color: #000000ff;
-          background: white
+        /* Hover animation */
+        .menu-item:hover::after {
+          width: 60%;              /* Shorter than text width */
+          opacity: 0.6;
+        }
+
+        /* Active animation */
+        .menu-item.active::after {
+          width: 60%;
+          opacity: 1;
         }
       `}</style>
 
