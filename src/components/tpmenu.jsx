@@ -27,7 +27,7 @@ export default function HorizontalTopMenu({ items }) {
         left: 0,
         width: "100%",
         height: "50px",          // UPDATED HEIGHT
-        backgroundColor: "#FBF8F6",
+        backgroundColor: "#fff3eb",
         overflowX: "auto",
         whiteSpace: "nowrap",
         display: "flex",
