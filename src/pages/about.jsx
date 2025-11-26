@@ -43,8 +43,7 @@ export default function About() {
                 <Card.Title className="fw-bold">Who We Are</Card.Title>
                 <Card.Text style={{ textAlign: "justify" }}>
                   <b>Dameeto</b> is a brand built on reflection, allowing you to
-                  express your vibes, emotions, and individuality through thoughtful,
-                  artistically crafted aesthetic goodies.
+                  express your vibes, emotions, and individuality through Art, crafting and favorite  goodies.
                 </Card.Text>
               </Card.Body>
             </Card>
