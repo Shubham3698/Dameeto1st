@@ -1,49 +1,32 @@
 import React from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import heroImg from "../assets/dmtl.jpg"; // <-- image added here
 
 export default function About() {
   return (
     <div style={{ backgroundColor: "#fff3eb" }}>
-      {/* HERO SECTION */}
-      <div
-        style={{
-          width: "100%",
-          height: "320px",
-          backgroundImage:
-            "url('https://wimzi.ph/cdn/shop/files/Cute-Vinyl-Sticker-Pack.jpg?v=1736863505')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          borderRadius: "12px",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.4)",
-            borderRadius: "12px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            fontSize: "40px",
-            fontWeight: "900",
-          }}
-        >
-          About Dameeto
-        </div>
+
+      {/* Local Image (replacing img??) */}
+      <div style={{ width: "100%", marginBottom: "20px" }}>
+        <img 
+          src={heroImg} 
+          alt="About Dameeto" 
+          style={{ width: "100%", borderRadius: "12px" }} 
+        />
       </div>
 
+
       {/* DESCRIPTION CARDS */}
-      <Container className="mt-5">
+      <Container  className="mt-5">
         <Row className="gy-4">
           <Col md={6}>
-            <Card className="shadow-lg border-0">
+            <Card  className="shadow-lg border-0">
               <Card.Body>
                 <Card.Title className="fw-bold">Who We Are</Card.Title>
                 <Card.Text style={{ textAlign: "justify" }}>
                   <b>Dameeto</b> is a brand built on reflection, allowing you to
-                  express your vibes, emotions, and individuality through Art, crafting and favorite  goodies.
+                  express your vibes, emotions, and individuality through Art,
+                  crafting and favorite goodies.
                 </Card.Text>
               </Card.Body>
             </Card>
