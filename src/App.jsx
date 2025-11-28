@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HorizontalTopMenu from "./components/tpmenu";
-import MasonryGallery from "./components/MasonryGallery";
 import About from "./pages/about";
+import Sticker from "./pages/Sticker";
+import Poster from "./pages/Poster"
+import Trending from "./pages/Trending"
 // import { div } from "framer-motion/client";
 
 function App() {
@@ -12,10 +14,10 @@ function App() {
         <div style={{ marginTop: "60px" }}></div>
 
         <Routes>
-          <Route path="/" element={<MasonryGallery />} />
+          <Route path="/" element={<Trending />} />
           <Route path="/about" element={<About />} />
-          <Route path="/sticker" element={<h1>Sticker Page</h1>} />
-          <Route path="/poster" element={<h1>Poster Page</h1>} />
+          <Route path="/sticker" element={<Sticker/>} />
+          <Route path="/poster" element={<Poster/>} />
         </Routes>
       </BrowserRouter>
     </div>
