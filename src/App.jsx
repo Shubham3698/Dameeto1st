@@ -5,6 +5,7 @@ import Sticker from "./pages/Sticker";
 import Poster from "./pages/Poster"
 import Trending from "./pages/Trending"
 import Goodies from "./pages/Goodies"
+import Testnav from "./components/Testnav"
 // import { div } from "framer-motion/client";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
       <BrowserRouter>
         <HorizontalTopMenu />
         <div style={{ marginTop: "60px" }}></div>
+        {/* <Testnav/> */}
 
         <Routes>
           <Route path="/" element={<Trending />} />

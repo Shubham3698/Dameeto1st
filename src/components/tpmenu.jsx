@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function HorizontalTopMenu({ items }) {
-  const location = useLocation(); // <-- yaha path mil jayega
+  const location = useLocation();
+  const [show, setShow] = useState(true);
+  const [lastScroll, setLastScroll] = useState(0);
+
+  // --- Instagram navbar scroll logic ---
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+
+      if (currentScroll > lastScroll) {
+        setShow(false); // scroll down → hide
+      } else {
+        setShow(true); // scroll up → show
+      }
+
+      setLastScroll(currentScroll);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScroll]);
 
   const data = items || [
     { label: "Trending", path: "/" },
@@ -33,14 +53,18 @@ export default function HorizontalTopMenu({ items }) {
         alignItems: "center",
         paddingLeft: "8px",
         zIndex: 9999,
+        transition: "transform 0.3s ease",
+        transform: show ? "translateY(0)" : "translateY(-100%)",
       }}
       className="horizontal-menu"
     >
+      {/* Google Font */}
       <link
         href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap"
         rel="stylesheet"
       />
 
+      {/* CSS */}
       <style>{`
         .horizontal-menu::-webkit-scrollbar {
           display: none;
