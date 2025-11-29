@@ -1,81 +1,124 @@
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 
-import HorizontalTopMenu from "./components/tpmenu";
-import About from "./pages/about";
-import Sticker from "./pages/Sticker";
-import Poster from "./pages/Poster";
-import Trending from "./pages/Trending";
-import Goodies from "./pages/Goodies";
-import Testnav from "./components/Testnav";
-import Logonav from "./components/Logonav";
-import MNv from "./components/Maninav";
-
-function SwipeHandler({ children }) {
-  const navigate = useNavigate();
+export default function BottomMenu({ items }) {
   const location = useLocation();
+  const menuRef = useRef(null);
 
-  const startX = useRef(0);
-  const endX = useRef(0);
+  const [show, setShow] = useState(true);
+  const [lastScroll, setLastScroll] = useState(0);
 
-  // 🔥 Allowed pages order
-  const pages = ["/", "/sticker", "/poster", "/goodies", "/about"];
+  // --- Instagram style scroll animation only for bottom menu ---
+  useEffect(() => {
+    const handleScroll = () => {
+      const current = window.scrollY;
 
-  const handleTouchStart = (e) => {
-    startX.current = e.touches[0].clientX;
-  };
+      if (current > lastScroll) {
+        setShow(false); // scroll down → hide bottom bar
+      } else {
+        setShow(true); // scroll up → show bottom bar
+      }
 
-  const handleTouchMove = (e) => {
-    endX.current = e.touches[0].clientX;
-  };
+      setLastScroll(current);
+    };
 
-  const handleTouchEnd = () => {
-    const distance = endX.current - startX.current;
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScroll]);
 
-    if (Math.abs(distance) < 70) return; // Small movement ignore
-
-    const currentIndex = pages.indexOf(location.pathname);
-
-    if (distance > 70) {
-      // 👉 Swipe Right = previous page
-      if (currentIndex > 0) navigate(pages[currentIndex - 1]);
-    } else {
-      // 👈 Swipe Left = next page
-      if (currentIndex < pages.length - 1) navigate(pages[currentIndex + 1]);
+  // --- Auto scroll to active menu item ---
+  useEffect(() => {
+    const activeItem = menuRef.current.querySelector(".active");
+    if (activeItem) {
+      activeItem.scrollIntoView({ behavior: "smooth", inline: "center" });
     }
-  };
+  }, [location.pathname]);
+
+  const data = items || [
+    { label: "Trending", path: "/" },
+    { label: "About us", path: "/about" },
+    { label: "Sticker", path: "/sticker" },
+    { label: "Poster", path: "/poster" },
+    { label: "Goodies", path: "/goodies" },
+    { label: "Marvel", path: "/marvel" },
+    { label: "Heroic", path: "/heroic" },
+    { label: "Gadgets", path: "/gadgets" },
+    { label: "Photography", path: "/photo" },
+    { label: "Aesthetic", path: "/aesthetic" },
+    { label: "Art", path: "/art" },
+  ];
 
   return (
     <div
-      style={{ width: "100%", height: "100%" }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      ref={menuRef}
+      style={{
+        position: "fixed",
+        top: "60px", // under top navbar
+        left: 0,
+        width: "100%",
+        height: "50px",
+        backgroundColor: "#fff3eb",
+        display: "flex",
+        overflowX: "auto",
+        whiteSpace: "nowrap",
+        alignItems: "center",
+        paddingLeft: "8px",
+        zIndex: 9998,
+        transition: "transform 0.3s ease",
+        transform: show ? "translateY(0)" : "translateY(-100%)",
+      }}
+      className="horizontal-menu"
     >
-      {children}
+      <style>
+        {`
+        .horizontal-menu::-webkit-scrollbar {
+          display: none;
+        }
+
+        .menu-item {
+          font-family: 'Baloo 2', cursive;
+          padding: 0 14px;
+          margin-right: 14px;
+          font-size: 18px;
+          height: 36px;
+          display: inline-flex;
+          align-items: center;
+          font-weight: 700;
+          text-decoration: none;
+          color: #fe3d00;
+          position: relative;
+        }
+
+        .menu-item::after {
+          content: "";
+          position: absolute;
+          bottom: -2px;
+          left: 50%;
+          transform: translateX(-50%);
+          height: 3px;
+          width: 0%;
+          background: black;
+          transition: width 0.3s ease;
+        }
+
+        .menu-item:hover::after,
+        .menu-item.active::after {
+          width: 60%;
+        }
+        `}
+      </style>
+
+      {data.map((item, i) => (
+        <Link
+          key={i}
+          to={item.path}
+          className={`menu-item ${
+            location.pathname === item.path ? "active" : ""
+          }`}
+        >
+          {item.label}
+        </Link>
+      ))}
     </div>
   );
 }
-
-function App() {
-  return (
-    <div style={{ background: "#fff3eb" }}>
-      <BrowserRouter>
-        <SwipeHandler>
-          <MNv />
-          <div style={{ marginTop: "105px" }}></div>
-
-          <Routes>
-            <Route path="/" element={<Trending />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/sticker" element={<Sticker />} />
-            <Route path="/poster" element={<Poster />} />
-            <Route path="/goodies" element={<Goodies />} />
-          </Routes>
-        </SwipeHandler>
-      </BrowserRouter>
-    </div>
-  );
-}
-
-export default App;
