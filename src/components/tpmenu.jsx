@@ -1,28 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function BottomMenu({ items }) {
   const location = useLocation();
+  const menuRef = useRef(null);
+
   const [show, setShow] = useState(true);
   const [lastScroll, setLastScroll] = useState(0);
 
-  // --- Instagram style scroll animation only for bottom menu ---
+  // Instagram-style scroll animation
   useEffect(() => {
     const handleScroll = () => {
       const current = window.scrollY;
-
-      if (current > lastScroll) {
-        setShow(false); // scroll down → hide bottom bar
-      } else {
-        setShow(true); // scroll up → show bottom bar
-      }
-
+      if (current > lastScroll) setShow(false);
+      else setShow(true);
       setLastScroll(current);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScroll]);
+
+  // Auto scroll to active menu item
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const activeItem = menuRef.current.querySelector(".active");
+      if (activeItem) {
+        activeItem.scrollIntoView({ behavior: "smooth", inline: "center" });
+      }
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, [location.pathname]);
 
   const data = items || [
     { label: "Trending", path: "/" },
@@ -40,9 +48,10 @@ export default function BottomMenu({ items }) {
 
   return (
     <div
+      ref={menuRef}
       style={{
         position: "fixed",
-        top: "60px",       // under top navbar
+        top: "60px", // below top navbar
         left: 0,
         width: "100%",
         height: "50px",

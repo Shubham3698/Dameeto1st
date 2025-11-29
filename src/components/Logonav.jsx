@@ -26,7 +26,7 @@ export default function TopNavbar() {
         </Link>
       </div>
 
-      {/* Center: Label */}
+      {/* Center: Text */}
       <div
         style={{
           flex: 1,
@@ -39,35 +39,14 @@ export default function TopNavbar() {
       </div>
 
       {/* Right: Icons */}
-      <div style={{ display: "flex", gap: "18px", fontSize: "24px" }}>
-        <Link className="icon-no-underline" to="/account" style={{ color: "#fe3d00" }}>
+      <div style={{ display: "flex", gap: "18px", fontSize: "24px", color:"#fe3d00" }}>
+        <Link to="/account">
           <FaUserCircle />
         </Link>
-
-        <Link className="icon-no-underline" to="/cart" style={{ color: "#fe3d00" }}>
+        <Link to="/cart">
           <FaShoppingCart />
         </Link>
       </div>
-
-      {/* ZERO UNDERLINE CSS */}
-      <style>
-        {`
-          .icon-no-underline {
-            text-decoration: none !important;
-          }
-
-          .icon-no-underline:hover,
-          .icon-no-underline:active,
-          .icon-no-underline:focus {
-            text-decoration: none !important;
-          }
-
-          .icon-no-underline::after {
-            display: none !important;
-            content: none !important;
-          }
-        `}
-      </style>
     </div>
   );
 }

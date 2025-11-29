@@ -1,124 +1,27 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MainNavbar from "./components/Maninav";
+import Trending from "./pages/Trending";
+import About from "./pages/About";
+import Sticker from "./pages/Sticker";
+import Poster from "./pages/Poster";
+import Goodies from "./pages/Goodies";
 
-export default function BottomMenu({ items }) {
-  const location = useLocation();
-  const menuRef = useRef(null);
-
-  const [show, setShow] = useState(true);
-  const [lastScroll, setLastScroll] = useState(0);
-
-  // --- Instagram style scroll animation only for bottom menu ---
-  useEffect(() => {
-    const handleScroll = () => {
-      const current = window.scrollY;
-
-      if (current > lastScroll) {
-        setShow(false); // scroll down → hide bottom bar
-      } else {
-        setShow(true); // scroll up → show bottom bar
-      }
-
-      setLastScroll(current);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScroll]);
-
-  // --- Auto scroll to active menu item ---
-  useEffect(() => {
-    const activeItem = menuRef.current.querySelector(".active");
-    if (activeItem) {
-      activeItem.scrollIntoView({ behavior: "smooth", inline: "center" });
-    }
-  }, [location.pathname]);
-
-  const data = items || [
-    { label: "Trending", path: "/" },
-    { label: "About us", path: "/about" },
-    { label: "Sticker", path: "/sticker" },
-    { label: "Poster", path: "/poster" },
-    { label: "Goodies", path: "/goodies" },
-    { label: "Marvel", path: "/marvel" },
-    { label: "Heroic", path: "/heroic" },
-    { label: "Gadgets", path: "/gadgets" },
-    { label: "Photography", path: "/photo" },
-    { label: "Aesthetic", path: "/aesthetic" },
-    { label: "Art", path: "/art" },
-  ];
-
+function App() {
   return (
-    <div
-      ref={menuRef}
-      style={{
-        position: "fixed",
-        top: "60px", // under top navbar
-        left: 0,
-        width: "100%",
-        height: "50px",
-        backgroundColor: "#fff3eb",
-        display: "flex",
-        overflowX: "auto",
-        whiteSpace: "nowrap",
-        alignItems: "center",
-        paddingLeft: "8px",
-        zIndex: 9998,
-        transition: "transform 0.3s ease",
-        transform: show ? "translateY(0)" : "translateY(-100%)",
-      }}
-      className="horizontal-menu"
-    >
-      <style>
-        {`
-        .horizontal-menu::-webkit-scrollbar {
-          display: none;
-        }
+    <div style={{ background: "#fff3eb" }}>
+      <BrowserRouter>
+        <MainNavbar />
 
-        .menu-item {
-          font-family: 'Baloo 2', cursive;
-          padding: 0 14px;
-          margin-right: 14px;
-          font-size: 18px;
-          height: 36px;
-          display: inline-flex;
-          align-items: center;
-          font-weight: 700;
-          text-decoration: none;
-          color: #fe3d00;
-          position: relative;
-        }
-
-        .menu-item::after {
-          content: "";
-          position: absolute;
-          bottom: -2px;
-          left: 50%;
-          transform: translateX(-50%);
-          height: 3px;
-          width: 0%;
-          background: black;
-          transition: width 0.3s ease;
-        }
-
-        .menu-item:hover::after,
-        .menu-item.active::after {
-          width: 60%;
-        }
-        `}
-      </style>
-
-      {data.map((item, i) => (
-        <Link
-          key={i}
-          to={item.path}
-          className={`menu-item ${
-            location.pathname === item.path ? "active" : ""
-          }`}
-        >
-          {item.label}
-        </Link>
-      ))}
+        <Routes>
+          <Route path="/" element={<Trending />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/sticker" element={<Sticker />} />
+          <Route path="/poster" element={<Poster />} />
+          <Route path="/goodies" element={<Goodies />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
+
+export default App;
