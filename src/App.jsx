@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MainNavbar from "./components/MainNavbar";
+import MainNavbar from "./components/Maninav";
 import Trending from "./pages/Trending";
 import About from "./pages/About";
 import Sticker from "./pages/Sticker";
