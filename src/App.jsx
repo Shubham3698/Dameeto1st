@@ -16,10 +16,10 @@ function App() {
     <div style={{background:"#fff3eb"}} >
       <BrowserRouter>
         {/* <HorizontalTopMenu /> */}
-        <div style={{ marginTop: "60px" }}></div>
         {/* <Testnav/> */}
         {/* <Logonav/> */}
         <MNv/>
+        <div style={{ marginTop: "105px" }}></div>
 
         <Routes>
           <Route path="/" element={<Trending />} />
