@@ -6,7 +6,7 @@ export default function TopNavbar() {
   return (
     <div
       style={{
-        width: "100%",
+        width: "100vw",
         height: "60px",
         backgroundColor: "#fff3eb",
         display: "flex",

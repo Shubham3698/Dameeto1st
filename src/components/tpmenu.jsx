@@ -16,12 +16,11 @@ export default function BottomMenu({ items }) {
       else setShow(true);
       setLastScroll(current);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScroll]);
 
-  // Auto scroll to active menu item
+  // Auto scroll active menu item
   useEffect(() => {
     const timeout = setTimeout(() => {
       const activeItem = menuRef.current.querySelector(".active");
@@ -53,7 +52,7 @@ export default function BottomMenu({ items }) {
         position: "fixed",
         top: "60px", // below top navbar
         left: 0,
-        width: "100%",
+        width: "100vw",
         height: "50px",
         backgroundColor: "#fff3eb",
         display: "flex",
@@ -72,7 +71,6 @@ export default function BottomMenu({ items }) {
         .horizontal-menu::-webkit-scrollbar {
           display: none;
         }
-
         .menu-item {
           font-family: 'Baloo 2', cursive;
           padding: 0 14px;
@@ -86,7 +84,6 @@ export default function BottomMenu({ items }) {
           color: #fe3d00;
           position: relative;
         }
-
         .menu-item::after {
           content: "";
           position: absolute;
@@ -98,7 +95,6 @@ export default function BottomMenu({ items }) {
           background: black;
           transition: width 0.3s ease;
         }
-
         .menu-item:hover::after,
         .menu-item.active::after {
           width: 60%;
