@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-export default function HorizontalTopMenu({ items }) {
+export default function BottomMenu({ items }) {
   const location = useLocation();
   const [show, setShow] = useState(true);
   const [lastScroll, setLastScroll] = useState(0);
 
-  // --- Instagram navbar scroll logic ---
+  // --- Instagram style scroll animation only for bottom menu ---
   useEffect(() => {
     const handleScroll = () => {
-      const currentScroll = window.scrollY;
+      const current = window.scrollY;
 
-      if (currentScroll > lastScroll) {
-        setShow(false); // scroll down → hide
+      if (current > lastScroll) {
+        setShow(false); // scroll down → hide bottom bar
       } else {
-        setShow(true); // scroll up → show
+        setShow(true); // scroll up → show bottom bar
       }
 
-      setLastScroll(currentScroll);
+      setLastScroll(current);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -30,11 +30,11 @@ export default function HorizontalTopMenu({ items }) {
     { label: "Sticker", path: "/sticker" },
     { label: "Poster", path: "/poster" },
     { label: "Goodies", path: "/goodies" },
-    { label: "Marval", path: "/marvel" },
+    { label: "Marvel", path: "/marvel" },
     { label: "Heroic", path: "/heroic" },
     { label: "Gadgets", path: "/gadgets" },
     { label: "Photography", path: "/photo" },
-    { label: "Aeshthetic", path: "/aesthetic" },
+    { label: "Aesthetic", path: "/aesthetic" },
     { label: "Art", path: "/art" },
   ];
 
@@ -42,48 +42,40 @@ export default function HorizontalTopMenu({ items }) {
     <div
       style={{
         position: "fixed",
-        top: 0,
+        top: "60px",       // under top navbar
         left: 0,
         width: "100%",
         height: "50px",
         backgroundColor: "#fff3eb",
+        display: "flex",
         overflowX: "auto",
         whiteSpace: "nowrap",
-        display: "flex",
         alignItems: "center",
         paddingLeft: "8px",
-        zIndex: 9999,
+        zIndex: 9998,
         transition: "transform 0.3s ease",
         transform: show ? "translateY(0)" : "translateY(-100%)",
       }}
       className="horizontal-menu"
     >
-      {/* Google Font */}
-      <link
-        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap"
-        rel="stylesheet"
-      />
-
-      {/* CSS */}
-      <style>{`
+      <style>
+        {`
         .horizontal-menu::-webkit-scrollbar {
           display: none;
         }
 
         .menu-item {
-          position: relative;
-          font-family: 'Baloo 2', cursive !important;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0 12px;
+          font-family: 'Baloo 2', cursive;
+          padding: 0 14px;
           margin-right: 14px;
           font-size: 18px;
           height: 36px;
+          display: inline-flex;
+          align-items: center;
           font-weight: 700;
-          cursor: pointer;
           text-decoration: none;
           color: #fe3d00;
+          position: relative;
         }
 
         .menu-item::after {
@@ -95,21 +87,15 @@ export default function HorizontalTopMenu({ items }) {
           height: 3px;
           width: 0%;
           background: black;
-          border-radius: 10px;
-          transition: width 0.3s ease, opacity 0.3s ease;
-          opacity: 0;
+          transition: width 0.3s ease;
         }
 
-        .menu-item:hover::after {
-          width: 60%;
-          opacity: 0.6;
-        }
-
+        .menu-item:hover::after,
         .menu-item.active::after {
           width: 60%;
-          opacity: 1;
         }
-      `}</style>
+        `}
+      </style>
 
       {data.map((item, i) => (
         <Link

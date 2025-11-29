@@ -6,15 +6,20 @@ import Poster from "./pages/Poster"
 import Trending from "./pages/Trending"
 import Goodies from "./pages/Goodies"
 import Testnav from "./components/Testnav"
+import Logonav from "./components/Logonav"
+import MNv from "./components/Maninav"
+
 // import { div } from "framer-motion/client";
 
 function App() {
   return (
     <div style={{background:"#fff3eb"}} >
       <BrowserRouter>
-        <HorizontalTopMenu />
+        {/* <HorizontalTopMenu /> */}
         <div style={{ marginTop: "60px" }}></div>
         {/* <Testnav/> */}
+        {/* <Logonav/> */}
+        <MNv/>
 
         <Routes>
           <Route path="/" element={<Trending />} />
