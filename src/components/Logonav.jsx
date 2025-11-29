@@ -39,9 +39,29 @@ export default function TopNavbar() {
 
       {/* Right: Icons */}
       <div style={{ display: "flex", gap: "18px", fontSize: "22px" }}>
-        <Link to="/account" style={{ color: "#fe3d00" }}>👤</Link>
-        <Link to="/cart" style={{ color: "#fe3d00" }}>🛒</Link>
+        <Link className="icon-no-underline" to="/account" style={{ color: "#fe3d00" }}>
+          👤
+        </Link>
+        <Link className="icon-no-underline" to="/cart" style={{ color: "#fe3d00" }}>
+          🛒
+        </Link>
       </div>
+
+      {/* ZERO underline CSS */}
+      <style>
+        {`
+          .icon-no-underline {
+            text-decoration: none !important;
+          }
+
+          .icon-no-underline::after,
+          .icon-no-underline:hover::after,
+          .icon-no-underline:active::after {
+            display: none !important;
+            content: none !important;
+          }
+        `}
+      </style>
     </div>
   );
 }
