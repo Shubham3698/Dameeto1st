@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 
 export default function TopNavbar() {
   return (
@@ -25,7 +26,7 @@ export default function TopNavbar() {
         </Link>
       </div>
 
-      {/* Center: Text */}
+      {/* Center: Label */}
       <div
         style={{
           flex: 1,
@@ -38,25 +39,30 @@ export default function TopNavbar() {
       </div>
 
       {/* Right: Icons */}
-      <div style={{ display: "flex", gap: "18px", fontSize: "22px" }}>
+      <div style={{ display: "flex", gap: "18px", fontSize: "24px" }}>
         <Link className="icon-no-underline" to="/account" style={{ color: "#fe3d00" }}>
-          👤
+          <FaUserCircle />
         </Link>
+
         <Link className="icon-no-underline" to="/cart" style={{ color: "#fe3d00" }}>
-          🛒
+          <FaShoppingCart />
         </Link>
       </div>
 
-      {/* ZERO underline CSS */}
+      {/* ZERO UNDERLINE CSS */}
       <style>
         {`
           .icon-no-underline {
             text-decoration: none !important;
           }
 
-          .icon-no-underline::after,
-          .icon-no-underline:hover::after,
-          .icon-no-underline:active::after {
+          .icon-no-underline:hover,
+          .icon-no-underline:active,
+          .icon-no-underline:focus {
+            text-decoration: none !important;
+          }
+
+          .icon-no-underline::after {
             display: none !important;
             content: none !important;
           }
