@@ -9,7 +9,7 @@ export default function MainNavbar() {
       <BottomMenu />
 
       {/* Gap so content does not go behind navbars */}
-      <div style={{ height: "110px" }}></div>
+      {/* <div style={{ height: "110px" }}></div> */}
     </>
   );
 }
