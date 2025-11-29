@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import heroImg from "../assets/dmtl.jpg"; // <-- image added here
+import FAQ from "../components/Faq";
 
 export default function About() {
   return (
@@ -78,6 +79,7 @@ export default function About() {
             href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
             rel="stylesheet"
           />
+          <FAQ/>
           <Button
             style={{
               background: "white",

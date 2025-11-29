@@ -4,6 +4,7 @@ import About from "./pages/about";
 import Sticker from "./pages/Sticker";
 import Poster from "./pages/Poster"
 import Trending from "./pages/Trending"
+import Goodies from "./pages/Goodies"
 // import { div } from "framer-motion/client";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/sticker" element={<Sticker/>} />
           <Route path="/poster" element={<Poster/>} />
+          <Route path="/goodies" element={<Goodies/>} />
         </Routes>
       </BrowserRouter>
     </div>
