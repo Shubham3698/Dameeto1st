@@ -7,6 +7,7 @@ import Goodies from "./pages/Goodies"
 import MNv from "./components/Maninav"
 import CartPage from "./pages/Cart";
 import ImageDetails from "./pages/Details";
+import User from './pages/User'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/goodies" element={<Goodies/>} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/image-details" element={<ImageDetails />} />
+          <Route path="/account" element={<User />} />
         </Routes>
       </BrowserRouter>
     </div>
