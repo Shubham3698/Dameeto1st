@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import Sticker from "./Sticker";
@@ -14,11 +14,14 @@ export default function ImageDetails() {
   const longDesc =
     "This sticker is crafted with precision, representing emotions, vibes, personality and style. It fits perfectly on phone covers, laptops, notebooks etc.";
 
+  // Scroll to top whenever `img` changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [img]);
+
   return (
     <div style={{ background: "#fff3eb", minHeight: "100vh", padding: "20px" }}>
-
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-
         {/* Full Image */}
         <img
           src={img}
@@ -87,7 +90,9 @@ export default function ImageDetails() {
             <FaHeart />
           </button>
         </div>
-        <Sticker/>
+
+        {/* Sticker Section */}
+        <Sticker />
       </div>
     </div>
   );
