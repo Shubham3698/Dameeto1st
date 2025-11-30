@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Row, Col, Image } from "react-bootstrap";
+import WhatsAppBtn from "../components/Watspp";
 
 export default function CartPage() {
   return (
@@ -89,9 +90,25 @@ export default function CartPage() {
 
           {/* Quantity */}
           <Col xs={4} md={2} className="d-flex align-items-center">
-            <button style={{ background: "transparent", border: "none", fontSize: "20px" }}>–</button>
+            <button
+              style={{
+                background: "transparent",
+                border: "none",
+                fontSize: "20px",
+              }}
+            >
+              –
+            </button>
             <span className="mx-2">1</span>
-            <button style={{ background: "transparent", border: "none", fontSize: "20px" }}>+</button>
+            <button
+              style={{
+                background: "transparent",
+                border: "none",
+                fontSize: "20px",
+              }}
+            >
+              +
+            </button>
           </Col>
 
           {/* Remove */}
@@ -108,6 +125,14 @@ export default function CartPage() {
             </button>
           </Col>
         </Row>
+
+        {/* WHATSAPP BUTTON (Perfect & working) */}
+        <div className="mt-4">
+          <WhatsAppBtn
+            phone="7080981033"
+            message="Hi! I want to confirm my cart order."
+          />
+        </div>
       </Container>
     </div>
   );
