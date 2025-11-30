@@ -3,6 +3,7 @@ import Nwmasonry from "../components/Nwmasonry";
 
 export default function Sticker() {
   const stickerImages = [
+    "https://i.pinimg.com/originals/11/39/64/1139647b65167a1c2a9f5895b58083b2.gif",
     "https://i.pinimg.com/1200x/5a/ad/0a/5aad0a8534ff652ffab1788930547741.jpg",
     "https://i.pinimg.com/736x/48/ba/91/48ba918c7fbdeee6056a7e664f35481b.jpg",
     "https://i.pinimg.com/1200x/8b/0c/14/8b0c14adee9fc943bc139a125a0fc400.jpg",
