@@ -5,7 +5,7 @@ export default function UserAccount() {
   // Dummy data for now
   const user = {
     name: "Shubham Pandey",
-    email: "shubham@example.com",
+    email: "Pandey0shubham3698@gmail.com",
     credits: 500,
     orders: 12,
     wishlist: 7,
