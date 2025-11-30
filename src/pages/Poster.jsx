@@ -1,7 +1,7 @@
 import React from "react";
 import Nwmasonry from "../components/Nwmasonry";
 
-export default function Sticker() {
+export default function Poster() {
   const stickerImages = [
     "https://i.pinimg.com/1200x/45/92/05/459205eebadf7b7d58be92bb1286a971.jpg",
     "https://i.pinimg.com/736x/60/2c/d7/602cd7ebc5cd8c71aef67b4338fb1997.jpg",
@@ -14,9 +14,5 @@ export default function Sticker() {
     "https://i.pinimg.com/736x/cf/a3/ae/cfa3ae0c9a718fea7295e7f07887c38e.jpg",
   ];
 
-  return (
-    <div>
-      <Nwmasonry images={stickerImages} />
-    </div>
-  );
+  return <Nwmasonry images={stickerImages} categoryName="poster" />;
 }

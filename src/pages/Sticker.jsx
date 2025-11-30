@@ -14,5 +14,5 @@ export default function Sticker() {
     "https://i.pinimg.com/1200x/da/d0/ae/dad0ae19bc31931008317564ba5ff832.jpg"
   ];
 
-  return <Nwmasonry images={stickerImages} />;
+  return <Nwmasonry images={stickerImages} categoryName="sticker" />;
 }

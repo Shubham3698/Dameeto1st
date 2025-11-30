@@ -25,7 +25,7 @@ export default function Sticker() {
 
   return (
     <div>
-      <Nwmasonry images={stickerImages} />
+      <Nwmasonry images={stickerImages} categoryName="Goodies" />
     </div>
   );
 }

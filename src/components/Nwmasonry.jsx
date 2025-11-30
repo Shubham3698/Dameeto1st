@@ -2,11 +2,17 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function Nwmasonry({ images }) {
+export default function Nwmasonry({ images, categoryName }) {
   const navigate = useNavigate();
 
   const handleClick = (src) => {
-    navigate("/image-details", { state: { src } });
+    navigate("/image-details", {
+      state: {
+        src,
+        category: categoryName,
+        images,
+      },
+    });
   };
 
   return (
