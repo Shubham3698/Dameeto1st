@@ -5,19 +5,18 @@ import Nwmasonry from "../components/Nwmasonry";
 
 export default function ImageDetails() {
   const { state } = useLocation();
+  const item = state?.item;
 
-  const mainImage = state?.src;
-  const fromCategory = state?.category ;
+  const mainImage = item?.src;
+  const fromCategory = state?.category;
   const relatedImages = state?.images || [];
 
   const [expanded, setExpanded] = useState(false);
 
-  const title = "Beautiful Sticker Design";
-  const shortDesc = "This is a high-quality premium sticker design.";
-  const longDesc =
-    "This sticker is crafted with precision, representing emotions, vibes, personality and style. It fits perfectly on phone covers, laptops, notebooks etc.";
+  const title = item?.title;
+  const shortDesc = item?.shortDesc;
+  const longDesc = item?.longDesc;
 
-  // Scroll to top on image change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [mainImage]);
@@ -25,40 +24,34 @@ export default function ImageDetails() {
   return (
     <div style={{ background: "#fff3eb", minHeight: "100vh", padding: "20px" }}>
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-        {/* Main Image */}
+
         <img
           src={mainImage}
-          alt="Selected"
           style={{
             width: "100%",
             borderRadius: "16px",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.2)"
           }}
         />
 
-        {/* Title */}
         <h2 className="mt-4">{title}</h2>
 
-        {/* Description */}
         <p style={{ fontSize: "16px", opacity: 0.8 }}>
           {expanded ? longDesc : shortDesc}
         </p>
 
-        {/* Expand Button */}
         <button
           onClick={() => setExpanded(!expanded)}
           style={{
-            border: "none",
             background: "transparent",
             color: "#fe3d00",
+            border: "none",
             fontWeight: "600",
-            cursor: "pointer",
           }}
         >
           {expanded ? "Show Less ▲" : "Read More ▼"}
         </button>
 
-        {/* Action Buttons */}
         <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
           <button
             style={{
@@ -94,9 +87,8 @@ export default function ImageDetails() {
           </button>
         </div>
 
-        {/* Related Images Section */}
         <h3 className="mt-5 text-capitalize">More from {fromCategory}</h3>
-        <Nwmasonry images={relatedImages} pageName={fromCategory} />
+        <Nwmasonry images={relatedImages} categoryName={fromCategory} />
       </div>
     </div>
   );

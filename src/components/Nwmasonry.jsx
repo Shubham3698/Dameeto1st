@@ -5,10 +5,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 export default function Nwmasonry({ images, categoryName }) {
   const navigate = useNavigate();
 
-  const handleClick = (src) => {
+  const handleClick = (item) => {
     navigate("/image-details", {
       state: {
-        src,
+        item,
         category: categoryName,
         images,
       },
@@ -58,8 +58,13 @@ export default function Nwmasonry({ images, categoryName }) {
       `}</style>
 
       <div className="masonry">
-        {images?.map((src, i) => (
-          <img key={i} src={src} alt="" onClick={() => handleClick(src)} />
+        {images?.map((item, i) => (
+          <img
+            key={i}
+            src={item.src}
+            alt=""
+            onClick={() => handleClick(item)}
+          />
         ))}
       </div>
     </div>
