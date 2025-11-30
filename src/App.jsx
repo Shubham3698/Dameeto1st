@@ -5,6 +5,8 @@ import Poster from "./pages/Poster"
 import Trending from "./pages/Trending"
 import Goodies from "./pages/Goodies"
 import MNv from "./components/Maninav"
+import CartPage from "./pages/Cart";
+import ImageDetails from "./pages/Details";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
           <Route path="/sticker" element={<Sticker/>} />
           <Route path="/poster" element={<Poster/>} />
           <Route path="/goodies" element={<Goodies/>} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/image-details" element={<ImageDetails />} />
         </Routes>
       </BrowserRouter>
     </div>

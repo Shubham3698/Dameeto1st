@@ -1,10 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Nwmasonry({ images }) {
+  const navigate = useNavigate();
+
+  const handleClick = (src) => {
+    navigate("/image-details", { state: { src } });
+  };
+
   return (
     <div style={{ background: "#fff3eb" }} className="container py-4">
-
       <style>{`
         .masonry {
           column-count: 1;
@@ -36,6 +42,7 @@ export default function Nwmasonry({ images }) {
           break-inside: avoid;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
           box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+          cursor: pointer;
         }
 
         .masonry img:hover {
@@ -46,10 +53,9 @@ export default function Nwmasonry({ images }) {
 
       <div className="masonry">
         {images?.map((src, i) => (
-          <img key={i} src={src} alt="" />
+          <img key={i} src={src} alt="" onClick={() => handleClick(src)} />
         ))}
       </div>
-
     </div>
   );
 }

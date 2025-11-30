@@ -31,7 +31,7 @@ export default function Navbar() {
         bottom: 0,
         left: 0,
         width: "100%",
-        background: "#fff",
+        background: "#ce0000ff",
         padding: "12px 0",
         boxShadow: "0px -2px 10px rgba(0,0,0,0.1)",
         display: "flex",
