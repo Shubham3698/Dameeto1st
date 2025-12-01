@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Container, Row, Col, Image } from "react-bootstrap";
 import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
@@ -6,18 +6,26 @@ import { CartContext } from "../contexAndhooks/CartContext";
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity } = useContext(CartContext);
 
-  // ✅ Dynamic message
+  const cartEndRef = useRef(null);
+
+  // Scroll to bottom whenever cartItems change
+  useEffect(() => {
+    if (cartEndRef.current) {
+      cartEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [cartItems]);
+
   const generateWhatsAppMessage = () => {
     if (cartItems.length === 0) return "Hi! I have a query about your products.";
-    
+
     let msg = "Hi! I want to order the following items:\n";
     let total = 0;
-    
+
     cartItems.forEach((item, index) => {
       msg += `${index + 1}. ${item.title} - Quantity: ${item.quantity} - Price: ₹${item.price * item.quantity}\n`;
       total += item.price * item.quantity;
     });
-    
+
     msg += `Total Price: ₹${total}`;
     return msg;
   };
@@ -73,7 +81,10 @@ export default function CartPage() {
           ))
         )}
 
-        {/* ✅ WhatsApp button hamesha visible */}
+        {/* Invisible div to scroll into view */}
+        <div ref={cartEndRef}></div>
+
+        {/* WhatsApp button */}
         <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage()} />
       </Container>
     </div>
