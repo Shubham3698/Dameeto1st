@@ -1,8 +1,18 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
+import Logo from "../assets/lg.png"; // <-- your round logo
 
 export default function TopNavbar() {
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && query.trim() !== "") {
+      navigate(`/search-results?query=${query}`);
+    }
+  };
+
   return (
     <div
       style={{
@@ -12,34 +22,62 @@ export default function TopNavbar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0 16px",
+        padding: "0 12px",
         position: "fixed",
         top: 0,
         left: 0,
         zIndex: 9999,
       }}
     >
-      {/* Left: Logo */}
-      <div style={{ fontSize: "24px", fontWeight: "800", color: "#fe3d00" }}>
-        <Link to="/" style={{ color: "#fe3d00", textDecoration: "none" }}>
-          Dameeto
-        </Link>
+      {/* LEFT: Circular Logo */}
+      <div style={{ marginRight: "10px" }}>
+        <img
+          src={Logo}
+          alt="logo"
+          style={{
+            marginTop:"4px",
+            marginLeft:"2px",
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            objectFit: "cover",
+            cursor: "pointer",
+          }}
+          onClick={() => navigate("/")}
+        />
       </div>
 
-      {/* Center: Label */}
+      {/* CENTER: Search Bar */}
       <div
         style={{
           flex: 1,
-          textAlign: "center",
-          fontSize: "20px",
-          fontWeight: "700",
+          display: "flex",
+          justifyContent: "center",
         }}
       >
-        Explore
+        <input
+          type="text"
+          placeholder="Search Sticker & Goodies..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyPress}
+          style={{
+            marginTop: "5px",
+            width: "92%",
+            maxWidth: "450px",
+            height: "38px",
+            borderRadius: "20px",
+            padding: "0 14px",
+            border: "1px solid #ffb291",
+            outline: "none",
+            fontSize: "15px",
+            backgroundColor: "#ffffff",
+          }}
+        />
       </div>
 
-      {/* Right: Icons */}
-      <div style={{ display: "flex", gap: "18px", fontSize: "24px" }}>
+      {/* RIGHT: Icons */}
+      <div style={{ display: "flex", gap: "16px", fontSize: "24px" }}>
         <Link className="icon-no-underline" to="/account" style={{ color: "#fe3d00" }}>
           <FaUserCircle />
         </Link>
@@ -49,22 +87,17 @@ export default function TopNavbar() {
         </Link>
       </div>
 
-      {/* ZERO UNDERLINE CSS */}
       <style>
         {`
           .icon-no-underline {
             text-decoration: none !important;
           }
 
-          .icon-no-underline:hover,
-          .icon-no-underline:active,
-          .icon-no-underline:focus {
-            text-decoration: none !important;
-          }
-
-          .icon-no-underline::after {
-            display: none !important;
-            content: none !important;
+          @media (max-width: 480px) {
+            input {
+              font-size: 14px !important;
+              height: 34px !important;
+            }
           }
         `}
       </style>

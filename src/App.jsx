@@ -8,6 +8,8 @@ import MNv from "./components/Maninav";
 import CartPage from "./pages/Cart";
 import ImageDetails from "./pages/Details";
 import User from './pages/User';
+import SearchPage from "./pages/SearchPage";
+import SearchResults from "./pages/SearchResults";
 
 import { CartProvider } from "./contexAndhooks/CartProvider"; 
 
@@ -26,6 +28,8 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/image-details" element={<ImageDetails />} />
             <Route path="/account" element={<User />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/search-results" element={<SearchResults />} />
           </Routes>
         </BrowserRouter>
       </div>
