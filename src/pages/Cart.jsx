@@ -5,14 +5,15 @@ import { CartContext } from "../contexAndhooks/CartContext";
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity } = useContext(CartContext);
-
   const cartEndRef = useRef(null);
+  const prevCartLengthRef = useRef(cartItems.length);
 
-  // Scroll to bottom whenever cartItems change
+  // Scroll only when new items are added
   useEffect(() => {
-    if (cartEndRef.current) {
-      cartEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (cartItems.length > prevCartLengthRef.current) {
+      cartEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
+    prevCartLengthRef.current = cartItems.length;
   }, [cartItems]);
 
   const generateWhatsAppMessage = () => {
