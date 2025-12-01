@@ -5,6 +5,13 @@ import Prgg from "../assets/prg.jpg";
 export default function Goodies() {
   const stickerImages = [
     {
+      src: "https://i.pinimg.com/736x/63/26/50/632650d4a548158dfc3120f93ca95ce1.jpg",
+      title: "Premium Goodies Pack",
+      shortDesc: "Exclusive custom design.",
+      longDesc:
+        "A premium goodies item crafted for unique style, vibes, and personal expression."
+    },
+    {
       src: Prgg,
       title: "Premium Goodies Pack",
       shortDesc: "Exclusive custom design.",
@@ -20,6 +27,13 @@ export default function Goodies() {
     },
     {
       src: "https://i.pinimg.com/1200x/d6/d1/93/d6d193915dc45cf446b9c16627d278da.jpg",
+      title: "Moody Art Goodie",
+      shortDesc: "High-resolution art.",
+      longDesc:
+        "Ideal for those who love expressive art and stylish mood-based designs."
+    },
+    {
+      src: "https://i.pinimg.com/1200x/d0/69/62/d0696284e5a0ecf0ed79af0675331ca6.jpg",
       title: "Moody Art Goodie",
       shortDesc: "High-resolution art.",
       longDesc:

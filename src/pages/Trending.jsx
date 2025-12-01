@@ -11,7 +11,28 @@ export default function Trending() {
         "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions."
     },
     {
+      src: "https://i.pinimg.com/1200x/00/a4/94/00a494141a36a87a4ecad3865592c8b4.jpg",
+      title: "Animated Aesthetic GIF",
+      shortDesc: "Smooth loop animation.",
+      longDesc:
+        "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions."
+    },
+    {
+      src: "https://i.pinimg.com/1200x/b2/ba/fb/b2bafb418b82abb211bde55889125d16.jpg",
+      title: "Animated Aesthetic GIF",
+      shortDesc: "Smooth loop animation.",
+      longDesc:
+        "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions."
+    },
+    {
       src: "https://i.pinimg.com/1200x/5a/ad/0a/5aad0a8534ff652ffab1788930547741.jpg",
+      title: "Aesthetic Girl Art",
+      shortDesc: "Premium digital artwork.",
+      longDesc:
+        "Trending aesthetic girl illustration perfect for covers, wallpapers, and designs."
+    },
+    {
+      src: "https://i.pinimg.com/736x/c6/3f/f5/c63ff5143c6919ff422f735bab715dc3.jpg",
       title: "Aesthetic Girl Art",
       shortDesc: "Premium digital artwork.",
       longDesc:
@@ -26,6 +47,20 @@ export default function Trending() {
     },
     {
       src: "https://i.pinimg.com/1200x/8b/0c/14/8b0c14adee9fc943bc139a125a0fc400.jpg",
+      title: "Moody Girl Illustration",
+      shortDesc: "Minimal clean art.",
+      longDesc:
+        "Soft shades and emotional aesthetic artwork, suitable for any theme."
+    },
+    {
+      src: "https://i.pinimg.com/736x/15/64/6c/15646ca71fc337aee3307db372b6e767.jpg",
+      title: "Moody Girl Illustration",
+      shortDesc: "Minimal clean art.",
+      longDesc:
+        "Soft shades and emotional aesthetic artwork, suitable for any theme."
+    },
+    {
+      src: "https://i.pinimg.com/1200x/c5/aa/38/c5aa38ad698123fa88b13b02bcf90c12.jpg",
       title: "Moody Girl Illustration",
       shortDesc: "Minimal clean art.",
       longDesc:
