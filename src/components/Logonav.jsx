@@ -37,8 +37,8 @@ export default function TopNavbar() {
           style={{
             marginTop:"4px",
             marginLeft:"2px",
-            width: "40px",
-            height: "40px",
+            width: "45px",
+            height: "45px",
             borderRadius: "50%",
             objectFit: "cover",
             cursor: "pointer",
