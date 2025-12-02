@@ -4,6 +4,14 @@ import Prgg from "../assets/prg.jpg";
 
 export default function Goodies() {
   const stickerImages = [
+        {
+      src: "https://i.pinimg.com/1200x/b2/ba/fb/b2bafb418b82abb211bde55889125d16.jpg",
+      title: "Lxuary car sticker",
+      shortDesc: "Smooth loop animation.",
+      longDesc:
+        "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+      price: 199
+    },
     {
       src: "https://i.pinimg.com/736x/63/26/50/632650d4a548158dfc3120f93ca95ce1.jpg",
       title: "Premium Goodies Pack",

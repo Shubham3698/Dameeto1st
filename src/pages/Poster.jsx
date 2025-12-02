@@ -3,6 +3,7 @@ import Nwmasonry from "../components/Nwmasonry";
 
 export default function Poster() {
   const stickerImages = [
+    
     {
       src: "https://i.pinimg.com/originals/5e/52/03/5e5203bc54a8b079e74b99f79a282317.gif",
       title: "Retro Motion Poster",

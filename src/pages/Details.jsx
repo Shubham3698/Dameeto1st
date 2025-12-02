@@ -23,8 +23,16 @@ export default function ImageDetails() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [mainImage]);
 
+  // 🔥 FIXED: full object added to cart
   const handleAddToCart = () => {
-    addToCart({ src: mainImage, title, price });
+    addToCart({
+      src: mainImage,
+      title,
+      shortDesc,
+      longDesc,
+      price
+    });
+
     alert(`${title} added to cart!`);
   };
 

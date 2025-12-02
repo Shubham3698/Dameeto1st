@@ -10,15 +10,17 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Add item to cart, merge if already exists
+  // Add item to cart (FIXED 🔥)
   const addToCart = (item) => {
     setCartItems((prev) => {
-      const existingIndex = prev.findIndex(i => i.title === item.title);
+      // 🔥 FIX: Compare using src (NOT title)
+      const existingIndex = prev.findIndex(i => i.src === item.src);
+
       if (existingIndex !== -1) {
         const updated = [...prev];
         updated[existingIndex] = {
           ...updated[existingIndex],
-          quantity: updated[existingIndex].quantity + 1 // +1 only
+          quantity: updated[existingIndex].quantity + 1
         };
         return updated;
       } else {
@@ -27,12 +29,12 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  // Remove item completely
+  // Remove item
   const removeFromCart = (index) => {
     setCartItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Update quantity +1 or -1
+  // Update qty
   const updateQuantity = (index, amount) => {
     setCartItems((prev) => {
       const updated = [...prev];
@@ -40,13 +42,15 @@ export const CartProvider = ({ children }) => {
         ...updated[index],
         quantity: updated[index].quantity + amount
       };
-      if (updated[index].quantity <= 0) updated.splice(index, 1); // remove if 0
+      if (updated[index].quantity <= 0) updated.splice(index, 1);
       return updated;
     });
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity }}>
+    <CartContext.Provider
+      value={{ cartItems, addToCart, removeFromCart, updateQuantity }}
+    >
       {children}
     </CartContext.Provider>
   );
