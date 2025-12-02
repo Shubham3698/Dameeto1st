@@ -31,8 +31,14 @@ export default function FAQ() {
   };
 
   return (
-    <div style={{ background: "#fff3eb", padding: "20px" }}>
-      <h2 style={{ textAlign: "center", fontWeight: "900", marginBottom: "20px" }}>
+    <div style={{ padding: "20px" }}>
+      <h2
+        style={{
+          textAlign: "center",
+          fontWeight: "900",
+          marginBottom: "20px",
+        }}
+      >
         Frequently Asked Questions
       </h2>
 
@@ -41,12 +47,9 @@ export default function FAQ() {
           <div
             key={index}
             style={{
-              background: "white",
-              borderRadius: "10px",
-              marginBottom: "10px",
-              padding: "15px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+              padding: "12px 5px",
               cursor: "pointer",
+              borderBottom: "1px solid #ddd",
             }}
             onClick={() => toggleFAQ(index)}
           >
@@ -68,8 +71,8 @@ export default function FAQ() {
             {openIndex === index && (
               <div
                 style={{
-                  marginTop: "10px",
-                  color: "#444",
+                  marginTop: "8px",
+                  color: "#555",
                   lineHeight: "1.6",
                   fontSize: "15px",
                 }}

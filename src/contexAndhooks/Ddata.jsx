@@ -380,3 +380,25 @@ export const goodiesData = [
   }
 ];
 
+
+// Yeh component ke bahar rakho
+export const cardSlides = [
+  {
+    title: "Who We Are",
+    text: "Dameeto is a brand built on reflection..."
+  },
+  {
+    title: "Our Vision",
+    text: "Our mission is to bring your desk..."
+  },
+  {
+    title: "Quality Promise",
+    text: "Every product we create undergoes premium UV-DTF printing..."
+  },
+  {
+    title: "What Makes Dameeto Special?",
+    text: "We believe designs speak louder than words..."
+  }
+];
+
+
