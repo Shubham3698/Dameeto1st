@@ -141,7 +141,7 @@ export const trendingData = [
   {
     src: "https://i.pinimg.com/1200x/8b/0c/14/8b0c14adee9fc943bc139a125a0fc400.jpg",
     title: "Moody Girl Illustration",
-    tag: "Trending",
+    tag: "Trending gta",
     shortDesc: "Minimal clean art.",
     longDesc:
       "Soft shades and emotional aesthetic artwork, suitable for any theme.",
