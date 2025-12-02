@@ -1,15 +1,19 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { stickerData } from "../contexAndhooks/Ddata";
+import { stickerData, trendingData, posterData, goodiesData } from "../contexAndhooks/Ddata";
 
 export default function SearchResults() {
   const navigate = useNavigate();
   const query = new URLSearchParams(useLocation().search).get("query")?.toLowerCase();
 
-  const results = stickerData.filter(
+  // Merge all data arrays into a single array
+  const allData = [...stickerData, ...trendingData, ...posterData, ...goodiesData];
+
+  // Filter based on query matching title or tag
+  const results = allData.filter(
     (item) =>
       item.title.toLowerCase().includes(query) ||
-      item.tag.toLowerCase().includes(query)
+      (item.tag && item.tag.toLowerCase().includes(query))
   );
 
   const openImage = (item) => {
@@ -60,7 +64,7 @@ export default function SearchResults() {
               <img
                 key={i}
                 src={item.src}
-                alt=""
+                alt={item.title}
                 onClick={() => openImage(item)}
               />
             ))}
