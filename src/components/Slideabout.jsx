@@ -59,15 +59,14 @@ export default function SlideAbout() {
       <Swiper
         modules={[Pagination, Autoplay]}
         pagination={{ clickable: true }}
-        // 🛠️ The modification is here
+        // Autoplay settings:
         autoplay={{
           delay: 2500,
-          // This setting makes Autoplay NOT stop when user interacts (like clicking/holding or swiping).
-          // However, by default, Swiper's Autoplay will PAUSE when you hover/click-hold on the slider.
-          // Since you want it to pause on click-hold, the default behavior of Swiper usually handles this.
-          // But to be sure it resumes after interaction, we'll use a setting that works well with this:
-          disableOnInteraction: false, 
-          pauseOnMouseEnter: true // Optional: Also pauses when mouse is over the slider
+          // 1. disableOnInteraction: false - सुनिश्चित करता है कि जब आप क्लिक करना छोड़ दें तो Autoplay अपने आप फिर से शुरू हो जाए।
+          disableOnInteraction: false,
+          // 2. pauseOnMouseEnter: true - यह सुनिश्चित करता है कि जब आप माउस को स्लाइडर पर लाते हैं (hover/click-hold),
+          // तो Autoplay रुक जाए। यही वह सेटिंग है जो आपके "क्लिक होल्ड" की आवश्यकता को पूरा करती है।
+          pauseOnMouseEnter: true,
         }}
         spaceBetween={20}
         speed={600}
