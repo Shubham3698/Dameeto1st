@@ -14,23 +14,27 @@ export default function ImageDetails() {
   const relatedImages = state?.images || [];
 
   const [expanded, setExpanded] = useState(false);
+
   const title = item?.title;
   const shortDesc = item?.shortDesc;
   const longDesc = item?.longDesc;
-  const price = item?.price || 199;
+
+  // Prices
+  const price = item?.price ?? 199;                  // selling price
+  const originalPrice = item?.originalPrice ?? null; // MRP
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [mainImage]);
 
-  // 🔥 FIXED: full object added to cart
   const handleAddToCart = () => {
     addToCart({
       src: mainImage,
       title,
       shortDesc,
       longDesc,
-      price
+      price,
+      originalPrice
     });
 
     alert(`${title} added to cart!`);
@@ -41,10 +45,33 @@ export default function ImageDetails() {
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
         <img
           src={mainImage}
-          style={{ width: "100%", borderRadius: "16px", boxShadow: "0 6px 20px rgba(0,0,0,0.2)" }}
+          style={{
+            width: "100%",
+            borderRadius: "16px",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+          }}
         />
 
         <h2 className="mt-4">{title}</h2>
+
+        {/* ⭐ Price UI */}
+        <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "12px" }}>
+          <span style={{ color: "#fe3d00", fontSize: "26px", fontWeight: "700" }}>
+            ₹{price}
+          </span>
+
+          {originalPrice && (
+            <span
+              style={{
+                fontSize: "18px",
+                textDecoration: "line-through",
+                color: "#777",
+              }}
+            >
+              ₹{originalPrice}
+            </span>
+          )}
+        </div>
 
         <p style={{ fontSize: "16px", opacity: 0.8 }}>
           {expanded ? longDesc : shortDesc}
@@ -52,7 +79,12 @@ export default function ImageDetails() {
 
         <button
           onClick={() => setExpanded(!expanded)}
-          style={{ background: "transparent", color: "#fe3d00", border: "none", fontWeight: "600" }}
+          style={{
+            background: "transparent",
+            color: "#fe3d00",
+            border: "none",
+            fontWeight: "600",
+          }}
         >
           {expanded ? "Show Less ▲" : "Read More ▼"}
         </button>

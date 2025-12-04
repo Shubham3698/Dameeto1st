@@ -8,7 +8,6 @@ export default function CartPage() {
   const cartEndRef = useRef(null);
   const prevCartLengthRef = useRef(cartItems.length);
 
-  // Scroll only when new items are added
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
       cartEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -23,7 +22,7 @@ export default function CartPage() {
     let total = 0;
 
     cartItems.forEach((item, index) => {
-      msg += `${index + 1}. ${item.title} - Quantity: ${item.quantity} - Price: ₹${item.price * item.quantity}\n`;
+      msg += `${index + 1}. ${item.title} - Qty: ${item.quantity} - Price: ₹${item.price * item.quantity}\n`;
       total += item.price * item.quantity;
     });
 
@@ -51,7 +50,25 @@ export default function CartPage() {
 
               <Col xs={5} md={6}>
                 <h5 style={{ margin: 0 }}>{item.title}</h5>
-                <p style={{ margin: 0 }}>₹{item.price}</p>
+
+                {/* ⭐ Price UI in Cart */}
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span style={{ fontSize: "20px", fontWeight: "700", color: "#fe3d00" }}>
+                    ₹{item.price}
+                  </span>
+
+                  {item.originalPrice && (
+                    <span
+                      style={{
+                        fontSize: "16px",
+                        color: "#777",
+                        textDecoration: "line-through",
+                      }}
+                    >
+                      ₹{item.originalPrice}
+                    </span>
+                  )}
+                </div>
               </Col>
 
               <Col xs={4} md={2} className="d-flex align-items-center">
@@ -82,10 +99,8 @@ export default function CartPage() {
           ))
         )}
 
-        {/* Invisible div to scroll into view */}
         <div ref={cartEndRef}></div>
 
-        {/* WhatsApp button */}
         <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage()} />
       </Container>
     </div>

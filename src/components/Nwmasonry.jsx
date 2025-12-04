@@ -8,7 +8,7 @@ export default function Nwmasonry({ images, categoryName }) {
   const handleClick = (item) => {
     navigate("/image-details", {
       state: {
-        item,
+        item,           // 👈 full object pass ho raha hai
         category: categoryName,
         images,
       },
