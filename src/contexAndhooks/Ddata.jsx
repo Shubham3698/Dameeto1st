@@ -108,6 +108,16 @@ export const stickerData = [
 
 export const trendingData = [
   {
+    src: "https://i.pinimg.com/736x/da/f2/93/daf293b49f030d1f984ee659f18b8e05.jpg",
+    title: "Pocoyo Sticker",
+    tag: "Trending",
+    shortDesc: "Smooth loop animation.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
     src: "https://i.pinimg.com/originals/11/39/64/1139647b65167a1c2a9f5895b58083b2.gif",
     title: "Pocoyo Sticker",
     tag: "Trending",
@@ -128,6 +138,26 @@ export const trendingData = [
     finalPrice: 99,
   },
   {
+    src: "https://i.pinimg.com/736x/a2/ff/6c/a2ff6cef71615787f49719fb70d7a085.jpg",
+    title: "bgmi ",
+    tag: "Trending",
+    shortDesc: "Smooth loop animation.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
+    src: "https://i.pinimg.com/736x/cf/cb/e2/cfcbe23a1a3473986975bfb6917eede4.jpg",
+    title: "Animated Aesthetic GIF",
+    tag: "Trending",
+    shortDesc: "Smooth loop animation.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
     src: "https://i.pinimg.com/1200x/b2/ba/fb/b2bafb418b82abb211bde55889125d16.jpg",
     title: "Luxury Car Sticker",
     tag: "Trending",
@@ -138,8 +168,68 @@ export const trendingData = [
     finalPrice: 99,
   },
   {
+    src: "https://i.pinimg.com/736x/fc/ef/c9/fcefc989fa89ae548289ddab0f1a95f9.jpg",
+    title: "GTA_VI sticker",
+    tag: "Trending",
+    shortDesc: "Premium glossy design.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
+    src: "https://i.pinimg.com/736x/c4/43/b8/c443b8ecd6b09b556eaf5d5b95fb0baa.jpg",
+    title: "GTA_VI sticker",
+    tag: "Trending",
+    shortDesc: "Premium glossy design.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
+    src: "https://i.pinimg.com/736x/01/a8/49/01a8493f780df91ba316725687125de9.jpg",
+    title: "bgmi sticker",
+    tag: "Trending",
+    shortDesc: "Premium glossy design.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
+    src: "https://i.pinimg.com/736x/bf/06/5f/bf065f947e4ac33b6167f70df406aa05.jpg",
+    title: "bgmi sticker",
+    tag: "Trending",
+    shortDesc: "Premium glossy design.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
+    src: "https://i.pinimg.com/736x/30/43/39/3043396190a3712eb66157b0bb12ec2d.jpg",
+    title: "ps5 girl",
+    tag: "Trending",
+    shortDesc: "Premium glossy design.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
     src: "https://i.pinimg.com/1200x/5a/ad/0a/5aad0a8534ff652ffab1788930547741.jpg",
     title: "Aesthetic Girl Art",
+    tag: "Trending",
+    shortDesc: "Premium digital artwork.",
+    longDesc:
+      "Trending aesthetic girl illustration perfect for covers, wallpapers, and designs.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
+    src: "https://i.pinimg.com/736x/18/8f/b0/188fb05fce96365ea65807e8ee65a159.jpg",
+    title: "rockstar",
     tag: "Trending",
     shortDesc: "Premium digital artwork.",
     longDesc:
@@ -226,6 +316,27 @@ export const trendingData = [
     finalPrice: 99,
   },
   {
+    src: "https://i.pinimg.com/1200x/ab/20/0e/ab200eb1923996098bef2c5b6e49d029.jpg",
+    title: "Cool Character Art",
+    tag: "Trending",
+    shortDesc: "Stylish detailed character.",
+    longDesc:
+      "Trending among teens for its bold aesthetic and expression.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
+    src: "https://i.pinimg.com/736x/89/6a/10/896a104d3a2e14bc3b0c022e5d5868ce.jpg",
+    title: "Cool Character Art",
+    tag: "Trending",
+    shortDesc: "Stylish detailed character.",
+    longDesc:
+      "Trending among teens for its bold aesthetic and expression.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+ 
+  {
     src: "https://i.pinimg.com/736x/01/c2/ad/01c2ad7a7c93fc6508ed6753daf04455.jpg",
     title: "Vibes Graphic Art",
     tag: "Trending",
@@ -240,20 +351,21 @@ export const trendingData = [
     tag: "Trending",
     shortDesc: "Stylish detailed character.",
     longDesc:
-      "Trending among teens for its bold aesthetic and expression.",
+    "Trending among teens for its bold aesthetic and expression.",
     originalPrice: 149,
     finalPrice: 99,
   },
   {
-    src: "https://i.pinimg.com/1200x/da/d0/ae/dad0ae19bc31931008317564ba5ff832.jpg",
-    title: "Soft Pastel Girl",
+    src: "https://i.pinimg.com/736x/66/ed/1e/66ed1e50fa8bd9a5924d2cafacf34b5f.jpg",
+    title: "Cool Character Art",
     tag: "Trending",
-    shortDesc: "Calm pastel artwork.",
+    shortDesc: "Stylish detailed character.",
     longDesc:
-      "Represents soft emotions, peaceful vibes, and clean color palette.",
+      "Trending among teens for its bold aesthetic and expression.",
     originalPrice: 149,
     finalPrice: 99,
   },
+ 
 ];
 
 
@@ -432,22 +544,47 @@ export const goodiesData = [
   },
 ];
 
-// Yeh component ke bahar rakho
-export const cardSlides = [
-  {
-    title: "Who We Are",
-    text: "Dameeto is a brand built on reflection...",
+
+export const funnyData=[
+    {
+    src: "https://i.pinimg.com/736x/ff/0e/f9/ff0ef9d4322a62845183e672c007999c.jpg",
+    title: "Karan Johar funny",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
   },
-  {
-    title: "Our Vision",
-    text: "Our mission is to bring your desk...",
+    {
+    src: "https://i.pinimg.com/1200x/60/c1/68/60c168950c64000e4fed405ae5bc1f44.jpg",
+    title: "gopi ben funny",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
   },
-  {
-    title: "Quality Promise",
-    text: "Every product we create undergoes premium UV-DTF printing...",
+    {
+    src: "https://tinopia.com/wp-content/uploads/2025/08/hakla-shahrukh-khan-sticker.webp",
+    title: "gopi ben funny",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
   },
-  {
-    title: "What Makes Dameeto Special?",
-    text: "We believe designs speak louder than words...",
+    {
+    src: "https://i.pinimg.com/736x/be/02/4a/be024a1d9fbb0fd493ade2bd56b351c5.jpg",
+    title: "gopi ben funny",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
   },
-];
+  
+]

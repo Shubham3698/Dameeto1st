@@ -1,13 +1,13 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { stickerData, trendingData, posterData, goodiesData } from "../contexAndhooks/Ddata";
+import { stickerData, trendingData, posterData, goodiesData,funnyData } from "../contexAndhooks/Ddata";
 
 export default function SearchResults() {
   const navigate = useNavigate();
   const query = new URLSearchParams(useLocation().search).get("query")?.toLowerCase();
 
   // Merge all data arrays into a single array
-  const allData = [...stickerData, ...trendingData, ...posterData, ...goodiesData];
+  const allData = [...stickerData, ...trendingData, ...posterData, ...goodiesData,...funnyData];
 
   // Filter based on query matching title or tag
   const results = allData.filter(

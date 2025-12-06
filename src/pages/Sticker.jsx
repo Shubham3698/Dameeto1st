@@ -4,7 +4,7 @@ import { stickerData } from "../contexAndhooks/Ddata";
 
 export default function Sticker() {
   return (
-    <div style={{ background: "#fff3eb", minHeight: "100vh", padding: "20px" }}>
+    <div style={{ background: "#fff3eb", minHeight: "100vh", }}>
       <h2 className="text-center mt-3">Sticker Collection</h2>
 
       <Nwmasonry 
