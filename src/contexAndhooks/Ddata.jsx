@@ -105,7 +105,6 @@ export const stickerData = [
   },
 ];
 
-
 export const trendingData = [
   {
     src: "https://i.pinimg.com/736x/da/f2/93/daf293b49f030d1f984ee659f18b8e05.jpg",
@@ -126,7 +125,8 @@ export const trendingData = [
       "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
     originalPrice: 149,
     finalPrice: 99,
-  },  {
+  },
+  {
     src: "https://i.pinimg.com/1200x/c0/f5/e1/c0f5e140d779796930a1a9d844266e83.jpg",
     title: "ff logo sticker",
     tag: "Trending  ",
@@ -136,7 +136,6 @@ export const trendingData = [
     originalPrice: 149,
     finalPrice: 99,
   },
-
 
   {
     src: "https://i.pinimg.com/1200x/00/a4/94/00a494141a36a87a4ecad3865592c8b4.jpg",
@@ -331,8 +330,7 @@ export const trendingData = [
     title: "Sad Anime Boy",
     tag: "Trending",
     shortDesc: "Emotional character.",
-    longDesc:
-      "Expresses relatable emotions through clean anime visual style.",
+    longDesc: "Expresses relatable emotions through clean anime visual style.",
     originalPrice: 149,
     finalPrice: 99,
   },
@@ -341,8 +339,7 @@ export const trendingData = [
     title: "Cool Character Art",
     tag: "Trending",
     shortDesc: "Stylish detailed character.",
-    longDesc:
-      "Trending among teens for its bold aesthetic and expression.",
+    longDesc: "Trending among teens for its bold aesthetic and expression.",
     originalPrice: 149,
     finalPrice: 99,
   },
@@ -351,12 +348,11 @@ export const trendingData = [
     title: "Cool Character Art",
     tag: "Trending",
     shortDesc: "Stylish detailed character.",
-    longDesc:
-      "Trending among teens for its bold aesthetic and expression.",
+    longDesc: "Trending among teens for its bold aesthetic and expression.",
     originalPrice: 149,
     finalPrice: 99,
   },
- 
+
   {
     src: "https://i.pinimg.com/736x/01/c2/ad/01c2ad7a7c93fc6508ed6753daf04455.jpg",
     title: "Vibes Graphic Art",
@@ -371,8 +367,7 @@ export const trendingData = [
     title: "Cool Character Art",
     tag: "Trending",
     shortDesc: "Stylish detailed character.",
-    longDesc:
-    "Trending among teens for its bold aesthetic and expression.",
+    longDesc: "Trending among teens for its bold aesthetic and expression.",
     originalPrice: 149,
     finalPrice: 99,
   },
@@ -381,14 +376,11 @@ export const trendingData = [
     title: "Cool Character Art",
     tag: "Trending",
     shortDesc: "Stylish detailed character.",
-    longDesc:
-      "Trending among teens for its bold aesthetic and expression.",
+    longDesc: "Trending among teens for its bold aesthetic and expression.",
     originalPrice: 149,
     finalPrice: 99,
   },
- 
 ];
-
 
 export const posterData = [
   {
@@ -493,7 +485,6 @@ export const posterData = [
   },
 ];
 
-
 export const goodiesData = [
   {
     src: "https://i.pinimg.com/736x/63/26/50/632650d4a548158dfc3120f93ca95ce1.jpg",
@@ -556,6 +547,16 @@ export const goodiesData = [
     finalPrice: 149,
   },
   {
+    src: "https://i.pinimg.com/1200x/21/de/40/21de40edac16bc9a68a415e3c9592914.jpg",
+    title: "gaming mouse ",
+    tag: "Goodies",
+    shortDesc: "High-resolution art piece.",
+    longDesc:
+      "Created for moody aesthetic lovers wanting expressive modern designs.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
     src: "https://i.pinimg.com/736x/28/9c/58/289c58da0cc815dbd60cfcd8b074767a.jpg",
     title: "Moody Art Goodie",
     tag: "Goodies",
@@ -585,9 +586,8 @@ export const goodiesData = [
   },
 ];
 
-
-export const funnyData=[
-    {
+export const funnyData = [
+  {
     src: "https://i.pinimg.com/736x/ff/0e/f9/ff0ef9d4322a62845183e672c007999c.jpg",
     title: "Karan Johar funny",
     tag: "Goodies",
@@ -597,7 +597,7 @@ export const funnyData=[
     originalPrice: 199,
     finalPrice: 149,
   },
-    {
+  {
     src: "https://i.pinimg.com/1200x/60/c1/68/60c168950c64000e4fed405ae5bc1f44.jpg",
     title: "gopi ben funny",
     tag: "Goodies",
@@ -607,7 +607,7 @@ export const funnyData=[
     originalPrice: 199,
     finalPrice: 149,
   },
-    {
+  {
     src: "https://tinopia.com/wp-content/uploads/2025/08/hakla-shahrukh-khan-sticker.webp",
     title: "gopi ben funny",
     tag: "Goodies",
@@ -617,7 +617,7 @@ export const funnyData=[
     originalPrice: 199,
     finalPrice: 149,
   },
-    {
+  {
     src: "https://i.pinimg.com/736x/be/02/4a/be024a1d9fbb0fd493ade2bd56b351c5.jpg",
     title: "gopi ben funny",
     tag: "Goodies",
@@ -627,5 +627,157 @@ export const funnyData=[
     originalPrice: 199,
     finalPrice: 149,
   },
-  
-]
+];
+
+export const hotData = [
+  {
+    src: "https://i.pinimg.com/736x/f0/59/51/f059514c3cd36212154edfc8feac2bfe.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/39/4f/08/394f084b4b68e34313b385b40c823620.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/b4/57/d8/b457d84ad71d92a3e219ac46c8628ffb.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/1200x/5b/eb/f7/5bebf76d08ebf00d8a677ef9930b68f5.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/3c/de/b6/3cdeb6ad25bcdaf92786ed2fa548b69d.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/92/11/a6/9211a603952afc1ceac9a7cf7984c28c.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/53/2f/bd/532fbd086173572192e9ea73eb6c4a3f.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/6c/17/bb/6c17bb95646e58a9685a0b4188fb0ee5.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/03/29/dd/0329dde8f850c98123d99eebfd8a7f9f.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/12/f4/1d/12f41d2b13ab214af77697de08a0fd21.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/50/e2/ad/50e2ad259f7855b4a362eb75bd63f42d.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/bd/71/04/bd7104ec42a28e5f08b2caabc4bc46e0.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/bd/71/04/bd7104ec42a28e5f08b2caabc4bc46e0.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/f6/7d/d8/f67dd89970431c40baf80db3a9db87e2.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/a8/6f/54/a86f54fe53d6f467c5c6e085b27e01fd.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+];
