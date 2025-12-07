@@ -189,6 +189,16 @@ export const trendingData = [
     finalPrice: 99,
   },
   {
+    src: "https://i.pinimg.com/1200x/46/ce/66/46ce66226bbc2f1a6548d6336ba35574.jpg",
+    title: "GTA_VI sticker",
+    tag: "Trending",
+    shortDesc: "Premium glossy design.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
     src: "https://i.pinimg.com/736x/c4/43/b8/c443b8ecd6b09b556eaf5d5b95fb0baa.jpg",
     title: "GTA_VI sticker",
     tag: "Trending",
@@ -526,7 +536,27 @@ export const goodiesData = [
     finalPrice: 149,
   },
   {
+    src: "https://i.pinimg.com/736x/1f/b1/71/1fb17194657e89aa4b1d4b6608fab6c8.jpg",
+    title: "Moody Art Goodie",
+    tag: "Goodies",
+    shortDesc: "High-resolution art.",
+    longDesc:
+      "Ideal for those who love expressive art and stylish mood-based designs.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
     src: "https://i.pinimg.com/1200x/d0/69/62/d0696284e5a0ecf0ed79af0675331ca6.jpg",
+    title: "Moody Art Goodie",
+    tag: "Goodies",
+    shortDesc: "High-resolution art piece.",
+    longDesc:
+      "Created for moody aesthetic lovers wanting expressive modern designs.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/28/9c/58/289c58da0cc815dbd60cfcd8b074767a.jpg",
     title: "Moody Art Goodie",
     tag: "Goodies",
     shortDesc: "High-resolution art piece.",
