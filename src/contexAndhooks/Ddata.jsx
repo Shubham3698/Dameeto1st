@@ -126,7 +126,18 @@ export const trendingData = [
       "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
     originalPrice: 149,
     finalPrice: 99,
+  },  {
+    src: "https://i.pinimg.com/1200x/c0/f5/e1/c0f5e140d779796930a1a9d844266e83.jpg",
+    title: "ff logo sticker",
+    tag: "Trending  ",
+    shortDesc: "Smooth loop animation.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
   },
+
+
   {
     src: "https://i.pinimg.com/1200x/00/a4/94/00a494141a36a87a4ecad3865592c8b4.jpg",
     title: "Animated Aesthetic GIF",
