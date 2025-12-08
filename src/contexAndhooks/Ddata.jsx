@@ -691,7 +691,27 @@ export const hotData = [
     finalPrice: 149,
   },
   {
+    src: "https://i.pinimg.com/736x/7e/c4/bb/7ec4bbee6dae600bb70ef5545b209f15.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
     src: "https://i.pinimg.com/736x/53/2f/bd/532fbd086173572192e9ea73eb6c4a3f.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/0f/39/cf/0f39cf72386455226f16eaffff66ae1c.jpg",
     title: "Honies sticker ",
     tag: "Goodies",
     shortDesc: "Exclusive custom design.",
@@ -751,6 +771,16 @@ export const hotData = [
     finalPrice: 149,
   },
   {
+    src: "https://i.pinimg.com/736x/a1/34/e5/a134e5312c64ca55abc7c59d55bf94ef.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
     src: "https://i.pinimg.com/736x/bd/71/04/bd7104ec42a28e5f08b2caabc4bc46e0.jpg",
     title: "Honies sticker ",
     tag: "Goodies",
@@ -762,6 +792,16 @@ export const hotData = [
   },
   {
     src: "https://i.pinimg.com/736x/f6/7d/d8/f67dd89970431c40baf80db3a9db87e2.jpg",
+    title: "Honies sticker ",
+    tag: "Goodies",
+    shortDesc: "Exclusive custom design.",
+    longDesc:
+      "A premium goodies item crafted for unique style, vibes, and personal expression.",
+    originalPrice: 199,
+    finalPrice: 149,
+  },
+  {
+    src: "https://i.pinimg.com/736x/e3/b6/c9/e3b6c9ce3dccf23e1021cbf661b25213.jpg",
     title: "Honies sticker ",
     tag: "Goodies",
     shortDesc: "Exclusive custom design.",
