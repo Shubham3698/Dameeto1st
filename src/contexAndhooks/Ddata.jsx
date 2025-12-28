@@ -34,6 +34,16 @@ export const stickerData = [
     finalPrice: 99,
   },
   {
+    src: "https://i.pinimg.com/736x/f1/02/64/f102649980fc75461d4d78239847772a.jpg",
+    title: "spider-man",
+    tag: "sticker",
+    shortDesc: "Top trending artistic design.",
+    longDesc:
+      "Crafted with aesthetic details, ideal for personal expression and daily vibe representation.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
     src: "https://i.pinimg.com/1200x/80/2c/6d/802c6df0611780efb775913bc18ad73a.jpg",
     title: "Modern Cool Girl Sticker",
     tag: "Modern",
