@@ -118,23 +118,13 @@ export const stickerData = [
 export const trendingData = [
   {
     src: "https://i.pinimg.com/736x/94/9b/e9/949be92bdc0fce7693370d4c340df5ec.jpg",
-    title: "Pocoyo Sticker",
-    tag: "Trending",
-    shortDesc: "Smooth loop animation.",
+    title: "Lucia Jason with pistol",
+    tag: "Trending GTA VI ",
+    shortDesc: "Lucia Caminos | Jason Duval DTF-sticker",
     longDesc:
-      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
-    originalPrice: 149,
-    finalPrice: 99,
-  },
-  {
-    src: "https://i.pinimg.com/736x/da/f2/93/daf293b49f030d1f984ee659f18b8e05.jpg",
-    title: "Pocoyo Sticker",
-    tag: "Trending",
-    shortDesc: "Smooth loop animation.",
-    longDesc:
-      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
-    originalPrice: 149,
-    finalPrice: 99,
+      "This Lucia Caminos | Jason Duval They are believed to be the main protagonists of the upcoming game Grand Theft Auto VI. DTF sticker (6 × 4 cm) reflects a bold, rebellious duo vibe — a mix of loyalty, ambition and fearless street energy. The compact size keeps it clean and minimal while still noticeable.",
+    originalPrice: 99,
+    finalPrice: 29,
   },
   {
     src: "https://i.pinimg.com/originals/11/39/64/1139647b65167a1c2a9f5895b58083b2.gif",
@@ -209,16 +199,6 @@ export const trendingData = [
   },
   {
     src: "https://i.pinimg.com/1200x/46/ce/66/46ce66226bbc2f1a6548d6336ba35574.jpg",
-    title: "GTA_VI sticker",
-    tag: "Trending",
-    shortDesc: "Premium glossy design.",
-    longDesc:
-      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
-    originalPrice: 149,
-    finalPrice: 99,
-  },
-  {
-    src: "https://i.pinimg.com/736x/c4/43/b8/c443b8ecd6b09b556eaf5d5b95fb0baa.jpg",
     title: "GTA_VI sticker",
     tag: "Trending",
     shortDesc: "Premium glossy design.",

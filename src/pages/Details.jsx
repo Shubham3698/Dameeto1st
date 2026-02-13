@@ -19,8 +19,8 @@ export default function ImageDetails() {
   const shortDesc = item?.shortDesc;
   const longDesc = item?.longDesc;
 
-  // Prices
-  const price = item?.price ?? 199;                  // selling price
+  // Prices (FIXED HERE ONLY 👇)
+  const price = item?.finalPrice ?? 199;        // selling price
   const originalPrice = item?.originalPrice ?? null; // MRP
 
   useEffect(() => {
