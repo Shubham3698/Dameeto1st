@@ -47,7 +47,7 @@ export default function Nwmasonry({ images, categoryName }) {
           border-radius: 14px;
           break-inside: avoid;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+          // box-shadow: 0 4px 10px rgba(0,0,0,0.12);
           cursor: pointer;
         }
 

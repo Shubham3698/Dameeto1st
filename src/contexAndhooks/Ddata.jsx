@@ -117,6 +117,16 @@ export const stickerData = [
 
 export const trendingData = [
   {
+    src: "https://i.pinimg.com/736x/94/9b/e9/949be92bdc0fce7693370d4c340df5ec.jpg",
+    title: "Pocoyo Sticker",
+    tag: "Trending",
+    shortDesc: "Smooth loop animation.",
+    longDesc:
+      "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
+    originalPrice: 149,
+    finalPrice: 99,
+  },
+  {
     src: "https://i.pinimg.com/736x/da/f2/93/daf293b49f030d1f984ee659f18b8e05.jpg",
     title: "Pocoyo Sticker",
     tag: "Trending",
