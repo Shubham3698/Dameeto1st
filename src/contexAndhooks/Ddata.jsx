@@ -123,7 +123,7 @@ export const trendingData = [
     shortDesc: "Lucia Caminos | Jason Duval DTF-sticker",
     longDesc:
       "This Lucia Caminos | Jason Duval They are believed to be the main protagonists of the upcoming game Grand Theft Auto VI. DTF sticker (6 × 4 cm) reflects a bold, rebellious duo vibe — a mix of loyalty, ambition and fearless street energy. The compact size keeps it clean and minimal while still noticeable.",
-    originalPrice: 99,
+    originalPrice: 199,
     finalPrice: 29,
   },
   {
@@ -135,6 +135,16 @@ export const trendingData = [
       "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
     originalPrice: 149,
     finalPrice: 99,
+  },
+  {
+    src: "https://i.pinimg.com/736x/70/3e/57/703e57fd0dabe23ab3dd55c719db8fad.jpg",
+    title: "SPIDER-MAN",
+    tag: "Trending",
+    shortDesc: "A high-quality DTF sticker featuring Spider-Man relaxing on a Porsche GT3 RS",
+    longDesc:
+      "A high-quality DTF sticker featuring Spider-Man relaxing on a Porsche GT3 RS, blending superhero energy with luxury car culture. The compact 6 × 4.5 cm size makes it perfect for laptops, phone covers, notebooks, and consoles. Sharp colors, clean edges, and a glossy finish give it a premium look while reflecting speed, confidence, and street-style attitude in one bold design.",
+    originalPrice: 199,
+    finalPrice: 29,
   },
   {
     src: "https://i.pinimg.com/1200x/c0/f5/e1/c0f5e140d779796930a1a9d844266e83.jpg",
