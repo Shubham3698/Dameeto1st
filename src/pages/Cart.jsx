@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Container, Row, Col, Image } from "react-bootstrap";
 import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
@@ -8,6 +8,10 @@ export default function CartPage() {
   const cartEndRef = useRef(null);
   const prevCartLengthRef = useRef(cartItems.length);
 
+  // ⭐ NEW STATES
+  const [coupon, setCoupon] = useState("");
+  const [discountPercent, setDiscountPercent] = useState(0);
+
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
       cartEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -15,18 +19,50 @@ export default function CartPage() {
     prevCartLengthRef.current = cartItems.length;
   }, [cartItems]);
 
+  // ⭐ TOTAL CALCULATION
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+
+  const discountAmount = (subtotal * discountPercent) / 100;
+  const finalTotal = subtotal - discountAmount;
+
+  // ⭐ COUPON SYSTEM
+  const applyCoupon = () => {
+    const code = coupon.trim().toUpperCase();
+
+    if (code === "SAVE10") {
+      setDiscountPercent(10);
+      alert("10% Discount Applied 🎉");
+    } 
+    else if (code === "SAVE20") {
+      setDiscountPercent(20);
+      alert("20% Discount Applied 🎉");
+    } 
+    else {
+      setDiscountPercent(0);
+      alert("Invalid Coupon ❌");
+    }
+  };
+
   const generateWhatsAppMessage = () => {
     if (cartItems.length === 0) return "Hi! I have a query about your products.";
 
     let msg = "Hi! I want to order the following items:\n";
-    let total = 0;
 
     cartItems.forEach((item, index) => {
       msg += `${index + 1}. ${item.title} - Qty: ${item.quantity} - Price: ₹${item.price * item.quantity}\n`;
-      total += item.price * item.quantity;
     });
 
-    msg += `Total Price: ₹${total}`;
+    msg += `\nSubtotal: ₹${subtotal}`;
+
+    if (discountPercent > 0) {
+      msg += `\nDiscount (${discountPercent}%): -₹${discountAmount}`;
+    }
+
+    msg += `\nFinal Total: ₹${finalTotal}`;
+
     return msg;
   };
 
@@ -51,7 +87,6 @@ export default function CartPage() {
               <Col xs={5} md={6}>
                 <h5 style={{ margin: 0 }}>{item.title}</h5>
 
-                {/* ⭐ Price UI in Cart */}
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <span style={{ fontSize: "20px", fontWeight: "700", color: "#fe3d00" }}>
                     ₹{item.price}
@@ -100,6 +135,72 @@ export default function CartPage() {
         )}
 
         <div ref={cartEndRef}></div>
+
+        {/* ⭐ ORDER SUMMARY */}
+        {cartItems.length > 0 && (
+          <div
+            style={{
+              marginTop: "30px",
+              padding: "20px",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              background: "#fafafa",
+            }}
+          >
+            <h4>Order Summary</h4>
+
+            <div className="d-flex justify-content-between">
+              <span>Subtotal</span>
+              <span>₹{subtotal}</span>
+            </div>
+
+            {discountPercent > 0 && (
+              <div className="d-flex justify-content-between text-success">
+                <span>Discount ({discountPercent}%)</span>
+                <span>- ₹{discountAmount}</span>
+              </div>
+            )}
+
+            <hr />
+
+            <div
+              className="d-flex justify-content-between"
+              style={{ fontWeight: "700", fontSize: "20px" }}
+            >
+              <span>Total</span>
+              <span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
+            </div>
+
+            {/* Coupon */}
+            <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
+              <input
+                type="text"
+                placeholder="Enter coupon code"
+                value={coupon}
+                onChange={(e) => setCoupon(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: "8px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                }}
+              />
+
+              <button
+                onClick={applyCoupon}
+                style={{
+                  background: "#000",
+                  color: "#fff",
+                  border: "none",
+                  padding: "8px 15px",
+                  borderRadius: "8px",
+                }}
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        )}
 
         <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage()} />
       </Container>
