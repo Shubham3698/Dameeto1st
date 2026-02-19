@@ -117,6 +117,26 @@ export const stickerData = [
 
 export const trendingData = [
   {
+    src: "https://i.pinimg.com/736x/64/5d/4b/645d4bb5ef2069c6ef72f9e112272d14.jpg",
+    title: "Lucia Jason with pistol",
+    tag: "Trending GTA VI ",
+    shortDesc: "Lucia Caminos | Jason Duval DTF-sticker",
+    longDesc:
+      "This Lucia Caminos | Jason Duval They are believed to be the main protagonists of the upcoming game Grand Theft Auto VI. DTF sticker (6 × 4 cm) reflects a bold, rebellious duo vibe — a mix of loyalty, ambition and fearless street energy. The compact size keeps it clean and minimal while still noticeable.",
+    originalPrice: 199,
+    finalPrice: 29,
+  },
+  {
+    src: "https://i.pinimg.com/736x/e6/71/2b/e6712b68daf8a5e901d0a6fafc3f54e4.jpg",
+    title: "Lucia Jason with pistol",
+    tag: "Trending GTA VI ",
+    shortDesc: "Lucia Caminos | Jason Duval DTF-sticker",
+    longDesc:
+      "This Lucia Caminos | Jason Duval They are believed to be the main protagonists of the upcoming game Grand Theft Auto VI. DTF sticker (6 × 4 cm) reflects a bold, rebellious duo vibe — a mix of loyalty, ambition and fearless street energy. The compact size keeps it clean and minimal while still noticeable.",
+    originalPrice: 199,
+    finalPrice: 29,
+  },
+  {
     src: "https://i.pinimg.com/736x/94/9b/e9/949be92bdc0fce7693370d4c340df5ec.jpg",
     title: "Lucia Jason with pistol",
     tag: "Trending GTA VI ",
