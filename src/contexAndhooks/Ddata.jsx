@@ -120,6 +120,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/64/5d/4b/645d4bb5ef2069c6ef72f9e112272d14.jpg",
     title: "Lucia Jason with pistol",
     tag: "Trending GTA VI ",
+    badge: "hot", 
     shortDesc: "Lucia Caminos | Jason Duval DTF-sticker",
     longDesc:
       "This Lucia Caminos | Jason Duval They are believed to be the main protagonists of the upcoming game Grand Theft Auto VI. DTF sticker (6 × 4 cm) reflects a bold, rebellious duo vibe — a mix of loyalty, ambition and fearless street energy. The compact size keeps it clean and minimal while still noticeable.",
@@ -130,6 +131,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/e6/71/2b/e6712b68daf8a5e901d0a6fafc3f54e4.jpg",
     title: "Lucia Jason with pistol",
     tag: "Trending GTA VI ",
+    badge: "New", 
     shortDesc: "Lucia Caminos | Jason Duval DTF-sticker",
     longDesc:
       "This Lucia Caminos | Jason Duval They are believed to be the main protagonists of the upcoming game Grand Theft Auto VI. DTF sticker (6 × 4 cm) reflects a bold, rebellious duo vibe — a mix of loyalty, ambition and fearless street energy. The compact size keeps it clean and minimal while still noticeable.",
@@ -140,6 +142,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/94/9b/e9/949be92bdc0fce7693370d4c340df5ec.jpg",
     title: "Lucia Jason with pistol",
     tag: "Trending GTA VI ",
+    badge: "trending", 
     shortDesc: "Lucia Caminos | Jason Duval DTF-sticker",
     longDesc:
       "This Lucia Caminos | Jason Duval They are believed to be the main protagonists of the upcoming game Grand Theft Auto VI. DTF sticker (6 × 4 cm) reflects a bold, rebellious duo vibe — a mix of loyalty, ambition and fearless street energy. The compact size keeps it clean and minimal while still noticeable.",
@@ -160,6 +163,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/70/3e/57/703e57fd0dabe23ab3dd55c719db8fad.jpg",
     title: "SPIDER-MAN",
     tag: "Trending",
+    badge: "New", 
     shortDesc: "A high-quality DTF sticker featuring Spider-Man relaxing on a Porsche GT3 RS",
     longDesc:
       "A high-quality DTF sticker featuring Spider-Man relaxing on a Porsche GT3 RS, blending superhero energy with luxury car culture. The compact 6 × 4.5 cm size makes it perfect for laptops, phone covers, notebooks, and consoles. Sharp colors, clean edges, and a glossy finish give it a premium look while reflecting speed, confidence, and street-style attitude in one bold design.",
@@ -191,6 +195,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/a2/ff/6c/a2ff6cef71615787f49719fb70d7a085.jpg",
     title: "bgmi ",
     tag: "Trending",
+    badge: "New", 
     shortDesc: "Smooth loop animation.",
     longDesc:
       "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
@@ -241,6 +246,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/01/a8/49/01a8493f780df91ba316725687125de9.jpg",
     title: "bgmi sticker",
     tag: "Trending",
+    badge: "Hot",
     shortDesc: "Premium glossy design.",
     longDesc:
       "A unique animated sticker-style GIF that expresses aesthetic vibes and emotions.",
@@ -281,6 +287,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/18/8f/b0/188fb05fce96365ea65807e8ee65a159.jpg",
     title: "rockstar",
     tag: "Trending",
+    badge: "New", 
     shortDesc: "Premium digital artwork.",
     longDesc:
       "Trending aesthetic girl illustration perfect for covers, wallpapers, and designs.",
@@ -291,6 +298,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/c6/3f/f5/c63ff5143c6919ff422f735bab715dc3.jpg",
     title: "Aesthetic Girl Art",
     tag: "Trending",
+    badge: "Hot", 
     shortDesc: "Premium digital artwork.",
     longDesc:
       "Trending aesthetic girl illustration perfect for covers, wallpapers, and designs.",
@@ -311,6 +319,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/1200x/8b/0c/14/8b0c14adee9fc943bc139a125a0fc400.jpg",
     title: "Moody Girl Illustration",
     tag: "Trending gta",
+    badge: "trending", 
     shortDesc: "Minimal clean art.",
     longDesc:
       "Soft shades and emotional aesthetic artwork, suitable for any theme.",
@@ -341,6 +350,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/1200x/80/2c/6d/802c6df0611780efb775913bc18ad73a.jpg",
     title: "Cool Girl Modern Look",
     tag: "Trending",
+    badge: "hot", 
     shortDesc: "Trendy fashion artwork.",
     longDesc: "Represents confidence, style, and modern youth culture.",
     originalPrice: 149,
@@ -377,6 +387,7 @@ export const trendingData = [
     src: "https://i.pinimg.com/736x/89/6a/10/896a104d3a2e14bc3b0c022e5d5868ce.jpg",
     title: "Cool Character Art",
     tag: "Trending",
+    badge: "New", 
     shortDesc: "Stylish detailed character.",
     longDesc: "Trending among teens for its bold aesthetic and expression.",
     originalPrice: 149,
