@@ -4,16 +4,19 @@ import Prgg from "../assets/prg.jpg";
 
 export const stickerData = [
   {
-    src: "https://i.pinimg.com/1200x/5a/ad/0a/5aad0a8534ff652ffab1788930547741.jpg",
-    title: "Girl Aesthetic Sticker",
-    tag: "Aesthetic",
-    badge: "hot", 
-    shortDesc: "Premium glossy sticker.",
-    longDesc:
-      "This aesthetic girl sticker expresses mood, personality, vibes and looks great on phone covers and laptops.",
-    originalPrice: 149,
-    finalPrice: 99,
-  },
+  src: "https://i.pinimg.com/1200x/5a/ad/0a/5aad0a8534ff652ffab1788930547741.jpg",
+  subImages: [
+   
+  ],
+  title: "Girl Aesthetic Sticker",
+  tag: "Aesthetic",
+  badge: "hot",
+  shortDesc: "Premium glossy sticker.",
+  longDesc:
+    "This aesthetic girl sticker expresses mood, personality, vibes and looks great on phone covers and laptops.",
+  originalPrice: 149,
+  finalPrice: 99,
+},
   {
     src: "https://i.pinimg.com/736x/e2/c4/13/e2c41353d25e9aaaaeff36bbf125beea.jpg",
     title: "Dark Anime Sticker",
@@ -119,6 +122,11 @@ export const stickerData = [
 export const trendingData = [
   {
     src: "https://i.pinimg.com/736x/64/5d/4b/645d4bb5ef2069c6ef72f9e112272d14.jpg",
+      subImages: [
+    "https://i.pinimg.com/1200x/3e/55/b4/3e55b4dd734305304829a190c4f8cec5.jpg",
+    "https://i.pinimg.com/736x/0b/e1/17/0be11763788d6da33ddc96a52e1b320b.jpg",
+    "https://i.pinimg.com/736x/c7/32/e7/c732e7f11dd3c7eb110acbda090f8d5f.jpg"
+  ],
     title: "Lucia Jason with pistol",
     tag: "Trending GTA VI ",
     badge: "hot", 
