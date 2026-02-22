@@ -128,7 +128,7 @@ export const trendingData = [
     finalPrice: 29,
   },
   {
-    src: "https://i.pinimg.com/736x/e6/71/2b/e6712b68daf8a5e901d0a6fafc3f54e4.jpg",
+    src: "https://i.pinimg.com/736x/03/a5/7d/03a57dcb9c8d55026d079cc4db3d2265.jpg",
     title: "Lucia Jason with pistol",
     tag: "Trending GTA VI ",
     badge: "New", 
