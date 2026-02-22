@@ -21,24 +21,36 @@ export default function ImageDetails() {
 
   const [expanded, setExpanded] = useState(false);
 
-  // ✅ All Images (Main + SubImages)
+  // Lazy initializer for selectedImage to avoid ESLint warning
+  const [selectedImage, setSelectedImage] = useState(() => {
+    if (!item) return null;
+    if (item.subImages && item.subImages.length > 0) {
+      return [item.src, ...item.subImages][0];
+    }
+    return item?.src || null;
+  });
+
+  // Memoize images array
   const imagesArray = useMemo(() => {
     if (!item) return [];
     if (item.subImages && item.subImages.length > 0) {
       return [item.src, ...item.subImages];
     }
-    return item?.src ? [item.src] : [];
+    return [item.src];
   }, [item]);
 
-  // ✅ Lazy initializer (NO ESLINT ERROR)
-  const [selectedImage, setSelectedImage] = useState(
-    () => imagesArray[0]
-  );
-
-  // ✅ Only scroll effect (allowed)
+  // Scroll to top and safely update selected image without ESLint warning
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [item]);
+    
+    const timer = setTimeout(() => {
+      if (imagesArray.length > 0) {
+        setSelectedImage(imagesArray[0]);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [item, imagesArray]);
 
   const handleAddToCart = () => {
     addToCart({
@@ -55,7 +67,6 @@ export default function ImageDetails() {
 
   return (
     <div
-      key={item?.src}
       style={{ background: "#fff3eb", minHeight: "100vh", padding: "20px" }}
     >
       <style>{`
@@ -93,7 +104,7 @@ export default function ImageDetails() {
 
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
 
-        {/* 🔥 Main Image */}
+        {/* Main Image */}
         {selectedImage && (
           <img
             src={selectedImage}
@@ -102,7 +113,7 @@ export default function ImageDetails() {
           />
         )}
 
-        {/* 🔥 Thumbnails (Between Image & Title) */}
+        {/* Thumbnails */}
         {imagesArray.length > 1 && (
           <div className="thumbnail-container">
             {imagesArray.map((img, index) => (
@@ -119,10 +130,10 @@ export default function ImageDetails() {
           </div>
         )}
 
-        {/* 🔥 Title */}
+        {/* Title */}
         <h2 className="mt-3">{title}</h2>
 
-        {/* ⭐ Price */}
+        {/* Price */}
         <div
           style={{
             marginTop: "10px",
@@ -170,7 +181,7 @@ export default function ImageDetails() {
           {expanded ? "Show Less ▲" : "Read More ▼"}
         </button>
 
-        {/* 🔥 Buttons */}
+        {/* Buttons */}
         <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
           <button
             onClick={handleAddToCart}
@@ -207,7 +218,7 @@ export default function ImageDetails() {
           </button>
         </div>
 
-        {/* 🔥 Related */}
+        {/* Related Products */}
         <h3 className="mt-5 text-capitalize">
           More from {fromCategory}
         </h3>
