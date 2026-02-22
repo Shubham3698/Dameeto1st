@@ -20,8 +20,9 @@ export default function ImageDetails() {
   const originalPrice = item?.originalPrice ?? null;
 
   const [expanded, setExpanded] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false); // 🔹 Fade-in state
 
-  // Lazy initializer for selectedImage to avoid ESLint warning
+  // Lazy initializer for selectedImage
   const [selectedImage, setSelectedImage] = useState(() => {
     if (!item) return null;
     if (item.subImages && item.subImages.length > 0) {
@@ -39,14 +40,15 @@ export default function ImageDetails() {
     return [item.src];
   }, [item]);
 
-  // Scroll to top and safely update selected image without ESLint warning
+  // Scroll to top and safely update selected image
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    
+
     const timer = setTimeout(() => {
       if (imagesArray.length > 0) {
         setSelectedImage(imagesArray[0]);
       }
+      setFadeIn(true); // 🔹 Fade-in trigger
     }, 0);
 
     return () => clearTimeout(timer);
@@ -61,13 +63,18 @@ export default function ImageDetails() {
       price,
       originalPrice
     });
-
     alert(`${title} added to cart!`);
   };
 
   return (
     <div
-      style={{ background: "#fff3eb", minHeight: "100vh", padding: "20px" }}
+      style={{
+        background: "#fff3eb",
+        minHeight: "100vh",
+        padding: "20px",
+        opacity: fadeIn ? 1 : 0, // 🔹 Fade-in effect
+        transition: "opacity 0.8s ease-in"
+      }}
     >
       <style>{`
         .main-image {
@@ -103,17 +110,10 @@ export default function ImageDetails() {
       `}</style>
 
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-
-        {/* Main Image */}
         {selectedImage && (
-          <img
-            src={selectedImage}
-            className="main-image"
-            alt={title}
-          />
+          <img src={selectedImage} className="main-image" alt={title} />
         )}
 
-        {/* Thumbnails */}
         {imagesArray.length > 1 && (
           <div className="thumbnail-container">
             {imagesArray.map((img, index) => (
@@ -130,10 +130,8 @@ export default function ImageDetails() {
           </div>
         )}
 
-        {/* Title */}
         <h2 className="mt-3">{title}</h2>
 
-        {/* Price */}
         <div
           style={{
             marginTop: "10px",
@@ -151,7 +149,6 @@ export default function ImageDetails() {
           >
             ₹{price}
           </span>
-
           {originalPrice && (
             <span
               style={{
@@ -181,7 +178,6 @@ export default function ImageDetails() {
           {expanded ? "Show Less ▲" : "Read More ▼"}
         </button>
 
-        {/* Buttons */}
         <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
           <button
             onClick={handleAddToCart}
@@ -218,16 +214,11 @@ export default function ImageDetails() {
           </button>
         </div>
 
-        {/* Related Products */}
         <h3 className="mt-5 text-capitalize">
           More from {fromCategory}
         </h3>
 
-        <Nwmasonry
-          images={relatedImages}
-          categoryName={fromCategory}
-        />
-
+        <Nwmasonry images={relatedImages} categoryName={fromCategory} />
       </div>
     </div>
   );
