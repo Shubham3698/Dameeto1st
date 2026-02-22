@@ -7,6 +7,7 @@ export const stickerData = [
     src: "https://i.pinimg.com/1200x/5a/ad/0a/5aad0a8534ff652ffab1788930547741.jpg",
     title: "Girl Aesthetic Sticker",
     tag: "Aesthetic",
+    badge: "hot", 
     shortDesc: "Premium glossy sticker.",
     longDesc:
       "This aesthetic girl sticker expresses mood, personality, vibes and looks great on phone covers and laptops.",
@@ -14,7 +15,7 @@ export const stickerData = [
     finalPrice: 99,
   },
   {
-    src: "https://i.pinimg.com/736x/48/ba/91/48ba918c7fbdeee6057a7e664f35481b.jpg",
+    src: "https://i.pinimg.com/736x/e2/c4/13/e2c41353d25e9aaaaeff36bbf125beea.jpg",
     title: "Dark Anime Sticker",
     tag: "Anime",
     shortDesc: "High-quality matte finish.",

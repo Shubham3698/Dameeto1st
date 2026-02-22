@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function Nwmasonry({ images, categoryName }) {
+export default function Nwmasonry({ images = [], categoryName }) {
   const navigate = useNavigate();
+  const containerRef = useRef(null);
 
   const handleClick = (item) => {
     navigate("/image-details", {
@@ -15,9 +16,43 @@ export default function Nwmasonry({ images, categoryName }) {
     });
   };
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const visibleHeight = container.clientHeight;
+
+      // 🔽 Only bottom infinite
+      if (scrollTop + visibleHeight >= scrollHeight - 5) {
+        const oneSetHeight = scrollHeight / 3;
+        container.scrollTop = scrollTop - oneSetHeight;
+      }
+    };
+
+    // Start from middle set
+    setTimeout(() => {
+      container.scrollTop = container.scrollHeight / 3;
+    }, 100);
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const loopImages = [...images, ...images, ...images];
+
   return (
-    <div style={{ background: "#fff3eb" }} className="container py-4">
-      
+    <div
+      ref={containerRef}
+      style={{
+        background: "#fff3eb",
+        height: "100vh",
+        overflowY: "auto",
+      }}
+      className="container py-4"
+    >
       <style>{`
         .masonry {
           column-count: 1;
@@ -25,21 +60,15 @@ export default function Nwmasonry({ images, categoryName }) {
         }
 
         @media (max-width: 600px) {
-          .masonry {
-            column-count: 2 !important;
-          }
+          .masonry { column-count: 2 !important; }
         }
 
         @media (min-width: 768px) {
-          .masonry {
-            column-count: 3;
-          }
+          .masonry { column-count: 3; }
         }
 
         @media (min-width: 992px) {
-          .masonry {
-            column-count: 4;
-          }
+          .masonry { column-count: 4; }
         }
 
         .image-wrapper {
@@ -60,28 +89,23 @@ export default function Nwmasonry({ images, categoryName }) {
           box-shadow: 0 10px 20px rgba(0,0,0,0.22);
         }
 
-        /* 🔥 30px Fixed Badge */
+        /* 🔥 Badge */
         .badge-custom {
           position: absolute;
           top: 6px;
           left: 6px;
-
           width: 30px;
           height: 18px;
-
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
-
           font-size: 7px;
           font-weight: 600;
           border-radius: 8px;
           color: white;
-          z-index: 2;
           text-transform: uppercase;
           letter-spacing: 0.3px;
-
           animation: rgbFlow 4s linear infinite;
         }
 
@@ -89,7 +113,6 @@ export default function Nwmasonry({ images, categoryName }) {
           white-space: nowrap;
         }
 
-        /* Scroll only when needed */
         .scroll-text {
           display: inline-block;
           padding-left: 100%;
@@ -111,13 +134,12 @@ export default function Nwmasonry({ images, categoryName }) {
       `}</style>
 
       <div className="masonry">
-        {images?.map((item, i) => {
+        {loopImages.map((item, i) => {
           const isLongText =
-            item.badge && item.badge.length > 4; // 30px width ke hisaab se
+            item.badge && item.badge.length > 4;
 
           return (
             <div key={i} className="image-wrapper">
-              
               {item.badge && (
                 <div className="badge-custom">
                   <div
