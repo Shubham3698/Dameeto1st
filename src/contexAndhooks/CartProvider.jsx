@@ -2,10 +2,19 @@ import React, { useState, useEffect } from "react";
 import { CartContext } from "./CartContext";
 
 export const CartProvider = ({ children }) => {
+
+  // Safe localStorage load
   const [cartItems, setCartItems] = useState(() => {
-    return JSON.parse(localStorage.getItem("cartItems")) || [];
+    try {
+      const stored = localStorage.getItem("cartItems");
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error("LocalStorage error:", error);
+      return [];
+    }
   });
 
+  // Save to localStorage
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
@@ -13,42 +22,56 @@ export const CartProvider = ({ children }) => {
   // Add item
   const addToCart = (item) => {
     setCartItems((prev) => {
-      const existingIndex = prev.findIndex(i => i.src === item.src);
+      const existingIndex = prev.findIndex(
+        (i) => i.src === item.src
+      );
 
       if (existingIndex !== -1) {
         const updated = [...prev];
         updated[existingIndex] = {
           ...updated[existingIndex],
-          quantity: updated[existingIndex].quantity + 1
+          quantity: updated[existingIndex].quantity + 1,
         };
         return updated;
-      } else {
-        return [...prev, { ...item, quantity: 1 }];
       }
+
+      return [...prev, { ...item, quantity: 1 }];
     });
   };
 
   // Remove item
   const removeFromCart = (index) => {
-    setCartItems((prev) => prev.filter((_, i) => i !== index));
+    setCartItems((prev) =>
+      prev.filter((_, i) => i !== index)
+    );
   };
 
-  // Update quantity
+  // Update quantity safely
   const updateQuantity = (index, amount) => {
     setCartItems((prev) => {
       const updated = [...prev];
-      updated[index] = {
-        ...updated[index],
-        quantity: updated[index].quantity + amount
-      };
-      if (updated[index].quantity <= 0) updated.splice(index, 1);
+
+      if (!updated[index]) return prev;
+
+      const newQty = updated[index].quantity + amount;
+
+      if (newQty <= 0) {
+        updated.splice(index, 1);
+      } else {
+        updated[index] = {
+          ...updated[index],
+          quantity: newQty,
+        };
+      }
+
       return updated;
     });
   };
 
-  // 🔥 ADD THIS FUNCTION
+  // Clear cart completely
   const clearCart = () => {
     setCartItems([]);
+    localStorage.removeItem("cartItems");
   };
 
   return (
@@ -58,7 +81,7 @@ export const CartProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         updateQuantity,
-        clearCart   // 🔥 MUST INCLUDE THIS
+        clearCart,
       }}
     >
       {children}

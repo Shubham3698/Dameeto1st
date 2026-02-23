@@ -4,14 +4,15 @@ import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
 
 export default function CartPage() {
-  const { cartItems, updateQuantity, clearCart } = useContext(CartContext);
+  const { cartItems, updateQuantity, clearCart } =
+    useContext(CartContext);
 
   const cartEndRef = useRef(null);
   const prevCartLengthRef = useRef(cartItems.length);
 
   const [coupon, setCoupon] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // 🔥 loader state
 
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
@@ -20,7 +21,7 @@ export default function CartPage() {
     prevCartLengthRef.current = cartItems.length;
   }, [cartItems]);
 
-  // ✅ TOTAL CALCULATION
+  // ================= TOTAL CALCULATION =================
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
@@ -29,7 +30,7 @@ export default function CartPage() {
   const discountAmount = (subtotal * discountPercent) / 100;
   const finalTotal = subtotal - discountAmount;
 
-  // ✅ COUPON SYSTEM
+  // ================= COUPON SYSTEM =================
   const applyCoupon = () => {
     const code = coupon.trim().toUpperCase();
 
@@ -45,17 +46,13 @@ export default function CartPage() {
     }
   };
 
-  // ✅ WHATSAPP MESSAGE
+  // ================= WHATSAPP MESSAGE =================
   const generateWhatsAppMessage = () => {
-    if (cartItems.length === 0)
-      return "Hi! I have a query about your products.";
-
-    let msg = "Hi! I want to order the following items:\n";
+    let msg = "Hello 👋\n\n";
+    msg += "I have placed an order for the following items:\n\n";
 
     cartItems.forEach((item, index) => {
-      msg += `${index + 1}. ${item.title} - Qty: ${
-        item.quantity
-      } - Price: ₹${item.price * item.quantity}\n`;
+      msg += `${index + 1}. ${item.title} - Qty: ${item.quantity} - Price: ₹${item.price * item.quantity}\n`;
     });
 
     msg += `\nSubtotal: ₹${subtotal}`;
@@ -64,47 +61,53 @@ export default function CartPage() {
       msg += `\nDiscount (${discountPercent}%): -₹${discountAmount}`;
     }
 
-    msg += `\nFinal Total: ₹${finalTotal}`;
+    msg += `\nFinal Total: ₹${finalTotal}\n\n`;
+    msg += "Please confirm that you have received my order.\n";
+    msg += "Kindly dispatch it as soon as possible. 🚀\n\n";
+    msg += "Thank you!";
 
     return msg;
   };
 
-  // ✅ PLACE ORDER FUNCTION
+  // ================= PLACE ORDER =================
   const placeOrder = async () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty!");
       return;
     }
 
-    if (loading) return; // prevent multiple clicks
-
-    setLoading(true);
+    setLoading(true); // 🔥 start loader
 
     const message = generateWhatsAppMessage();
 
     try {
-      const res = await fetch("https://serdeptry1st.onrender.com/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
-      });
-
-      const json = await res.json();
+      const res = await fetch(
+        "https://serdeptry1st.onrender.com/orders",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        }
+      );
 
       if (res.ok) {
         alert("✅ Your order is placed successfully!");
-        clearCart(); // ⭐ clear cart
-        setCoupon("");
-        setDiscountPercent(0);
-      } else {
-        alert(`❌ ${json.message || "Error placing your order"}`);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Server Error");
-    }
+        clearCart();
 
-    setLoading(false);
+        const whatsappURL =
+          "https://wa.me/917080981033?text=" +
+          encodeURIComponent(message);
+
+        window.location.href = whatsappURL;
+      } else {
+        alert("❌ Error placing your order");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("❌ Error placing your order");
+      setLoading(false);
+    }
   };
 
   return (
@@ -156,22 +159,16 @@ export default function CartPage() {
               <Col xs={4} md={2} className="d-flex align-items-center">
                 <button
                   onClick={() => updateQuantity(index, -1)}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    fontSize: "20px",
-                  }}
+                  style={{ background: "transparent", border: "none", fontSize: "20px" }}
                 >
                   –
                 </button>
+
                 <span className="mx-2">{item.quantity}</span>
+
                 <button
                   onClick={() => updateQuantity(index, 1)}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    fontSize: "20px",
-                  }}
+                  style={{ background: "transparent", border: "none", fontSize: "20px" }}
                 >
                   +
                 </button>
@@ -182,7 +179,6 @@ export default function CartPage() {
 
         <div ref={cartEndRef}></div>
 
-        {/* ✅ ORDER SUMMARY */}
         {cartItems.length > 0 && (
           <div
             style={{
@@ -217,7 +213,7 @@ export default function CartPage() {
               <span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
             </div>
 
-            {/* Coupon */}
+            {/* COUPON SECTION */}
             <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
               <input
                 type="text"
@@ -246,7 +242,7 @@ export default function CartPage() {
               </button>
             </div>
 
-            {/* ✅ PLACE ORDER BUTTON */}
+            {/* PLACE ORDER BUTTON WITH LOADER */}
             <button
               onClick={placeOrder}
               disabled={loading}
@@ -260,30 +256,18 @@ export default function CartPage() {
                 cursor: loading ? "not-allowed" : "pointer",
               }}
             >
-              {loading ? "Placing Order..." : "Place Order"}
+              {loading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  Placing Order...
+                </>
+              ) : (
+                "Place Order"
+              )}
             </button>
-          </div>
-        )}
-
-        {/* ✅ FULL SCREEN LOADER */}
-        {loading && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              background: "rgba(0,0,0,0.5)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#fff",
-              fontSize: "22px",
-              zIndex: 9999,
-            }}
-          >
-            Processing your order...
           </div>
         )}
 
