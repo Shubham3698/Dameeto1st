@@ -4,7 +4,7 @@ import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
 
 export default function CartPage() {
-  const { cartItems, removeFromCart, updateQuantity } = useContext(CartContext);
+  const { cartItems, updateQuantity } = useContext(CartContext); // removeFromCart removed to fix ESLint
   const cartEndRef = useRef(null);
   const prevCartLengthRef = useRef(cartItems.length);
 
@@ -46,6 +46,7 @@ export default function CartPage() {
     }
   };
 
+  // ⭐ GENERATE WHATSAPP MESSAGE
   const generateWhatsAppMessage = () => {
     if (cartItems.length === 0) return "Hi! I have a query about your products.";
 
@@ -64,6 +65,32 @@ export default function CartPage() {
     msg += `\nFinal Total: ₹${finalTotal}`;
 
     return msg;
+  };
+
+  // ⭐ PLACE ORDER BUTTON FUNCTION
+  const placeOrder = async () => {
+    const message = generateWhatsAppMessage();
+    if (cartItems.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    try {
+      const res = await fetch("https://serdeptry1st.onrender.com/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        alert("✅ your order is placed");
+      } else {
+        alert(`❌ ${json.message || "Error to place your order"}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error to place your order");
+    }
   };
 
   return (
@@ -119,15 +146,6 @@ export default function CartPage() {
                   style={{ background: "transparent", border: "none", fontSize: "20px" }}
                 >
                   +
-                </button>
-              </Col>
-
-              <Col xs={12} md={2} className="mt-2 mt-md-0">
-                <button
-                  onClick={() => removeFromCart(index)}
-                  style={{ background: "transparent", border: "none", color: "red", padding: 0 }}
-                >
-                  Remove
                 </button>
               </Col>
             </Row>
@@ -199,9 +217,26 @@ export default function CartPage() {
                 Apply
               </button>
             </div>
+
+            {/* ⭐ PLACE ORDER BUTTON */}
+            <button
+              onClick={placeOrder}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#fe3d00",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+            >
+              Place Order
+            </button>
           </div>
         )}
 
+        {/* WhatsApp Button */}
         <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage()} />
       </Container>
     </div>
