@@ -4,13 +4,14 @@ import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
 
 export default function CartPage() {
-  const { cartItems, updateQuantity } = useContext(CartContext); // removeFromCart removed to fix ESLint
+  const { cartItems, updateQuantity, clearCart } = useContext(CartContext);
+
   const cartEndRef = useRef(null);
   const prevCartLengthRef = useRef(cartItems.length);
 
-  // ⭐ NEW STATES
   const [coupon, setCoupon] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
@@ -19,7 +20,7 @@ export default function CartPage() {
     prevCartLengthRef.current = cartItems.length;
   }, [cartItems]);
 
-  // ⭐ TOTAL CALCULATION
+  // ✅ TOTAL CALCULATION
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
@@ -28,32 +29,33 @@ export default function CartPage() {
   const discountAmount = (subtotal * discountPercent) / 100;
   const finalTotal = subtotal - discountAmount;
 
-  // ⭐ COUPON SYSTEM
+  // ✅ COUPON SYSTEM
   const applyCoupon = () => {
     const code = coupon.trim().toUpperCase();
 
     if (code === "SAVE10") {
       setDiscountPercent(10);
       alert("10% Discount Applied 🎉");
-    } 
-    else if (code === "SAVE20") {
+    } else if (code === "SAVE20") {
       setDiscountPercent(20);
       alert("20% Discount Applied 🎉");
-    } 
-    else {
+    } else {
       setDiscountPercent(0);
       alert("Invalid Coupon ❌");
     }
   };
 
-  // ⭐ GENERATE WHATSAPP MESSAGE
+  // ✅ WHATSAPP MESSAGE
   const generateWhatsAppMessage = () => {
-    if (cartItems.length === 0) return "Hi! I have a query about your products.";
+    if (cartItems.length === 0)
+      return "Hi! I have a query about your products.";
 
     let msg = "Hi! I want to order the following items:\n";
 
     cartItems.forEach((item, index) => {
-      msg += `${index + 1}. ${item.title} - Qty: ${item.quantity} - Price: ₹${item.price * item.quantity}\n`;
+      msg += `${index + 1}. ${item.title} - Qty: ${
+        item.quantity
+      } - Price: ₹${item.price * item.quantity}\n`;
     });
 
     msg += `\nSubtotal: ₹${subtotal}`;
@@ -67,13 +69,18 @@ export default function CartPage() {
     return msg;
   };
 
-  // ⭐ PLACE ORDER BUTTON FUNCTION
+  // ✅ PLACE ORDER FUNCTION
   const placeOrder = async () => {
-    const message = generateWhatsAppMessage();
     if (cartItems.length === 0) {
       alert("Your cart is empty!");
       return;
     }
+
+    if (loading) return; // prevent multiple clicks
+
+    setLoading(true);
+
+    const message = generateWhatsAppMessage();
 
     try {
       const res = await fetch("https://serdeptry1st.onrender.com/orders", {
@@ -81,16 +88,23 @@ export default function CartPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message }),
       });
+
       const json = await res.json();
+
       if (res.ok) {
-        alert("✅ your order is placed");
+        alert("✅ Your order is placed successfully!");
+        clearCart(); // ⭐ clear cart
+        setCoupon("");
+        setDiscountPercent(0);
       } else {
-        alert(`❌ ${json.message || "Error to place your order"}`);
+        alert(`❌ ${json.message || "Error placing your order"}`);
       }
     } catch (err) {
       console.error(err);
-      alert("❌ Error to place your order");
+      alert("❌ Server Error");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -114,8 +128,14 @@ export default function CartPage() {
               <Col xs={5} md={6}>
                 <h5 style={{ margin: 0 }}>{item.title}</h5>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontSize: "20px", fontWeight: "700", color: "#fe3d00" }}>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <span
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "700",
+                      color: "#fe3d00",
+                    }}
+                  >
                     ₹{item.price}
                   </span>
 
@@ -136,14 +156,22 @@ export default function CartPage() {
               <Col xs={4} md={2} className="d-flex align-items-center">
                 <button
                   onClick={() => updateQuantity(index, -1)}
-                  style={{ background: "transparent", border: "none", fontSize: "20px" }}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    fontSize: "20px",
+                  }}
                 >
                   –
                 </button>
                 <span className="mx-2">{item.quantity}</span>
                 <button
                   onClick={() => updateQuantity(index, 1)}
-                  style={{ background: "transparent", border: "none", fontSize: "20px" }}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    fontSize: "20px",
+                  }}
                 >
                   +
                 </button>
@@ -154,7 +182,7 @@ export default function CartPage() {
 
         <div ref={cartEndRef}></div>
 
-        {/* ⭐ ORDER SUMMARY */}
+        {/* ✅ ORDER SUMMARY */}
         {cartItems.length > 0 && (
           <div
             style={{
@@ -218,26 +246,51 @@ export default function CartPage() {
               </button>
             </div>
 
-            {/* ⭐ PLACE ORDER BUTTON */}
+            {/* ✅ PLACE ORDER BUTTON */}
             <button
               onClick={placeOrder}
+              disabled={loading}
               style={{
                 marginTop: "20px",
                 padding: "10px 20px",
-                backgroundColor: "#fe3d00",
+                backgroundColor: loading ? "#999" : "#fe3d00",
                 color: "#fff",
                 border: "none",
                 borderRadius: "8px",
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
               }}
             >
-              Place Order
+              {loading ? "Placing Order..." : "Place Order"}
             </button>
           </div>
         )}
 
-        {/* WhatsApp Button */}
-        <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage()} />
+        {/* ✅ FULL SCREEN LOADER */}
+        {loading && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              background: "rgba(0,0,0,0.5)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "#fff",
+              fontSize: "22px",
+              zIndex: 9999,
+            }}
+          >
+            Processing your order...
+          </div>
+        )}
+
+        <WhatsAppBtn
+          phone="7080981033"
+          message={generateWhatsAppMessage()}
+        />
       </Container>
     </div>
   );

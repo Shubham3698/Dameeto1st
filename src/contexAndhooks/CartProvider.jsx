@@ -10,10 +10,9 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Add item to cart (FIXED 🔥)
+  // Add item
   const addToCart = (item) => {
     setCartItems((prev) => {
-      // 🔥 FIX: Compare using src (NOT title)
       const existingIndex = prev.findIndex(i => i.src === item.src);
 
       if (existingIndex !== -1) {
@@ -34,7 +33,7 @@ export const CartProvider = ({ children }) => {
     setCartItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Update qty
+  // Update quantity
   const updateQuantity = (index, amount) => {
     setCartItems((prev) => {
       const updated = [...prev];
@@ -47,9 +46,20 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  // 🔥 ADD THIS FUNCTION
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, updateQuantity }}
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart   // 🔥 MUST INCLUDE THIS
+      }}
     >
       {children}
     </CartContext.Provider>
