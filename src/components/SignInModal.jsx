@@ -8,25 +8,30 @@ export default function SignInModal({ onClose }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // 🔥 Loading state
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true); // 🔥 Start loading
 
     if (!email || !password) {
-      return setError("Email & password required");
+      setError("Email & password required");
+      setLoading(false);
+      return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return setError("Invalid email format");
+      setError("Invalid email format");
+      setLoading(false);
+      return;
     }
 
-    // Signup validation
     if (!isLogin) {
-      if (!name) return setError("Name is required");
-      if (email !== confirmEmail) return setError("Emails do not match");
-      if (password !== confirmPassword) return setError("Passwords do not match");
+      if (!name) { setError("Name is required"); setLoading(false); return; }
+      if (email !== confirmEmail) { setError("Emails do not match"); setLoading(false); return; }
+      if (password !== confirmPassword) { setError("Passwords do not match"); setLoading(false); return; }
     }
 
     try {
@@ -34,9 +39,7 @@ export default function SignInModal({ onClose }) {
         ? "https://serdeptry1st.onrender.com/api/users/login"
         : "https://serdeptry1st.onrender.com/api/users/signup";
 
-      const body = isLogin
-        ? { email, password }     // 🔥 Login me sirf email + password
-        : { name, email, password };
+      const body = isLogin ? { email, password } : { name, email, password };
 
       const res = await fetch(url, {
         method: "POST",
@@ -47,18 +50,20 @@ export default function SignInModal({ onClose }) {
       const data = await res.json();
 
       if (!res.ok) {
-        return setError(data.message || "Something went wrong");
+        setError(data.message || "Something went wrong");
+        setLoading(false);
+        return;
       }
 
-      // 🔥 IMPORTANT: Name + Email dono save karo
+      // Save user info
       localStorage.setItem("userEmail", data.email);
       localStorage.setItem("userName", data.name);
 
       // Redirect
       window.location.href = "/account";
-
-    } catch  {
+    } catch {
       setError("Server error, try again");
+      setLoading(false);
     }
   };
 
@@ -111,11 +116,30 @@ export default function SignInModal({ onClose }) {
           />
         )}
 
-        <button type="submit" style={submitStyle}>
-          {isLogin ? "Login" : "Sign Up"}
+        <button
+          type="submit"
+          style={{
+            ...submitStyle,
+            backgroundColor: loading ? "#999" : "#fe3d00", // 🔥 Loading color
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
+          disabled={loading} // 🔥 Disable while loading
+        >
+          {loading
+            ? isLogin
+              ? "Logging in..."
+              : "Signing up..."
+            : isLogin
+            ? "Login"
+            : "Sign Up"}
         </button>
 
-        <button type="button" onClick={onClose} style={cancelStyle}>
+        <button
+          type="button"
+          onClick={onClose}
+          style={cancelStyle}
+          disabled={loading} // 🔥 Optional: prevent closing mid-request
+        >
           Cancel
         </button>
 
@@ -170,6 +194,7 @@ const submitStyle = {
   border: "none",
   borderRadius: "6px",
   marginBottom: "6px",
+  fontWeight: "700",
 };
 
 const cancelStyle = {
@@ -177,6 +202,7 @@ const cancelStyle = {
   padding: "8px",
   border: "1px solid #fe3d00",
   borderRadius: "6px",
+  marginBottom: "6px",
 };
 
 const toggleStyle = {
