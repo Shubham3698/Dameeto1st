@@ -1,58 +1,97 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaUserCircle, FaGift, FaShoppingCart, FaHeart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function UserAccount() {
-  // Dummy data for now
-  const user = {
-    name: "Shubham Pandey",
-    email: "Pandey0shubham3698@gmail.com",
-    credits: 500,
-    orders: 12,
-    wishlist: 7,
+  const navigate = useNavigate();
+
+  // ✅ Direct localStorage se data lo
+  const name = localStorage.getItem("userName");
+  const email = localStorage.getItem("userEmail");
+
+  // ✅ Agar login nahi hai to redirect
+  useEffect(() => {
+    if (!email) {
+      navigate("/");
+    }
+  }, [email, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+    navigate("/");
   };
 
   return (
-    <div style={{ background: "#fff3eb", minHeight: "100vh", padding: "80px 20px 20px 20px" }}>
+    <div
+      style={{
+        background: "#fff3eb",
+        minHeight: "100vh",
+        padding: "80px 20px 20px 20px",
+      }}
+    >
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <FaUserCircle style={{ fontSize: "80px", color: "#fe3d00" }} />
-        <h2 style={{ marginTop: "10px", fontWeight: "700" }}>{user.name}</h2>
-        <p style={{ opacity: 0.7 }}>{user.email}</p>
+
+        {/* 🔥 Login wala naam yaha show hoga */}
+        <h2 style={{ marginTop: "10px", fontWeight: "700" }}>
+          {name ? name : "User"}
+        </h2>
+
+        <p style={{ opacity: 0.7 }}>{email}</p>
       </div>
 
       {/* Stats Cards */}
-      <div style={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          flexWrap: "wrap",
+          gap: "20px",
+        }}
+      >
         <div style={cardStyle}>
           <FaGift style={{ fontSize: "28px", color: "#fe3d00" }} />
-          <h3>{user.credits}</h3>
+          <h3>0</h3>
           <p>Credits</p>
         </div>
 
         <div style={cardStyle}>
           <FaShoppingCart style={{ fontSize: "28px", color: "#fe3d00" }} />
-          <h3>{user.orders}</h3>
+          <h3>0</h3>
           <p>Orders</p>
         </div>
 
         <div style={cardStyle}>
           <FaHeart style={{ fontSize: "28px", color: "#fe3d00" }} />
-          <h3>{user.wishlist}</h3>
+          <h3>0</h3>
           <p>Wishlist</p>
         </div>
       </div>
 
       {/* Actions Section */}
-      <div style={{ marginTop: "40px", maxWidth: "400px", marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>
+      <div
+        style={{
+          marginTop: "40px",
+          maxWidth: "400px",
+          marginLeft: "auto",
+          marginRight: "auto",
+          textAlign: "center",
+        }}
+      >
         <button style={actionButton}>Edit Profile</button>
         <button style={actionButton}>Top Up Credits</button>
         <button style={actionButton}>View Orders</button>
-        <button style={actionButton}>Logout</button>
+        <button style={actionButton} onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </div>
   );
 }
 
-// Common card style
+// Card style
 const cardStyle = {
   background: "white",
   borderRadius: "16px",
@@ -63,7 +102,7 @@ const cardStyle = {
   cursor: "pointer",
 };
 
-// Action buttons style
+// Button style
 const actionButton = {
   display: "block",
   width: "100%",
