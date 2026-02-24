@@ -111,7 +111,7 @@ export default function BottomMenu({ items }) {
           top: "60px",
           left: 0,
           width: "100%",
-          height: "50px",
+          height: "58px",
           backgroundColor: "#fff3eb",
           display: "flex",
           overflowX: "auto",
