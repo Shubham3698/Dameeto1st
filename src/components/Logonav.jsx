@@ -98,6 +98,7 @@ export default function TopNavbar() {
             alignItems: "center",
             gap: "16px",
             fontSize: "24px",
+            marginLeft:"6px"
           }}
         >
           {/* 👇 Updated User Icon Logic */}
@@ -106,7 +107,7 @@ export default function TopNavbar() {
             onClick={handleUserClick}
           />
 
-          <Link to="/cart" style={{ color: "#fe3d00" }}>
+          <Link to="/cart" style={{ color: "#fe3d00", marginBottom:"5px" }}>
             <FaShoppingCart />
           </Link>
         </div>

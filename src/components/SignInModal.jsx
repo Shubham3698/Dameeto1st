@@ -31,8 +31,8 @@ export default function SignInModal({ onClose }) {
 
     try {
       const url = isLogin
-        ? "http://localhost:5000/api/users/login"
-        : "http://localhost:5000/api/users/signup";
+        ? "http://serdeptry1st.onrender.com/api/users/login"
+        : "http://serdeptry1st.onrender.com/api/users/signup";
 
       const body = isLogin
         ? { email, password }     // 🔥 Login me sirf email + password
