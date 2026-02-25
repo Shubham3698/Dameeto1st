@@ -1,23 +1,42 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { stickerData, trendingData, posterData, goodiesData,funnyData ,hotData } from "../contexAndhooks/Ddata";
+import {
+  stickerData,
+  trendingData,
+  posterData,
+  goodiesData,
+  funnyData,
+  hotData
+} from "../contexAndhooks/Ddata";
 
 export default function SearchResults() {
   const navigate = useNavigate();
-  const query = new URLSearchParams(useLocation().search).get("query")?.toLowerCase();
+  const location = useLocation();
 
-  // Merge all data arrays into a single array
-  const allData = [...stickerData, ...trendingData, ...posterData, ...goodiesData,...funnyData,...hotData];
+  const query = new URLSearchParams(location.search)
+    .get("query")
+    ?.toLowerCase() || "";
 
-  // Filter based on query matching title or tag
-  const results = allData.filter(
-    (item) =>
-      item.title.toLowerCase().includes(query) ||
-      (item.tag && item.tag.toLowerCase().includes(query))
-  );
+  // 🔥 Merge all product data
+  const allData = [
+    ...stickerData,
+    ...trendingData,
+    ...posterData,
+    ...goodiesData,
+    ...funnyData,
+    ...hotData
+  ];
 
+  // 🔥 Filter safely
+  const results = allData.filter((item) => {
+    const titleMatch = item.title?.toLowerCase().includes(query);
+    const tagMatch = item.tag?.toLowerCase().includes(query);
+    return titleMatch || tagMatch;
+  });
+
+  // ✅ FIXED ROUTE
   const openImage = (item) => {
-    navigate("/image-details", { state: { item } });
+    navigate(`/image/${item.id}`);
   };
 
   return (
@@ -27,7 +46,9 @@ export default function SearchResults() {
       </h4>
 
       {results.length === 0 ? (
-        <p style={{ textAlign: "center", fontSize: "18px" }}>❌ No results found</p>
+        <p style={{ textAlign: "center", fontSize: "18px" }}>
+          ❌ No results found
+        </p>
       ) : (
         <>
           <style>{`
@@ -60,9 +81,9 @@ export default function SearchResults() {
           `}</style>
 
           <div className="masonry">
-            {results.map((item, i) => (
+            {results.map((item) => (
               <img
-                key={i}
+                key={item.id}   // ✅ better than index
                 src={item.src}
                 alt={item.title}
                 onClick={() => openImage(item)}

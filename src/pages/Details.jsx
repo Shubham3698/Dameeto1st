@@ -1,58 +1,102 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
-import { useLocation } from "react-router-dom";
-import { FaHeart, FaShoppingCart } from "react-icons/fa";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useMemo
+} from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { FaHeart, FaShoppingCart, FaShareAlt } from "react-icons/fa";
 import Nwmasonry from "../components/Nwmasonry";
 import { CartContext } from "../contexAndhooks/CartContext";
 
+import {
+  trendingData,
+  stickerData,
+  posterData,
+  goodiesData,
+  funnyData,
+  hotData
+} from "../contexAndhooks/Ddata";
+
 export default function ImageDetails() {
-  const { state } = useLocation();
+  const { id } = useParams();
+  const location = useLocation();
   const { addToCart } = useContext(CartContext);
-  const item = state?.item;
 
-  const fromCategory = state?.category;
-  const relatedImages = state?.images || [];
-
-  const title = item?.title;
-  const shortDesc = item?.shortDesc;
-  const longDesc = item?.longDesc;
-
-  const price = item?.finalPrice ?? 199;
-  const originalPrice = item?.originalPrice ?? null;
-
-  const [expanded, setExpanded] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  const [selectedImage, setSelectedImage] = useState(() => {
-    if (!item) return null;
-    if (item.subImages && item.subImages.length > 0) {
-      return [item.src, ...item.subImages][0];
-    }
-    return item?.src || null;
-  });
+  /* 🔥 All Products */
+  const allProducts = useMemo(() => {
+    return [
+      ...trendingData,
+      ...stickerData,
+      ...posterData,
+      ...goodiesData,
+      ...funnyData,
+      ...hotData
+    ];
+  }, []);
 
+  /* 🔥 Find Item */
+  const item = useMemo(() => {
+    if (location.state?.item) return location.state.item;
+
+    return allProducts.find(
+      (p) => String(p.id) === String(id)
+    );
+  }, [id, location.state, allProducts]);
+
+  /* 🔥 Images Array */
   const imagesArray = useMemo(() => {
     if (!item) return [];
-    if (item.subImages && item.subImages.length > 0) {
+
+    if (item.subImages?.length > 0) {
       return [item.src, ...item.subImages];
     }
-    return [item.src];
+
+    return item.src ? [item.src] : [];
   }, [item]);
 
+  /* 🔥 Scroll + Fade */
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    setFadeIn(true);
+  }, [id]);
 
-    const timer = setTimeout(() => {
-      if (imagesArray.length > 0) {
-        setSelectedImage(imagesArray[0]);
-      }
-      setFadeIn(true);
-    }, 0);
+  /* 🔥 Default Image */
+  useEffect(() => {
+    if (imagesArray.length > 0) {
+      setSelectedImage(imagesArray[0]);
+    }
+  }, [imagesArray]);
 
-    return () => clearTimeout(timer);
-  }, [item, imagesArray]);
+  if (!item) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "100px" }}>
+        <h2>Product Not Found</h2>
+      </div>
+    );
+  }
 
+  const fromCategory = location.state?.category || "collection";
+  const relatedImages = location.state?.images || [];
+
+  const {
+    title,
+    shortDesc,
+    longDesc,
+    finalPrice,
+    originalPrice
+  } = item;
+
+  const price = finalPrice ?? 199;
+
+  /* 🛒 Add to Cart */
   const handleAddToCart = () => {
     addToCart({
+      id: item.id,
       src: selectedImage,
       title,
       shortDesc,
@@ -60,15 +104,28 @@ export default function ImageDetails() {
       price,
       originalPrice
     });
+
     alert(`${title} added to cart!`);
   };
 
-  // 🔹 Share Function for overlay icon
-  const handleShare = () => {
-    const pageUrl = window.location.href;
-    const message = `Hey! Check out this product: ${title} for ₹${price}. Link: ${pageUrl}`;
-    const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(message);
-    window.open(whatsappUrl, "_blank");
+  /* 🔗 Share Function */
+  const handleShare = async () => {
+    const shareData = {
+      title: title,
+      text: `Check this out: ${title}`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard!");
+      }
+    } catch (error) {
+      console.log("Sharing failed", error);
+    }
   };
 
   return (
@@ -82,17 +139,43 @@ export default function ImageDetails() {
       }}
     >
       <style>{`
+        .main-image-wrapper {
+          position: relative;
+        }
+
         .main-image {
           width: 100%;
           border-radius: 16px;
           box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
+
+        .share-btn {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          background: white;
+          border-radius: 50%;
+          width: 45px;
+          height: 45px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          cursor: pointer;
+          transition: 0.2s ease;
+        }
+
+        .share-btn:hover {
+          transform: scale(1.1);
+        }
+
         .thumbnail-container {
           display: flex;
           gap: 10px;
           overflow-x: auto;
           padding: 15px 0;
         }
+
         .thumb {
           min-width: 70px;
           height: 70px;
@@ -102,51 +185,31 @@ export default function ImageDetails() {
           border: 2px solid #ddd;
           transition: 0.2s ease;
         }
+
         .active-thumb {
           border: 3px solid #fe3d00;
         }
+
         .thumbnail-container::-webkit-scrollbar {
           display: none;
         }
       `}</style>
 
-      <div style={{ maxWidth: "600px", margin: "0 auto", position: "relative" }}>
+      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+        
         {selectedImage && (
-          <>
-            {/* Main Product Image */}
+          <div className="main-image-wrapper">
             <img
               src={selectedImage}
               className="main-image"
               alt={title}
             />
 
-            {/* Share Icon Overlay */}
-            <button
-              onClick={handleShare}
-              style={{
-                position: "absolute",
-                top: "15px",
-                right: "15px",
-                background: "rgba(0,0,0,0.6)",
-                border: "none",
-                width: "45px",
-                height: "45px",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "white",
-                fontSize: "20px",
-                transition: "0.3s",
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.8)"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.6)"}
-              title="Share Product"
-            >
-              📤
-            </button>
-          </>
+            {/* 🔗 Share Icon */}
+            <div className="share-btn" onClick={handleShare}>
+              <FaShareAlt color="#fe3d00" size={18} />
+            </div>
+          </div>
         )}
 
         {imagesArray.length > 1 && (
@@ -156,7 +219,9 @@ export default function ImageDetails() {
                 key={index}
                 src={img}
                 onClick={() => setSelectedImage(img)}
-                className={`thumb ${selectedImage === img ? "active-thumb" : ""}`}
+                className={`thumb ${
+                  selectedImage === img ? "active-thumb" : ""
+                }`}
                 alt="thumbnail"
               />
             ))}
@@ -165,19 +230,26 @@ export default function ImageDetails() {
 
         <h2 className="mt-3">{title}</h2>
 
-        <div
-          style={{
-            marginTop: "10px",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-          }}
-        >
-          <span style={{ color: "#fe3d00", fontSize: "26px", fontWeight: "700" }}>
+        <div style={{
+          marginTop: "10px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px"
+        }}>
+          <span style={{
+            color: "#fe3d00",
+            fontSize: "26px",
+            fontWeight: "700"
+          }}>
             ₹{price}
           </span>
+
           {originalPrice && (
-            <span style={{ fontSize: "18px", textDecoration: "line-through", color: "#777" }}>
+            <span style={{
+              fontSize: "18px",
+              textDecoration: "line-through",
+              color: "#777"
+            }}>
               ₹{originalPrice}
             </span>
           )}
@@ -194,6 +266,7 @@ export default function ImageDetails() {
             color: "#fe3d00",
             border: "none",
             fontWeight: "600",
+            cursor: "pointer"
           }}
         >
           {expanded ? "Show Less ▲" : "Read More ▼"}
@@ -212,6 +285,7 @@ export default function ImageDetails() {
               display: "flex",
               alignItems: "center",
               gap: "8px",
+              cursor: "pointer"
             }}
           >
             <FaShoppingCart /> Add to Cart
@@ -229,14 +303,23 @@ export default function ImageDetails() {
               alignItems: "center",
               justifyContent: "center",
               fontSize: "20px",
+              cursor: "pointer"
             }}
           >
             <FaHeart />
           </button>
         </div>
 
-        <h3 className="mt-5 text-capitalize">More from {fromCategory}</h3>
-        <Nwmasonry images={relatedImages} categoryName={fromCategory} />
+        <h3 className="mt-5 text-capitalize">
+          More from {fromCategory}
+        </h3>
+
+        {relatedImages.length > 0 && (
+          <Nwmasonry
+            images={relatedImages}
+            categoryName={fromCategory}
+          />
+        )}
       </div>
     </div>
   );

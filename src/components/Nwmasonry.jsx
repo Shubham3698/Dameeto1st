@@ -6,8 +6,14 @@ export default function Nwmasonry({ images = [], categoryName }) {
   const navigate = useNavigate();
   const containerRef = useRef(null);
 
+  // 🔥 FIXED ROUTING (Dynamic)
   const handleClick = (item) => {
-    navigate("/image-details", {
+    if (!item?.id) {
+      console.error("ID missing in item");
+      return;
+    }
+
+    navigate(`/image/${item.id}`, {
       state: {
         item,
         category: categoryName,
@@ -25,14 +31,14 @@ export default function Nwmasonry({ images = [], categoryName }) {
       const scrollHeight = container.scrollHeight;
       const visibleHeight = container.clientHeight;
 
-      // 🔽 Only bottom infinite
+      // 🔥 Bottom infinite loop
       if (scrollTop + visibleHeight >= scrollHeight - 5) {
         const oneSetHeight = scrollHeight / 3;
         container.scrollTop = scrollTop - oneSetHeight;
       }
     };
 
-    // Start from middle set
+    // 🔥 Start from middle set
     setTimeout(() => {
       container.scrollTop = container.scrollHeight / 3;
     }, 100);
@@ -89,7 +95,6 @@ export default function Nwmasonry({ images = [], categoryName }) {
           box-shadow: 0 10px 20px rgba(0,0,0,0.22);
         }
 
-        /* 🔥 Badge */
         .badge-custom {
           position: absolute;
           top: 6px;
