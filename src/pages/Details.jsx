@@ -20,9 +20,8 @@ export default function ImageDetails() {
   const originalPrice = item?.originalPrice ?? null;
 
   const [expanded, setExpanded] = useState(false);
-  const [fadeIn, setFadeIn] = useState(false); // 🔹 Fade-in state
+  const [fadeIn, setFadeIn] = useState(false);
 
-  // Lazy initializer for selectedImage
   const [selectedImage, setSelectedImage] = useState(() => {
     if (!item) return null;
     if (item.subImages && item.subImages.length > 0) {
@@ -31,7 +30,6 @@ export default function ImageDetails() {
     return item?.src || null;
   });
 
-  // Memoize images array
   const imagesArray = useMemo(() => {
     if (!item) return [];
     if (item.subImages && item.subImages.length > 0) {
@@ -40,7 +38,6 @@ export default function ImageDetails() {
     return [item.src];
   }, [item]);
 
-  // Scroll to top and safely update selected image
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -48,7 +45,7 @@ export default function ImageDetails() {
       if (imagesArray.length > 0) {
         setSelectedImage(imagesArray[0]);
       }
-      setFadeIn(true); // 🔹 Fade-in trigger
+      setFadeIn(true);
     }, 0);
 
     return () => clearTimeout(timer);
@@ -66,13 +63,21 @@ export default function ImageDetails() {
     alert(`${title} added to cart!`);
   };
 
+  // 🔹 Share Function for overlay icon
+  const handleShare = () => {
+    const pageUrl = window.location.href;
+    const message = `Hey! Check out this product: ${title} for ₹${price}. Link: ${pageUrl}`;
+    const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(message);
+    window.open(whatsappUrl, "_blank");
+  };
+
   return (
     <div
       style={{
         background: "#fff3eb",
         minHeight: "100vh",
         padding: "20px",
-        opacity: fadeIn ? 1 : 0, // 🔹 Fade-in effect
+        opacity: fadeIn ? 1 : 0,
         transition: "opacity 0.8s ease-in"
       }}
     >
@@ -82,14 +87,12 @@ export default function ImageDetails() {
           border-radius: 16px;
           box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
-
         .thumbnail-container {
           display: flex;
           gap: 10px;
           overflow-x: auto;
           padding: 15px 0;
         }
-
         .thumb {
           min-width: 70px;
           height: 70px;
@@ -99,19 +102,51 @@ export default function ImageDetails() {
           border: 2px solid #ddd;
           transition: 0.2s ease;
         }
-
         .active-thumb {
           border: 3px solid #fe3d00;
         }
-
         .thumbnail-container::-webkit-scrollbar {
           display: none;
         }
       `}</style>
 
-      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "600px", margin: "0 auto", position: "relative" }}>
         {selectedImage && (
-          <img src={selectedImage} className="main-image" alt={title} />
+          <>
+            {/* Main Product Image */}
+            <img
+              src={selectedImage}
+              className="main-image"
+              alt={title}
+            />
+
+            {/* Share Icon Overlay */}
+            <button
+              onClick={handleShare}
+              style={{
+                position: "absolute",
+                top: "15px",
+                right: "15px",
+                background: "rgba(0,0,0,0.6)",
+                border: "none",
+                width: "45px",
+                height: "45px",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "white",
+                fontSize: "20px",
+                transition: "0.3s",
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.8)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.6)"}
+              title="Share Product"
+            >
+              📤
+            </button>
+          </>
         )}
 
         {imagesArray.length > 1 && (
@@ -121,9 +156,7 @@ export default function ImageDetails() {
                 key={index}
                 src={img}
                 onClick={() => setSelectedImage(img)}
-                className={`thumb ${
-                  selectedImage === img ? "active-thumb" : ""
-                }`}
+                className={`thumb ${selectedImage === img ? "active-thumb" : ""}`}
                 alt="thumbnail"
               />
             ))}
@@ -140,23 +173,11 @@ export default function ImageDetails() {
             gap: "12px",
           }}
         >
-          <span
-            style={{
-              color: "#fe3d00",
-              fontSize: "26px",
-              fontWeight: "700",
-            }}
-          >
+          <span style={{ color: "#fe3d00", fontSize: "26px", fontWeight: "700" }}>
             ₹{price}
           </span>
           {originalPrice && (
-            <span
-              style={{
-                fontSize: "18px",
-                textDecoration: "line-through",
-                color: "#777",
-              }}
-            >
+            <span style={{ fontSize: "18px", textDecoration: "line-through", color: "#777" }}>
               ₹{originalPrice}
             </span>
           )}
@@ -214,10 +235,7 @@ export default function ImageDetails() {
           </button>
         </div>
 
-        <h3 className="mt-5 text-capitalize">
-          More from {fromCategory}
-        </h3>
-
+        <h3 className="mt-5 text-capitalize">More from {fromCategory}</h3>
         <Nwmasonry images={relatedImages} categoryName={fromCategory} />
       </div>
     </div>
