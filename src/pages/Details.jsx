@@ -27,7 +27,16 @@ export default function ImageDetails() {
   const [expanded, setExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  /* 🔥 All Products */
+  /* 🔥 Decode ID safely */
+  const decodedId = useMemo(() => {
+    try {
+      return atob(id);
+    } catch {
+      return id;
+    }
+  }, [id]);
+
+  /* 🔥 Combine all products */
   const allProducts = useMemo(() => {
     return [
       ...trendingData,
@@ -39,16 +48,42 @@ export default function ImageDetails() {
     ];
   }, []);
 
-  /* 🔥 Find Item */
+  /* 🔥 Find Product */
   const item = useMemo(() => {
     if (location.state?.item) return location.state.item;
 
     return allProducts.find(
-      (p) => String(p.id) === String(id)
+      (p) => String(p.id) === String(decodedId)
     );
-  }, [id, location.state, allProducts]);
+  }, [decodedId, location.state, allProducts]);
 
-  /* 🔥 Images Array */
+  /* 🔥 Encode */
+  const encodeId = (value) => btoa(value);
+
+  /* 🔥 Share Function */
+  const handleShare = async () => {
+    if (!item) return;
+
+    const encoded = encodeId(item.id);
+    const shareUrl = `${window.location.origin}/image/${encoded}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: item.title,
+          text: "Check this out on Dameeto 🔥",
+          url: shareUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        alert("Link copied successfully 🚀");
+      }
+    } catch (error) {
+      console.error("Share failed:", error);
+    }
+  };
+
+  /* 🔥 Images */
   const imagesArray = useMemo(() => {
     if (!item) return [];
 
@@ -59,13 +94,11 @@ export default function ImageDetails() {
     return item.src ? [item.src] : [];
   }, [item]);
 
-  /* 🔥 Scroll + Fade */
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setFadeIn(true);
-  }, [id]);
+  }, [decodedId]);
 
-  /* 🔥 Default Image */
   useEffect(() => {
     if (imagesArray.length > 0) {
       setSelectedImage(imagesArray[0]);
@@ -93,7 +126,6 @@ export default function ImageDetails() {
 
   const price = finalPrice ?? 199;
 
-  /* 🛒 Add to Cart */
   const handleAddToCart = () => {
     addToCart({
       id: item.id,
@@ -108,26 +140,6 @@ export default function ImageDetails() {
     alert(`${title} added to cart!`);
   };
 
-  /* 🔗 Share Function */
-  const handleShare = async () => {
-    const shareData = {
-      title: title,
-      text: `Check this out: ${title}`,
-      url: window.location.href
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
-      }
-    } catch (error) {
-      console.log("Sharing failed", error);
-    }
-  };
-
   return (
     <div
       style={{
@@ -138,90 +150,69 @@ export default function ImageDetails() {
         transition: "opacity 0.8s ease-in"
       }}
     >
-      <style>{`
-        .main-image-wrapper {
-          position: relative;
-        }
-
-        .main-image {
-          width: 100%;
-          border-radius: 16px;
-          box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-        }
-
-        .share-btn {
-          position: absolute;
-          top: 15px;
-          right: 15px;
-          background: white;
-          border-radius: 50%;
-          width: 45px;
-          height: 45px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-          cursor: pointer;
-          transition: 0.2s ease;
-        }
-
-        .share-btn:hover {
-          transform: scale(1.1);
-        }
-
-        .thumbnail-container {
-          display: flex;
-          gap: 10px;
-          overflow-x: auto;
-          padding: 15px 0;
-        }
-
-        .thumb {
-          min-width: 70px;
-          height: 70px;
-          object-fit: cover;
-          border-radius: 10px;
-          cursor: pointer;
-          border: 2px solid #ddd;
-          transition: 0.2s ease;
-        }
-
-        .active-thumb {
-          border: 3px solid #fe3d00;
-        }
-
-        .thumbnail-container::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-        
-        {selectedImage && (
-          <div className="main-image-wrapper">
+
+        {/* 🔥 IMAGE WITH SHARE OVERLAY */}
+        <div style={{ position: "relative" }}>
+          {selectedImage && (
             <img
               src={selectedImage}
-              className="main-image"
+              style={{
+                width: "100%",
+                borderRadius: "16px",
+                boxShadow: "0 6px 20px rgba(0,0,0,0.2)"
+              }}
               alt={title}
             />
+          )}
 
-            {/* 🔗 Share Icon */}
-            <div className="share-btn" onClick={handleShare}>
-              <FaShareAlt color="#fe3d00" size={18} />
-            </div>
-          </div>
-        )}
+          {/* SHARE BUTTON ON IMAGE */}
+          <button
+            onClick={handleShare}
+            style={{
+              position: "absolute",
+              top: "15px",
+              right: "15px",
+              background: "white",
+              border: "none",
+              width: "45px",
+              height: "45px",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              cursor: "pointer"
+            }}
+          >
+            <FaShareAlt color="#fe3d00" />
+          </button>
+        </div>
 
+        {/* 🔥 Thumbnails */}
         {imagesArray.length > 1 && (
-          <div className="thumbnail-container">
+          <div style={{
+            display: "flex",
+            gap: "10px",
+            overflowX: "auto",
+            padding: "15px 0"
+          }}>
             {imagesArray.map((img, index) => (
               <img
                 key={index}
                 src={img}
                 onClick={() => setSelectedImage(img)}
-                className={`thumb ${
-                  selectedImage === img ? "active-thumb" : ""
-                }`}
+                style={{
+                  minWidth: "70px",
+                  height: "70px",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  border:
+                    selectedImage === img
+                      ? "3px solid #fe3d00"
+                      : "2px solid #ddd"
+                }}
                 alt="thumbnail"
               />
             ))}
@@ -230,12 +221,7 @@ export default function ImageDetails() {
 
         <h2 className="mt-3">{title}</h2>
 
-        <div style={{
-          marginTop: "10px",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px"
-        }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <span style={{
             color: "#fe3d00",
             fontSize: "26px",
@@ -246,7 +232,6 @@ export default function ImageDetails() {
 
           {originalPrice && (
             <span style={{
-              fontSize: "18px",
               textDecoration: "line-through",
               color: "#777"
             }}>
@@ -255,7 +240,7 @@ export default function ImageDetails() {
           )}
         </div>
 
-        <p style={{ fontSize: "16px", opacity: 0.8 }}>
+        <p style={{ marginTop: "10px" }}>
           {expanded ? longDesc : shortDesc}
         </p>
 
@@ -272,7 +257,8 @@ export default function ImageDetails() {
           {expanded ? "Show Less ▲" : "Read More ▼"}
         </button>
 
-        <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
+        {/* 🔥 Bottom Buttons */}
+        <div style={{ display: "flex", gap: "15px", marginTop: "20px" }}>
           <button
             onClick={handleAddToCart}
             style={{
@@ -281,7 +267,6 @@ export default function ImageDetails() {
               padding: "12px 20px",
               borderRadius: "50px",
               border: "none",
-              fontSize: "16px",
               display: "flex",
               alignItems: "center",
               gap: "8px",
@@ -302,7 +287,6 @@ export default function ImageDetails() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "20px",
               cursor: "pointer"
             }}
           >
@@ -310,7 +294,7 @@ export default function ImageDetails() {
           </button>
         </div>
 
-        <h3 className="mt-5 text-capitalize">
+        <h3 style={{ marginTop: "40px" }}>
           More from {fromCategory}
         </h3>
 
