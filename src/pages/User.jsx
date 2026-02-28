@@ -1,20 +1,45 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FaUserCircle, FaGift, FaShoppingCart, FaHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function UserAccount() {
   const navigate = useNavigate();
 
-  // ✅ Direct localStorage se data lo
   const name = localStorage.getItem("userName");
   const email = localStorage.getItem("userEmail");
 
-  // ✅ Agar login nahi hai to redirect
+  const [orderCount, setOrderCount] = useState(0);
+
+  // Redirect if not logged in
   useEffect(() => {
     if (!email) {
       navigate("/");
     }
   }, [email, navigate]);
+
+  // Fetch Order Count
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch(
+          `https://serdeptry1st.onrender.com/api/customer-orders/user/${email}`
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+          setOrderCount(data.data.length); // ✅ FIXED
+        } else {
+          setOrderCount(0);
+        }
+      } catch (err) {
+        console.error("Order fetch error:", err);
+        setOrderCount(0);
+      }
+    };
+
+    if (email) fetchOrders();
+  }, [email]);
 
   const handleLogout = () => {
     localStorage.removeItem("userEmail");
@@ -30,19 +55,14 @@ export default function UserAccount() {
         padding: "80px 20px 20px 20px",
       }}
     >
-      {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <FaUserCircle style={{ fontSize: "80px", color: "#fe3d00" }} />
-
-        {/* 🔥 Login wala naam yaha show hoga */}
         <h2 style={{ marginTop: "10px", fontWeight: "700" }}>
           {name ? name : "User"}
         </h2>
-
         <p style={{ opacity: 0.7 }}>{email}</p>
       </div>
 
-      {/* Stats Cards */}
       <div
         style={{
           display: "flex",
@@ -57,9 +77,12 @@ export default function UserAccount() {
           <p>Credits</p>
         </div>
 
-        <div style={cardStyle}>
+        <div
+          style={cardStyle}
+          onClick={() => navigate("/view-order")}
+        >
           <FaShoppingCart style={{ fontSize: "28px", color: "#fe3d00" }} />
-          <h3>0</h3>
+          <h3>{orderCount}</h3>
           <p>Orders</p>
         </div>
 
@@ -70,7 +93,6 @@ export default function UserAccount() {
         </div>
       </div>
 
-      {/* Actions Section */}
       <div
         style={{
           marginTop: "40px",
@@ -82,7 +104,14 @@ export default function UserAccount() {
       >
         <button style={actionButton}>Edit Profile</button>
         <button style={actionButton}>Top Up Credits</button>
-        <button style={actionButton}>View Orders</button>
+
+        <button
+          style={actionButton}
+          onClick={() => navigate("/view-order")}
+        >
+          View Orders
+        </button>
+
         <button style={actionButton} onClick={handleLogout}>
           Logout
         </button>
@@ -91,7 +120,6 @@ export default function UserAccount() {
   );
 }
 
-// Card style
 const cardStyle = {
   background: "white",
   borderRadius: "16px",
@@ -102,7 +130,6 @@ const cardStyle = {
   cursor: "pointer",
 };
 
-// Button style
 const actionButton = {
   display: "block",
   width: "100%",

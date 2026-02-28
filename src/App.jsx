@@ -12,6 +12,8 @@ import ImageDetails from "./pages/Details";
 import User from "./pages/User";
 import SearchPage from "./pages/SearchPage";
 import SearchResults from "./pages/SearchResults";
+import ViewOrders from "./pages/ViewOrders"; // ✅ NEW PAGE
+
 import { CartProvider } from "./contexAndhooks/CartProvider";
 
 function App() {
@@ -27,7 +29,7 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // 🔥 Loading Screen
+  // 🔥 Loading Screen (same as before)
   if (loading) {
     return (
       <div
@@ -95,6 +97,9 @@ function App() {
             <Route path="/account" element={<User />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/search-results" element={<SearchResults />} />
+
+            {/* ✅ NEW ROUTE FOR VIEW ORDERS */}
+            <Route path="/view-order" element={<ViewOrders />} />
 
             {/* 🔥 404 Safety Route */}
             <Route

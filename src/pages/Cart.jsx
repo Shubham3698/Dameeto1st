@@ -23,6 +23,7 @@ export default function CartPage() {
     (acc, item) => acc + item.price * item.quantity,
     0
   );
+
   const discountAmount = (subtotal * discountPercent) / 100;
   const finalTotal = subtotal - discountAmount;
 
@@ -43,46 +44,67 @@ export default function CartPage() {
   const generateWhatsAppMessage = () => {
     let msg = "Hello 👋\n\nI have placed an order for the following items:\n\n";
     cartItems.forEach((item, idx) => {
-      msg += `${idx + 1}. ${item.title} x${item.quantity} - ₹${item.price * item.quantity}\n`;
+      msg += `${idx + 1}. ${item.title} x${item.quantity} - ₹${
+        item.price * item.quantity
+      }\n`;
     });
+
     msg += `\nSubtotal: ₹${subtotal}`;
-    if (discountPercent > 0) msg += `\nDiscount (${discountPercent}%): -₹${discountAmount}`;
+    if (discountPercent > 0)
+      msg += `\nDiscount (${discountPercent}%): -₹${discountAmount}`;
     msg += `\nFinal Total: ₹${finalTotal}\n\nPlease confirm. 🚀\nThank you!`;
+
     return msg;
   };
 
   const placeOrder = async () => {
     if (cartItems.length === 0) return alert("Your cart is empty!");
+
+    const email = localStorage.getItem("userEmail");
+    if (!email) return alert("Please login first!");
+
     setLoading(true);
     const message = generateWhatsAppMessage();
 
     try {
-      const res = await fetch("https://serdeptry1st.onrender.com/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          products: cartItems,
-          subtotal,
-          discountPercent,
-          finalTotal,
-          message,
-        }),
-      });
+      const res = await fetch(
+        "https://serdeptry1st.onrender.com/api/customer-orders/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userEmail: email,
+            products: cartItems.map((item) => ({
+              title: item.title,
+              price: item.price,
+              quantity: item.quantity,
+              image: item.src,
+            })),
+            subtotal: subtotal,
+            discount: discountPercent,
+            total: finalTotal,
+          }),
+        }
+      );
 
-      if (res.ok) {
+      const data = await res.json();
+
+      if (data.success) {
         alert("✅ Order placed successfully!");
         clearCart();
+
         window.location.href =
-          "https://wa.me/917080981033?text=" + encodeURIComponent(message);
+          "https://wa.me/917080981033?text=" +
+          encodeURIComponent(message);
       } else {
         alert("❌ Error placing order");
-        setLoading(false);
       }
     } catch (err) {
       console.error(err);
-      alert("❌ Error placing order");
-      setLoading(false);
+      alert("❌ Server error");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -103,18 +125,36 @@ export default function CartPage() {
             }}
           >
             <Col xs={3} md={2}>
-              <Image src={item.src} fluid rounded style={{ borderRadius: "12px" }} />
+              <Image
+                src={item.src}
+                fluid
+                rounded
+                style={{ borderRadius: "12px" }}
+              />
             </Col>
 
             <Col xs={5} md={6}>
-              <h5 style={{ fontWeight: "700", fontSize: "1.15rem", marginBottom: "6px" }}>
+              <h5
+                style={{
+                  fontWeight: "700",
+                  fontSize: "1.15rem",
+                  marginBottom: "6px",
+                }}
+              >
                 {item.title}
               </h5>
 
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontWeight: "700", color: "#fe3d00", fontSize: "1.05rem" }}>
+                <span
+                  style={{
+                    fontWeight: "700",
+                    color: "#fe3d00",
+                    fontSize: "1.05rem",
+                  }}
+                >
                   ₹{item.price}
                 </span>
+
                 {item.originalPrice && (
                   <span
                     style={{
@@ -134,16 +174,30 @@ export default function CartPage() {
                 variant="outline-secondary"
                 size="sm"
                 onClick={() => updateQuantity(index, -1)}
-                style={{ borderRadius: "50%", width: "30px", height: "30px", padding: "0" }}
+                style={{
+                  borderRadius: "50%",
+                  width: "30px",
+                  height: "30px",
+                  padding: "0",
+                }}
               >
                 –
               </Button>
-              <span style={{ fontWeight: "700", fontSize: "1rem" }}>{item.quantity}</span>
+
+              <span style={{ fontWeight: "700", fontSize: "1rem" }}>
+                {item.quantity}
+              </span>
+
               <Button
                 variant="outline-secondary"
                 size="sm"
                 onClick={() => updateQuantity(index, 1)}
-                style={{ borderRadius: "50%", width: "30px", height: "30px", padding: "0" }}
+                style={{
+                  borderRadius: "50%",
+                  width: "30px",
+                  height: "30px",
+                  padding: "0",
+                }}
               >
                 +
               </Button>
@@ -164,7 +218,9 @@ export default function CartPage() {
             background: "#fafafa",
           }}
         >
-          <h4 style={{ fontWeight: "700", marginBottom: "15px" }}>Order Summary</h4>
+          <h4 style={{ fontWeight: "700", marginBottom: "15px" }}>
+            Order Summary
+          </h4>
 
           <div className="d-flex justify-content-between mb-2">
             <span>Subtotal</span>
@@ -202,7 +258,11 @@ export default function CartPage() {
               }}
             />
             <Button
-              style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700" }}
+              style={{
+                backgroundColor: "#fe3d00",
+                border: "none",
+                fontWeight: "700",
+              }}
               onClick={applyCoupon}
             >
               Apply
