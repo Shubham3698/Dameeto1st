@@ -8,23 +8,31 @@ export default function ViewOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 UPDATED: Render Backend URL
+  const API_BASE_URL = "https://serdeptry1st.onrender.com";
+
+  // 🔐 Redirect if not logged in
   useEffect(() => {
     if (!email) {
       navigate("/");
     }
   }, [email, navigate]);
 
+  // 📦 Fetch Orders
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        if (!email) return;
+
+        // 🔥 FIXED: Localhost ko Render URL se replace kiya
         const res = await fetch(
-          `https://serdeptry1st.onrender.com/api/customer-orders/user/${email}`
+          `${API_BASE_URL}/api/customer-orders/user/${encodeURIComponent(email)}`
         );
 
         const data = await res.json();
 
         if (data.success) {
-          setOrders(data.data); // ✅ FIXED
+          setOrders(data.data);
         } else {
           setOrders([]);
         }
@@ -47,18 +55,32 @@ export default function ViewOrders() {
         padding: "80px 20px 40px 20px",
       }}
     >
-      <h2 style={{ textAlign: "center", fontWeight: "700", marginBottom: "30px" }}>
+      <h2
+        style={{
+          textAlign: "center",
+          fontWeight: "700",
+          marginBottom: "30px",
+        }}
+      >
         📦 My Orders
       </h2>
 
       {loading ? (
         <p style={{ textAlign: "center" }}>Loading...</p>
       ) : orders.length === 0 ? (
-        <p style={{ textAlign: "center" }}>No orders found.</p>
+        <div style={{ textAlign: "center" }}>
+          <p>No orders found.</p>
+          <button 
+            onClick={() => navigate("/")}
+            style={{ color: "#fe3d00", cursor: "pointer", border: "none", background: "none", textDecoration: "underline" }}
+          >
+            Go Shopping
+          </button>
+        </div>
       ) : (
-        orders.map((order, index) => (
+        orders.map((order) => (
           <div
-            key={index}
+            key={order._id}
             style={{
               background: "white",
               borderRadius: "16px",
@@ -70,9 +92,10 @@ export default function ViewOrders() {
               marginRight: "auto",
             }}
           >
-            <p style={{ fontSize: "14px", opacity: 0.7 }}>
-              Date: {new Date(order.createdAt).toLocaleString()}
-            </p>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", opacity: 0.7 }}>
+              <span>Date: {new Date(order.createdAt).toLocaleString()}</span>
+              <span style={{ fontWeight: "bold", color: "#fe3d00" }}>{order.orderStatus || "Pending"}</span>
+            </div>
 
             <hr />
 
@@ -125,9 +148,25 @@ export default function ViewOrders() {
                 </p>
               )}
 
-              <h5 style={{ color: "#fe3d00", marginTop: "5px" }}>
+              <h5 style={{ color: "#fe3d00", marginTop: "5px", fontSize: "18px" }}>
                 Total: ₹{order.total}
               </h5>
+
+              <button
+                onClick={() => navigate(`/order/${order._id}`)}
+                style={{
+                  marginTop: "12px",
+                  background: "#fe3d00",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 15px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                }}
+              >
+                View Details
+              </button>
             </div>
           </div>
         ))

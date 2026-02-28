@@ -12,7 +12,8 @@ import ImageDetails from "./pages/Details";
 import User from "./pages/User";
 import SearchPage from "./pages/SearchPage";
 import SearchResults from "./pages/SearchResults";
-import ViewOrders from "./pages/ViewOrders"; // ✅ NEW PAGE
+import ViewOrders from "./pages/ViewOrders";
+import OrderDetails from "./pages/OrderDetails"; // ✅ NEW IMPORT
 
 import { CartProvider } from "./contexAndhooks/CartProvider";
 
@@ -29,7 +30,7 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // 🔥 Loading Screen (same as before)
+  // 🔥 Loading Screen (unchanged)
   if (loading) {
     return (
       <div
@@ -82,8 +83,8 @@ function App() {
           {/* 🔥 Navbar Always Visible */}
           <MNv />
 
-          {/* 🔥 All Routes */}
           <Routes>
+            {/* 🏠 Main Pages */}
             <Route path="/" element={<Trending />} />
             <Route path="/about" element={<About />} />
             <Route path="/sticker" element={<Sticker />} />
@@ -91,21 +92,25 @@ function App() {
             <Route path="/goodies" element={<Goodies />} />
             <Route path="/cart" element={<CartPage />} />
 
-            {/* 🔥 Dynamic Product Page */}
+            {/* 🖼 Dynamic Product Page */}
             <Route path="/image/:id" element={<ImageDetails />} />
 
+            {/* 👤 Account */}
             <Route path="/account" element={<User />} />
+
+            {/* 🔎 Search */}
             <Route path="/search" element={<SearchPage />} />
             <Route path="/search-results" element={<SearchResults />} />
 
-            {/* ✅ NEW ROUTE FOR VIEW ORDERS */}
+            {/* 📦 Orders */}
             <Route path="/view-order" element={<ViewOrders />} />
+            <Route path="/order/:id" element={<OrderDetails />} /> {/* ✅ NEW */}
 
-            {/* 🔥 404 Safety Route */}
+            {/* 🚫 404 Page */}
             <Route
               path="*"
               element={
-                <div style={{ textAlign: "center", marginTop: "80px" }}>
+                <div style={{ textAlign: "center", marginTop: "100px" }}>
                   <h2>404 - Page Not Found</h2>
                 </div>
               }

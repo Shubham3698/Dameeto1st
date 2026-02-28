@@ -12,6 +12,9 @@ export default function CartPage() {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  // API Base URL - Render Backend
+  const API_BASE_URL = "https://serdeptry1st.onrender.com";
+
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
       cartEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -61,31 +64,33 @@ export default function CartPage() {
     if (cartItems.length === 0) return alert("Your cart is empty!");
 
     const email = localStorage.getItem("userEmail");
+    const name = localStorage.getItem("userName") || "Customer";
+
     if (!email) return alert("Please login first!");
 
     setLoading(true);
     const message = generateWhatsAppMessage();
 
     try {
-      const res = await fetch(
-        "https://serdeptry1st.onrender.com/api/customer-orders/create",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userEmail: email,
-            products: cartItems.map((item) => ({
-              title: item.title,
-              price: item.price,
-              quantity: item.quantity,
-              image: item.src,
-            })),
-            subtotal: subtotal,
-            discount: discountPercent,
-            total: finalTotal,
-          }),
-        }
-      );
+      // API call to Render Backend
+      const res = await fetch(`${API_BASE_URL}/api/customer-orders/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userName: name,
+          userEmail: email,
+          products: cartItems.map((item) => ({
+            title: item.title,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.src,
+          })),
+          subtotal: subtotal,
+          discount: discountPercent,
+          total: finalTotal,
+          message: "Order placed via website",
+        }),
+      });
 
       const data = await res.json();
 
@@ -93,18 +98,20 @@ export default function CartPage() {
         alert("✅ Order placed successfully!");
         clearCart();
 
+        // Redirect to WhatsApp
         window.location.href =
-          "https://wa.me/917080981033?text=" +
-          encodeURIComponent(message);
+          "https://wa.me/917080981033?text=" + encodeURIComponent(message);
       } else {
-        alert("❌ Error placing order");
+        alert("❌ Error: " + (data.message || "Something went wrong"));
       }
     } catch (err) {
-      console.error(err);
-      alert("❌ Server error");
+      console.error("Deployment Error:", err);
+      alert(
+        "❌ Server Error: Make sure your backend on Render is active. (Note: Render free tier takes 1-2 mins to wake up initially)."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -274,9 +281,11 @@ export default function CartPage() {
             disabled={loading}
             style={{
               marginTop: "20px",
+              width: "100%",
               backgroundColor: loading ? "#999" : "#fe3d00",
+              border: "none",
               color: "#fff",
-              padding: "10px 20px",
+              padding: "12px 20px",
               fontWeight: "700",
             }}
           >

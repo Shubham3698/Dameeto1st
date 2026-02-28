@@ -10,6 +10,9 @@ export default function UserAccount() {
 
   const [orderCount, setOrderCount] = useState(0);
 
+  // 🔥 UPDATED: Render Backend URL
+  const API_BASE_URL = "https://serdeptry1st.onrender.com";
+
   // Redirect if not logged in
   useEffect(() => {
     if (!email) {
@@ -17,18 +20,24 @@ export default function UserAccount() {
     }
   }, [email, navigate]);
 
-  // Fetch Order Count
+  // Fetch Order Count (Render Backend)
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        if (!email) return;
+
+        const encodedEmail = encodeURIComponent(email);
+        
+        // 🔥 FIXED: Localhost ko Render URL se replace kiya
         const res = await fetch(
-          `https://serdeptry1st.onrender.com/api/customer-orders/user/${email}`
+          `${API_BASE_URL}/api/customer-orders/user/${encodedEmail}`
         );
 
         const data = await res.json();
 
         if (data.success) {
-          setOrderCount(data.data.length); // ✅ FIXED
+          // Maan lete hain ki data.data ek array hai orders ki
+          setOrderCount(data.data.length);
         } else {
           setOrderCount(0);
         }
@@ -38,7 +47,7 @@ export default function UserAccount() {
       }
     };
 
-    if (email) fetchOrders();
+    fetchOrders();
   }, [email]);
 
   const handleLogout = () => {
@@ -48,13 +57,7 @@ export default function UserAccount() {
   };
 
   return (
-    <div
-      style={{
-        background: "#fff3eb",
-        minHeight: "100vh",
-        padding: "80px 20px 20px 20px",
-      }}
-    >
+    <div style={{ background: "#fff3eb", minHeight: "100vh", padding: "80px 20px 20px 20px" }}>
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <FaUserCircle style={{ fontSize: "80px", color: "#fe3d00" }} />
         <h2 style={{ marginTop: "10px", fontWeight: "700" }}>
@@ -63,24 +66,14 @@ export default function UserAccount() {
         <p style={{ opacity: 0.7 }}>{email}</p>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-around",
-          flexWrap: "wrap",
-          gap: "20px",
-        }}
-      >
+      <div style={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "20px" }}>
         <div style={cardStyle}>
           <FaGift style={{ fontSize: "28px", color: "#fe3d00" }} />
           <h3>0</h3>
           <p>Credits</p>
         </div>
 
-        <div
-          style={cardStyle}
-          onClick={() => navigate("/view-order")}
-        >
+        <div style={cardStyle} onClick={() => navigate("/view-order")}>
           <FaShoppingCart style={{ fontSize: "28px", color: "#fe3d00" }} />
           <h3>{orderCount}</h3>
           <p>Orders</p>
@@ -93,28 +86,11 @@ export default function UserAccount() {
         </div>
       </div>
 
-      <div
-        style={{
-          marginTop: "40px",
-          maxWidth: "400px",
-          marginLeft: "auto",
-          marginRight: "auto",
-          textAlign: "center",
-        }}
-      >
+      <div style={{ marginTop: "40px", maxWidth: "400px", marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>
         <button style={actionButton}>Edit Profile</button>
         <button style={actionButton}>Top Up Credits</button>
-
-        <button
-          style={actionButton}
-          onClick={() => navigate("/view-order")}
-        >
-          View Orders
-        </button>
-
-        <button style={actionButton} onClick={handleLogout}>
-          Logout
-        </button>
+        <button style={actionButton} onClick={() => navigate("/view-order")}>View Orders</button>
+        <button style={actionButton} onClick={handleLogout}>Logout</button>
       </div>
     </div>
   );
