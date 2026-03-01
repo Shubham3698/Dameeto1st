@@ -12,8 +12,8 @@ export default function CartPage() {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // API Base URL - Render Backend
-  const API_BASE_URL = "https://serdeptry1st.onrender.com";
+  // 🔥 Deployed backend URL
+  const API_BASE_URL = "https://serdeptry1st.onrender.com/api/customer-orders";
 
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
@@ -26,7 +26,6 @@ export default function CartPage() {
     (acc, item) => acc + item.price * item.quantity,
     0
   );
-
   const discountAmount = (subtotal * discountPercent) / 100;
   const finalTotal = subtotal - discountAmount;
 
@@ -44,17 +43,14 @@ export default function CartPage() {
     }
   };
 
-  const generateWhatsAppMessage = () => {
-    let msg = "Hello 👋\n\nI have placed an order for the following items:\n\n";
+  const generateWhatsAppMessage = (shortOrderId = "") => {
+    let msg = `Hello 👋\n\nI have placed an order${shortOrderId ? ` (Order ID: ${shortOrderId})` : ""} for the following items:\n\n`;
     cartItems.forEach((item, idx) => {
-      msg += `${idx + 1}. ${item.title} x${item.quantity} - ₹${
-        item.price * item.quantity
-      }\n`;
+      msg += `${idx + 1}. ${item.title} x${item.quantity} - ₹${item.price * item.quantity}\n`;
     });
 
     msg += `\nSubtotal: ₹${subtotal}`;
-    if (discountPercent > 0)
-      msg += `\nDiscount (${discountPercent}%): -₹${discountAmount}`;
+    if (discountPercent > 0) msg += `\nDiscount (${discountPercent}%): -₹${discountAmount}`;
     msg += `\nFinal Total: ₹${finalTotal}\n\nPlease confirm. 🚀\nThank you!`;
 
     return msg;
@@ -69,11 +65,9 @@ export default function CartPage() {
     if (!email) return alert("Please login first!");
 
     setLoading(true);
-    const message = generateWhatsAppMessage();
 
     try {
-      // API call to Render Backend
-      const res = await fetch(`${API_BASE_URL}/api/customer-orders/create`, {
+      const res = await fetch(`${API_BASE_URL}/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -95,20 +89,20 @@ export default function CartPage() {
       const data = await res.json();
 
       if (data.success) {
-        alert("✅ Order placed successfully!");
+        const shortOrderId = data.data.shortOrderId; // 🔥 backend generated short ID
+        alert(`✅ Order placed successfully! (Order ID: ${shortOrderId})`);
+
         clearCart();
 
         // Redirect to WhatsApp
         window.location.href =
-          "https://wa.me/917080981033?text=" + encodeURIComponent(message);
+          "https://wa.me/917080981033?text=" + encodeURIComponent(generateWhatsAppMessage(shortOrderId));
       } else {
         alert("❌ Error: " + (data.message || "Something went wrong"));
       }
     } catch (err) {
       console.error("Deployment Error:", err);
-      alert(
-        "❌ Server Error: Make sure your backend on Render is active. (Note: Render free tier takes 1-2 mins to wake up initially)."
-      );
+      alert("❌ Server Error: Check your deployed backend URL.");
     } finally {
       setLoading(false);
     }
@@ -125,89 +119,30 @@ export default function CartPage() {
           <Row
             key={index}
             className="align-items-center py-3"
-            style={{
-              borderBottom: "1px solid #ddd",
-              marginBottom: "10px",
-              padding: "10px 0",
-            }}
+            style={{ borderBottom: "1px solid #ddd", marginBottom: "10px", padding: "10px 0" }}
           >
             <Col xs={3} md={2}>
-              <Image
-                src={item.src}
-                fluid
-                rounded
-                style={{ borderRadius: "12px" }}
-              />
+              <Image src={item.src} fluid rounded style={{ borderRadius: "12px" }} />
             </Col>
 
             <Col xs={5} md={6}>
-              <h5
-                style={{
-                  fontWeight: "700",
-                  fontSize: "1.15rem",
-                  marginBottom: "6px",
-                }}
-              >
+              <h5 style={{ fontWeight: "700", fontSize: "1.15rem", marginBottom: "6px" }}>
                 {item.title}
               </h5>
-
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span
-                  style={{
-                    fontWeight: "700",
-                    color: "#fe3d00",
-                    fontSize: "1.05rem",
-                  }}
-                >
-                  ₹{item.price}
-                </span>
-
-                {item.originalPrice && (
-                  <span
-                    style={{
-                      textDecoration: "line-through",
-                      color: "#777",
-                      fontSize: "0.9rem",
-                    }}
-                  >
-                    ₹{item.originalPrice}
-                  </span>
-                )}
+                <span style={{ fontWeight: "700", color: "#fe3d00", fontSize: "1.05rem" }}>₹{item.price}</span>
+                {item.originalPrice && <span style={{ textDecoration: "line-through", color: "#777", fontSize: "0.9rem" }}>₹{item.originalPrice}</span>}
               </div>
             </Col>
 
             <Col xs={4} md={2} className="d-flex align-items-center gap-2">
-              <Button
-                variant="outline-secondary"
-                size="sm"
-                onClick={() => updateQuantity(index, -1)}
-                style={{
-                  borderRadius: "50%",
-                  width: "30px",
-                  height: "30px",
-                  padding: "0",
-                }}
-              >
-                –
-              </Button>
+              <Button variant="outline-secondary" size="sm" onClick={() => updateQuantity(index, -1)}
+                style={{ borderRadius: "50%", width: "30px", height: "30px", padding: "0" }}>–</Button>
 
-              <span style={{ fontWeight: "700", fontSize: "1rem" }}>
-                {item.quantity}
-              </span>
+              <span style={{ fontWeight: "700", fontSize: "1rem" }}>{item.quantity}</span>
 
-              <Button
-                variant="outline-secondary"
-                size="sm"
-                onClick={() => updateQuantity(index, 1)}
-                style={{
-                  borderRadius: "50%",
-                  width: "30px",
-                  height: "30px",
-                  padding: "0",
-                }}
-              >
-                +
-              </Button>
+              <Button variant="outline-secondary" size="sm" onClick={() => updateQuantity(index, 1)}
+                style={{ borderRadius: "50%", width: "30px", height: "30px", padding: "0" }}>+</Button>
             </Col>
           </Row>
         ))
@@ -216,18 +151,8 @@ export default function CartPage() {
       <div ref={cartEndRef}></div>
 
       {cartItems.length > 0 && (
-        <div
-          style={{
-            marginTop: "20px",
-            padding: "20px",
-            border: "1px solid #ddd",
-            borderRadius: "12px",
-            background: "#fafafa",
-          }}
-        >
-          <h4 style={{ fontWeight: "700", marginBottom: "15px" }}>
-            Order Summary
-          </h4>
+        <div style={{ marginTop: "20px", padding: "20px", border: "1px solid #ddd", borderRadius: "12px", background: "#fafafa" }}>
+          <h4 style={{ fontWeight: "700", marginBottom: "15px" }}>Order Summary</h4>
 
           <div className="d-flex justify-content-between mb-2">
             <span>Subtotal</span>
@@ -243,52 +168,26 @@ export default function CartPage() {
 
           <hr />
 
-          <div
-            className="d-flex justify-content-between"
-            style={{ fontWeight: "700", fontSize: "1.2rem" }}
-          >
+          <div className="d-flex justify-content-between" style={{ fontWeight: "700", fontSize: "1.2rem" }}>
             <span>Total</span>
             <span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
           </div>
 
           <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
-            <input
-              type="text"
-              placeholder="Enter coupon code"
-              value={coupon}
-              onChange={(e) => setCoupon(e.target.value)}
-              style={{
-                flex: 1,
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-              }}
-            />
-            <Button
-              style={{
-                backgroundColor: "#fe3d00",
-                border: "none",
-                fontWeight: "700",
-              }}
-              onClick={applyCoupon}
-            >
-              Apply
-            </Button>
+            <input type="text" placeholder="Enter coupon code" value={coupon} onChange={(e) => setCoupon(e.target.value)}
+              style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #ccc" }} />
+            <Button style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700" }} onClick={applyCoupon}>Apply</Button>
           </div>
 
-          <Button
-            onClick={placeOrder}
-            disabled={loading}
-            style={{
-              marginTop: "20px",
-              width: "100%",
-              backgroundColor: loading ? "#999" : "#fe3d00",
-              border: "none",
-              color: "#fff",
-              padding: "12px 20px",
-              fontWeight: "700",
-            }}
-          >
+          <Button onClick={placeOrder} disabled={loading} style={{
+            marginTop: "20px",
+            width: "100%",
+            backgroundColor: loading ? "#999" : "#fe3d00",
+            border: "none",
+            color: "#fff",
+            padding: "12px 20px",
+            fontWeight: "700",
+          }}>
             {loading ? "Placing Order..." : "Place Order"}
           </Button>
         </div>
