@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import Logo from "../assets/lg.png";
 import SignInModal from "./SignInModal";
+import { CartContext } from "../contexAndhooks/CartContext";
 
 export default function TopNavbar() {
   const [query, setQuery] = useState("");
   const [showSignIn, setShowSignIn] = useState(false);
+  const [pop, setPop] = useState(false); // animation state
   const navigate = useNavigate();
+  const { cartItems } = useContext(CartContext);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && query.trim() !== "") {
@@ -15,18 +18,29 @@ export default function TopNavbar() {
     }
   };
 
-  // 🔥 User icon click handler
   const handleUserClick = () => {
     const email = localStorage.getItem("userEmail");
-
     if (email) {
-      // ✅ Already logged in
       navigate("/account");
     } else {
-      // ❌ Not logged in
       setShowSignIn(true);
     }
   };
+
+  // Total quantity for badge
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  // 🔹 Pop animation effect with safe setState
+  useEffect(() => {
+    if (totalQuantity > 0) {
+      const timer = setTimeout(() => {
+        setPop(true);
+        const hideTimer = setTimeout(() => setPop(false), 300);
+        return () => clearTimeout(hideTimer);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [totalQuantity]);
 
   return (
     <>
@@ -98,22 +112,53 @@ export default function TopNavbar() {
             alignItems: "center",
             gap: "16px",
             fontSize: "24px",
-            marginLeft:"6px"
+            marginLeft: "6px",
+            position: "relative",
           }}
         >
-          {/* 👇 Updated User Icon Logic */}
+          {/* User Icon */}
           <FaUserCircle
             style={{ color: "#fe3d00", cursor: "pointer" }}
             onClick={handleUserClick}
           />
 
-          <Link to="/cart" style={{ color: "#fe3d00", marginBottom:"5px" }}>
-            <FaShoppingCart />
+          {/* Cart Icon */}
+          <Link
+            to="/cart"
+            style={{ color: "#fe3d00", position: "relative", display: "flex" }}
+          >
+            <FaShoppingCart style={{ fontSize: "26px" }} />
+            {totalQuantity > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-8px",
+                  right: "-8px",
+                  backgroundColor: "#fe3d00",
+                  color: "#fff",
+                  fontSize: "12px",
+                  minWidth: "20px",
+                  height: "20px",
+                  padding: "0 6px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "700",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                  border: "2px solid white",
+                  transform: pop ? "scale(1.3)" : "scale(1)",
+                  transition: "transform 0.2s ease-in-out",
+                }}
+              >
+                {totalQuantity}
+              </span>
+            )}
           </Link>
         </div>
       </nav>
 
-      {/* ===== Modal ===== */}
+      {/* Sign In Modal */}
       {showSignIn && <SignInModal onClose={() => setShowSignIn(false)} />}
     </>
   );
