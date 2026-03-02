@@ -26,6 +26,10 @@ export default function ImageDetails() {
   const [fadeIn, setFadeIn] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  
+  // 🔥 New states for DB data
+  const [dbItem, setDbItem] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   /* 🔥 Decode ID safely */
   const decodedId = useMemo(() => {
@@ -36,8 +40,8 @@ export default function ImageDetails() {
     }
   }, [id]);
 
-  /* 🔥 Combine all products */
-  const allProducts = useMemo(() => {
+  /* 🔥 Combine all LOCAL products */
+  const allLocalProducts = useMemo(() => {
     return [
       ...trendingData,
       ...stickerData,
@@ -48,25 +52,48 @@ export default function ImageDetails() {
     ];
   }, []);
 
-  /* 🔥 Find Product */
-  const item = useMemo(() => {
+  /* 🔥 1. Check Local/State First */
+  const localItem = useMemo(() => {
     if (location.state?.item) return location.state.item;
-
-    return allProducts.find(
+    return allLocalProducts.find(
       (p) => String(p.id) === String(decodedId)
     );
-  }, [decodedId, location.state, allProducts]);
+  }, [decodedId, location.state, allLocalProducts]);
 
-  /* 🔥 Encode */
+  /* 🔥 2. Fetch from DB if not found in Local/State */
+  useEffect(() => {
+    const fetchFromDB = async () => {
+      // Agar item mil chuka hai toh DB call mat karo
+      if (localItem) return;
+
+      setLoading(true);
+      try {
+        const response = await fetch(`https://serdeptry1st.onrender.com/api/products/single/${decodedId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setDbItem(data);
+        }
+      } catch (error) {
+        console.error("Dameeto DB Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFromDB();
+  }, [decodedId, localItem]);
+
+  /* 🔥 Final Item Selection */
+  const item = localItem || dbItem;
+
+  /* 🔥 Encode (For sharing) */
   const encodeId = (value) => btoa(value);
 
-  /* 🔥 Share Function */
+  /* 🔥 Share Function (Original Functionality kept) */
   const handleShare = async () => {
     if (!item) return;
-
     const encoded = encodeId(item.id);
     const shareUrl = `${window.location.origin}/image/${encoded}`;
-
     try {
       if (navigator.share) {
         await navigator.share({
@@ -86,11 +113,9 @@ export default function ImageDetails() {
   /* 🔥 Images */
   const imagesArray = useMemo(() => {
     if (!item) return [];
-
     if (item.subImages?.length > 0) {
       return [item.src, ...item.subImages];
     }
-
     return item.src ? [item.src] : [];
   }, [item]);
 
@@ -105,15 +130,25 @@ export default function ImageDetails() {
     }
   }, [imagesArray]);
 
-  if (!item) {
+  // Loading UI
+  if (loading) {
     return (
-      <div style={{ textAlign: "center", marginTop: "100px" }}>
-        <h2>Product Not Found</h2>
+      <div style={{ textAlign: "center", marginTop: "100px", color: "#fe3d00" }}>
+        <h3>Finding your art... 🚀</h3>
       </div>
     );
   }
 
-  const fromCategory = location.state?.category || "collection";
+  if (!item) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "100px" }}>
+        <h2>Product Not Found</h2>
+        <p>Hume ye art database mein nahi mila.</p>
+      </div>
+    );
+  }
+
+  const fromCategory = location.state?.category || item.category || "collection";
   const relatedImages = location.state?.images || [];
 
   const {
@@ -136,7 +171,6 @@ export default function ImageDetails() {
       price,
       originalPrice
     });
-
     alert(`${title} added to cart!`);
   };
 
@@ -152,7 +186,6 @@ export default function ImageDetails() {
     >
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
 
-        {/* 🔥 IMAGE WITH SHARE OVERLAY */}
         <div style={{ position: "relative" }}>
           {selectedImage && (
             <img
@@ -166,7 +199,6 @@ export default function ImageDetails() {
             />
           )}
 
-          {/* SHARE BUTTON ON IMAGE */}
           <button
             onClick={handleShare}
             style={{
@@ -189,7 +221,6 @@ export default function ImageDetails() {
           </button>
         </div>
 
-        {/* 🔥 Thumbnails */}
         {imagesArray.length > 1 && (
           <div style={{
             display: "flex",
@@ -257,7 +288,6 @@ export default function ImageDetails() {
           {expanded ? "Show Less ▲" : "Read More ▼"}
         </button>
 
-        {/* 🔥 Bottom Buttons */}
         <div style={{ display: "flex", gap: "15px", marginTop: "20px" }}>
           <button
             onClick={handleAddToCart}
