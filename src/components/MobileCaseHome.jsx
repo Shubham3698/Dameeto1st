@@ -1,34 +1,31 @@
 import React from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { FaShoppingCart } from "react-icons/fa";
-import MobileCaseHome from "../components/MobileCaseHome";
 
-
-export default function DtfStickerHome() {
+export default function MobileCaseHome() {
 
   const products = [
-    { id: 1, name: "Cartoon DTF Sticker", price: "₹29", img: "https://i.pinimg.com/1200x/ce/73/45/ce73456e0678a01fedb443d48d561121.jpg" },
-    { id: 2, name: "Logo DTF Sticker", price: "₹29", img: "https://i.pinimg.com/474x/fe/b3/1f/feb31f641f6bddd3f789a2d8666a2592.jpg" },
-    { id: 3, name: "Custom Name Sticker", price: "₹29", img: "https://i.pinimg.com/736x/27/37/03/27370336be72e1d4c966bf21ee055e4d.jpg" },
-    { id: 4, name: "Bike DTF Sticker", price: "₹29", img: "https://i.pinimg.com/736x/7a/31/18/7a3118860493ce5bfd53cb6bbd87e5ca.jpg" },
+    { id: 1, name: "Transparent Hard Case", price: "₹199", img: "https://i.pinimg.com/1200x/46/9f/f2/469ff2477133042ba66ef40fcd744196.jpg" },
+    { id: 2, name: "Matte Silicone Case", price: "₹249", img: "https://i.pinimg.com/1200x/e2/25/01/e225015c9f0622b8a9b04c13a0101239.jpg" },
+    { id: 3, name: "Shockproof Armor Case", price: "₹299", img: "https://i.pinimg.com/1200x/f3/63/da/f363da8c1c28d2da2aaa2b719f527cc6.jpg" },
+    { id: 4, name: "Printed Designer Case", price: "₹229", img: "https://i.pinimg.com/736x/c5/b6/71/c5b671b7295f2aead202e72c69fd11b8.jpg" },
   ];
 
   const topSelling = [
-    { id: 5, name: "Premium DTF", price: "₹29", img: "https://i.pinimg.com/736x/9a/59/49/9a594945716f011c8c59314eca236e5e.jpg" },
-    { id: 6, name: "Holographic DTF", price: "₹29", img: "https://i.pinimg.com/736x/3c/6a/14/3c6a14bd4e0bf57c64c490b07bc80dd7.jpg" },
-    { id: 7, name: "Matte Finish", price: "₹29", img: "https://i.pinimg.com/474x/94/9b/e9/949be92bdc0fce7693370d4c340df5ec.jpg" },
-    { id: 8, name: "Waterproof DTF", price: "₹29", img: "https://i.pinimg.com/736x/1c/21/65/1c2165297dd41a0753410c1f79bfb094.jpg" },
+    { id: 5, name: "Premium Silicone Cover", price: "₹249", img: "https://i.pinimg.com/736x/e8/25/63/e825631e1e97c9e41174f5fed952ef22.jpg" },
+    { id: 6, name: "Carbon Fiber Case", price: "₹279", img: "https://i.pinimg.com/736x/2a/31/18/2a3118860493ce5bfd53cb6bbd87e5ca.jpg" },
+    { id: 7, name: "Ultra Slim Hard Case", price: "₹199", img: "https://i.pinimg.com/736x/1c/21/65/1c2165297dd41a0753410c1f79bfb094.jpg" },
+    { id: 8, name: "Heavy Duty Protection", price: "₹329", img: "https://i.pinimg.com/736x/9a/59/49/9a594945716f011c8c59314eca236e5e.jpg" },
   ];
 
   return (
-    <div>
     <div
       style={{
-        background: "#fff3eb",
+        background: "#f4f9ff",
         minHeight: "100vh",
         padding: "50px 0",
         margin: "20px",
-        borderLeft: "5px solid #fe3d00",
+        borderLeft: "5px solid #007bff",
         borderRadius: "10px",
         boxShadow: "0 10px 40px rgba(0,0,0,0.05)"
       }}
@@ -38,21 +35,21 @@ export default function DtfStickerHome() {
         {/* HEADER */}
         <div className="text-center mb-5">
           <h2 style={{ fontWeight: "700", color: "#111" }}>
-            DTF Sticker Collection
+            Mobile Hard Silicone Cases
           </h2>
 
           <div
             style={{
               width: "60px",
               height: "4px",
-              background: "#fe3d00",
+              background: "#007bff",
               margin: "12px auto",
               borderRadius: "10px"
             }}
           />
 
           <p style={{ color: "#555" }}>
-            High quality custom DTF stickers for laptop & bike branding.
+            Premium hard & silicone protection cases for all smartphones.
           </p>
         </div>
 
@@ -70,23 +67,14 @@ export default function DtfStickerHome() {
                   transition: "0.3s"
                 }}
               >
-                <div style={{ overflow: "hidden" }}>
-                  <Card.Img
-                    variant="top"
-                    src={product.img}
-                    style={{
-                      height: "190px",
-                      objectFit: "cover",
-                      transition: "0.4s"
-                    }}
-                    onMouseOver={(e) =>
-                      (e.currentTarget.style.transform = "scale(1.08)")
-                    }
-                    onMouseOut={(e) =>
-                      (e.currentTarget.style.transform = "scale(1)")
-                    }
-                  />
-                </div>
+                <Card.Img
+                  variant="top"
+                  src={product.img}
+                  style={{
+                    height: "190px",
+                    objectFit: "cover"
+                  }}
+                />
 
                 <Card.Body className="text-center">
                   <Card.Title style={{ fontSize: "14px", fontWeight: "600" }}>
@@ -96,7 +84,7 @@ export default function DtfStickerHome() {
                   <Card.Text
                     style={{
                       fontWeight: "700",
-                      color: "#fe3d00",
+                      color: "#007bff",
                       fontSize: "18px"
                     }}
                   >
@@ -106,8 +94,8 @@ export default function DtfStickerHome() {
                   <Button
                     style={{
                       background: "white",
-                      border: "2px solid #fe3d00",
-                      color: "#fe3d00",
+                      border: "2px solid #007bff",
+                      color: "#007bff",
                       borderRadius: "10px",
                       padding: "10px",
                       fontWeight: "500",
@@ -120,12 +108,12 @@ export default function DtfStickerHome() {
                       transition: "0.3s"
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.background = "#fe3d00";
+                      e.currentTarget.style.background = "#007bff";
                       e.currentTarget.style.color = "white";
                     }}
                     onMouseOut={(e) => {
                       e.currentTarget.style.background = "white";
-                      e.currentTarget.style.color = "#fe3d00";
+                      e.currentTarget.style.color = "#007bff";
                     }}
                   >
                     <FaShoppingCart size={14} />
@@ -174,7 +162,7 @@ export default function DtfStickerHome() {
                   <Card.Title style={{ fontSize: "13px", fontWeight: "600" }}>
                     {item.name}
                   </Card.Title>
-                  <Card.Text style={{ fontWeight: "700", color: "#fe3d00" }}>
+                  <Card.Text style={{ fontWeight: "700", color: "#007bff" }}>
                     {item.price}
                   </Card.Text>
                 </Card.Body>
@@ -187,7 +175,7 @@ export default function DtfStickerHome() {
         <div className="text-center mt-4">
           <Button
             style={{
-              background: "#fe3d00",
+              background: "#007bff",
               border: "none",
               color: "white",
               borderRadius: "50px",
@@ -200,9 +188,6 @@ export default function DtfStickerHome() {
         </div>
 
       </Container>
-    </div>
-    <MobileCaseHome />
-
     </div>
   );
 }
