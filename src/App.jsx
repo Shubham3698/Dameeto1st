@@ -31,7 +31,7 @@ function AppWrapper() {
 function App() {
   const [loading, setLoading] = useState(true);
   const [fadeIn, setFadeIn] = useState(false);
-  const location = useLocation(); // 👈 current route
+  const location = useLocation(); 
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -41,6 +41,17 @@ function App() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // --- Logic to hide Floating Button on specific pages ---
+  // In pages par button hide ho jayega
+  const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order"];
+  
+  // Isse check karte hain ki kya current path hidden list mein hai 
+  // ya fir Dynamic paths (jaise order details ya image details) hain
+  const isButtonHidden = 
+    hiddenRoutes.includes(location.pathname) || 
+    location.pathname.startsWith("/order/") || 
+    location.pathname.startsWith("/image/");
 
   if (loading) {
     return (
@@ -81,8 +92,8 @@ function App() {
         <Route path="*" element={<div style={{ textAlign: "center", marginTop: "100px" }}><h2>404 - Not Found</h2></div>} />
       </Routes>
 
-      {/* ✅ Floating Button Hide on /home */}
-      {location.pathname !== "/home" && (
+      {/* ✅ Floating Button Hidden on specific pages */}
+      {!isButtonHidden && (
         <Link
           to="/home"
           style={floatingBtnStyle}
@@ -100,7 +111,7 @@ function App() {
   );
 }
 
-// --- Styles ---
+// --- Styles (No changes here) ---
 const loadingStyles = {
   display: "flex",
   justifyContent: "center",
