@@ -15,7 +15,8 @@ import {
   posterData,
   goodiesData,
   funnyData,
-  hotData
+  hotData,
+  learningProducts
 } from "../contexAndhooks/Ddata";
 
 export default function ImageDetails() {
@@ -48,7 +49,8 @@ export default function ImageDetails() {
       ...posterData,
       ...goodiesData,
       ...funnyData,
-      ...hotData
+      ...hotData,
+      ...learningProducts
     ];
   }, []);
 

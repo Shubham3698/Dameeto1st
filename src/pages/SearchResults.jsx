@@ -7,7 +7,8 @@ import {
   posterData,
   goodiesData,
   funnyData,
-  hotData
+  hotData,
+  learningProducts
 } from "../contexAndhooks/Ddata";
 
 export default function SearchResults() {
@@ -50,7 +51,8 @@ export default function SearchResults() {
       ...posterData, 
       ...goodiesData, 
       ...funnyData, 
-      ...hotData
+      ...hotData,
+      ...learningProducts
     ];
 
     const filteredLocal = allLocalData.filter((item) => {
