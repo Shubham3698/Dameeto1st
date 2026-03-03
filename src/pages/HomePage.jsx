@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { FaShoppingCart } from "react-icons/fa";
 import MobileCaseHome from "../components/MobileCaseHome";
+import LearningProductsHome from "../components/LearningProductsHome";
 
 
 export default function DtfStickerHome() {
@@ -202,6 +203,7 @@ export default function DtfStickerHome() {
       </Container>
     </div>
     <MobileCaseHome />
+    <LearningProductsHome />
 
     </div>
   );
