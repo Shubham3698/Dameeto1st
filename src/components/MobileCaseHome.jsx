@@ -13,9 +13,9 @@ export default function MobileCaseHome() {
 
   const topSelling = [
     { id: 5, name: "Premium Silicone Cover", price: "₹249", img: "https://i.pinimg.com/736x/e8/25/63/e825631e1e97c9e41174f5fed952ef22.jpg" },
-    { id: 6, name: "Carbon Fiber Case", price: "₹279", img: "https://i.pinimg.com/736x/2a/31/18/2a3118860493ce5bfd53cb6bbd87e5ca.jpg" },
-    { id: 7, name: "Ultra Slim Hard Case", price: "₹199", img: "https://i.pinimg.com/736x/1c/21/65/1c2165297dd41a0753410c1f79bfb094.jpg" },
-    { id: 8, name: "Heavy Duty Protection", price: "₹329", img: "https://i.pinimg.com/736x/9a/59/49/9a594945716f011c8c59314eca236e5e.jpg" },
+    { id: 6, name: "Carbon Fiber Case", price: "₹279", img: "https://i.pinimg.com/736x/66/36/d3/6636d31796ea5ddaf27ca5d84657ee84.jpg" },
+    { id: 7, name: "Ultra Slim Hard Case", price: "₹199", img: "https://i.pinimg.com/736x/a8/a7/85/a8a78557e8ad370151d1b0030e359fe8.jpg" },
+    { id: 8, name: "Heavy Duty Protection", price: "₹329", img: "https://i.pinimg.com/1200x/96/3e/fe/963efeedfa62d3bad9c142ae9c35ae71.jpg" },
   ];
 
   return (
@@ -97,7 +97,7 @@ export default function MobileCaseHome() {
                       border: "2px solid #007bff",
                       color: "#007bff",
                       borderRadius: "10px",
-                      padding: "10px",
+                      padding: "5px",
                       fontWeight: "500",
                       fontSize: "13px",
                       display: "flex",

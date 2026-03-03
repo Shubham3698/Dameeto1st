@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Container, Row, Col, Image, Button } from "react-bootstrap";
+import { Container, Row, Col, Image, Button, Form } from "react-bootstrap";
 import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
 import AddressModal from "../components/AddressModal";
@@ -13,10 +13,13 @@ export default function CartPage() {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [loading, setLoading] = useState(false);
   
+  // 🔥 NEW: Customer Message State
+  const [customerNote, setCustomerNote] = useState("");
+
   // Modal State
   const [showAddressModal, setShowAddressModal] = useState(false);
 
-  // 🔥 UPDATED: Render Backend URL
+  // Backend URL
   const API_BASE_URL = "https://serdeptry1st.onrender.com/api/customer-orders";
 
   useEffect(() => {
@@ -61,6 +64,11 @@ export default function CartPage() {
       msg += `\n📍 *Delivery Address*:\n${address.fullName}\n${address.phone}\n${address.street}, ${address.city}, ${address.state} - ${address.pincode}\n`;
     }
 
+    // 🔥 Added Customer Note to WhatsApp
+    if (customerNote.trim()) {
+      msg += `\n📝 *Customer Note*: ${customerNote}\n`;
+    }
+
     msg += `\nPlease confirm. 🚀\nThank you!`;
     return msg;
   };
@@ -95,7 +103,8 @@ export default function CartPage() {
           subtotal: subtotal,
           discount: discountPercent,
           total: finalTotal,
-          message: "Order placed via website",
+          // 🔥 UPDATED: Ab static text ki jagah customer ka note database mein jayega
+          message: customerNote || "No special instructions",
         }),
       });
 
@@ -124,7 +133,7 @@ export default function CartPage() {
   };
 
   return (
-    <Container style={{ paddingTop: "20px", maxWidth: "900px" }}>
+    <Container style={{ paddingTop: "20px", maxWidth: "900px", paddingBottom: "50px" }}>
       <h2 className="mb-4 text-center" style={{ fontWeight: "800" }}>🛒 Your Cart</h2>
 
       {cartItems.length === 0 ? (
@@ -164,16 +173,32 @@ export default function CartPage() {
             <span>Total</span><span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
           </div>
 
+          {/* Coupon Code Section */}
           <div className="mt-3 d-flex gap-2">
             <input type="text" placeholder="Coupon Code" value={coupon} onChange={(e) => setCoupon(e.target.value)} className="form-control" style={{ borderRadius: "8px" }} />
             <Button style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700", borderRadius: "8px", padding: "0 20px" }} onClick={applyCoupon}>Apply</Button>
           </div>
 
+          <hr className="my-4" />
+
+          {/* 🔥 NEW: Customer Instructions Section */}
+          <Form.Group className="mb-3">
+            <Form.Label style={{ fontWeight: "700" }}>Add a note for your order (Optional):</Form.Label>
+            <Form.Control 
+              as="textarea" 
+              rows={3} 
+              placeholder="E.g. Wrap it as a gift or delivery instructions..." 
+              value={customerNote}
+              onChange={(e) => setCustomerNote(e.target.value)}
+              style={{ borderRadius: "10px", border: "1px solid #ccc" }}
+            />
+          </Form.Group>
+
           <Button 
             onClick={handlePlaceOrderClick} 
             disabled={loading} 
             style={{ 
-              marginTop: "20px", 
+              marginTop: "10px", 
               width: "100%", 
               backgroundColor: "#fe3d00", 
               border: "none", 
