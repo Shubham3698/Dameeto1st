@@ -103,35 +103,6 @@ export default function DtfStickerHome() {
                   >
                     {product.price}
                   </Card.Text>
-
-                  <Button
-                    style={{
-                      background: "white",
-                      border: "2px solid #fe3d00",
-                      color: "#fe3d00",
-                      borderRadius: "10px",
-                      padding: "10px",
-                      fontWeight: "500",
-                      fontSize: "13px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      justifyContent: "center",
-                      margin: "0 auto",
-                      transition: "0.3s"
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = "#fe3d00";
-                      e.currentTarget.style.color = "white";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = "white";
-                      e.currentTarget.style.color = "#fe3d00";
-                    }}
-                  >
-                    <FaShoppingCart size={14} />
-                    Add to Cart
-                  </Button>
                 </Card.Body>
               </Card>
             </Col>

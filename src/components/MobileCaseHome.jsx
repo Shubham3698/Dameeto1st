@@ -91,34 +91,7 @@ export default function MobileCaseHome() {
                     {product.price}
                   </Card.Text>
 
-                  <Button
-                    style={{
-                      background: "white",
-                      border: "2px solid #007bff",
-                      color: "#007bff",
-                      borderRadius: "10px",
-                      padding: "5px",
-                      fontWeight: "500",
-                      fontSize: "13px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      justifyContent: "center",
-                      margin: "0 auto",
-                      transition: "0.3s"
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = "#007bff";
-                      e.currentTarget.style.color = "white";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = "white";
-                      e.currentTarget.style.color = "#007bff";
-                    }}
-                  >
-                    <FaShoppingCart size={14} />
-                    Add to Cart
-                  </Button>
+           
                 </Card.Body>
               </Card>
             </Col>
