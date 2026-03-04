@@ -157,7 +157,15 @@ export default function LearningProductsHome() {
         {/* VIEW MORE BUTTON */}
         <div className="text-center mt-4">
           <Button
-            onClick={() => navigate("/learning-products")}
+           onClick={() => {
+  navigate("/learning-products");
+  setTimeout(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }, 100);
+}}
             style={{
               background: "#007bff",
               border: "none",

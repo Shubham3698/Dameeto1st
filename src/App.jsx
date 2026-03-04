@@ -46,7 +46,7 @@ function App() {
 
   // --- Logic to hide Floating Button on specific pages ---
   // In pages par button hide ho jayega
-  const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order"];
+  const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account"];
   
   // Isse check karte hain ki kya current path hidden list mein hai 
   // ya fir Dynamic paths (jaise order details ya image details) hain
