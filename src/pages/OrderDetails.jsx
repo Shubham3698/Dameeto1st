@@ -9,7 +9,6 @@ export default function OrderDetails() {
   const [otherReason, setOtherReason] = useState(""); 
   const [loading, setLoading] = useState(false);
 
-  // 🔥 URL for Testing (Change to Render URL when deploying)
   const API_BASE_URL = "https://serdeptry1st.onrender.com"; 
 
   const fetchOrder = async () => {
@@ -107,7 +106,7 @@ export default function OrderDetails() {
 
         <hr style={{ margin: "25px 0", opacity: 0.1 }} />
 
-        {/* --- Delivery Address Section (Fixed/Intact) --- */}
+        {/* --- Delivery Address Section --- */}
         <h4 style={{ marginBottom: "15px", fontSize: "1.1rem", fontWeight: "800" }}>📍 Shipping To:</h4>
         {order.address ? (
           <div style={{ background: "#fff9f7", padding: "20px", borderRadius: "15px", border: "1px dashed #fe3d00", fontSize: "15px", lineHeight: "1.7" }}>
@@ -126,7 +125,11 @@ export default function OrderDetails() {
         {/* --- Tracking Status UI & Cancel Button --- */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
             <h4 style={{ margin: 0, fontSize: "1.1rem", fontWeight: "800" }}>🚚 Order Status:</h4>
-            {order.orderStatus !== "Cancelled" && order.orderStatus !== "Delivered" && order.orderStatus !== "Shipped" && (
+            {/* Button only shows if not Cancelled/Delivered/Shipped/Requested */}
+            {order.orderStatus !== "Cancelled" && 
+             order.orderStatus !== "Delivered" && 
+             order.orderStatus !== "Shipped" && 
+             order.orderStatus !== "Cancel Requested" && (
                 <button 
                     onClick={() => setShowCancelModal(true)}
                     style={{ background: "#fff", border: "1px solid #e74c3c", color: "#e74c3c", padding: "8px 16px", borderRadius: "10px", fontWeight: "700", cursor: "pointer" }}>
@@ -135,10 +138,19 @@ export default function OrderDetails() {
             )}
         </div>
         
+        {/* Yahan logic update kiya hai taaki status UI sahi dikhe */}
         {order.orderStatus === "Cancelled" ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "18px", background: "#fff5f5", borderRadius: "12px", color: "#e74c3c", border: "1px solid #feb2b2" }}>
-            <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#e74c3c", boxShadow: "0 0 10px rgba(231, 76, 60, 0.4)" }} />
-            <span style={{ fontWeight: 800, fontSize: "16px" }}>This order was cancelled.</span>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "18px", background: "#fff5f5", borderRadius: "12px", color: "#e74c3c", border: "1px solid #feb2b2" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#e74c3c", boxShadow: "0 0 10px rgba(231, 76, 60, 0.4)" }} />
+                <span style={{ fontWeight: 800, fontSize: "16px" }}>This order was cancelled.</span>
+            </div>
+            {order.cancelReason && <p style={{margin: 0, fontSize: "14px", color: "#666"}}>Reason: {order.cancelReason}</p>}
+          </div>
+        ) : order.orderStatus === "Cancel Requested" ? (
+          <div style={{ padding: "18px", background: "#fff9eb", borderRadius: "12px", color: "#d97706", border: "1px solid #fef3c7" }}>
+             <p style={{ fontWeight: 800, margin: 0, fontSize: "16px" }}>⏳ Cancellation Pending</p>
+             <p style={{ margin: "5px 0 0 0", fontSize: "14px" }}>Admin is reviewing your request for: "{order.cancelReason}"</p>
           </div>
         ) : (
           <div style={{ marginTop: 10, paddingLeft: "10px" }}>
@@ -165,7 +177,7 @@ export default function OrderDetails() {
         )}
       </div>
 
-      {/* --- Cancel Modal --- */}
+      {/* --- Cancel Modal (Vahi original vala) --- */}
       {showCancelModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(5px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
           <div style={{ background: "white", padding: "30px", borderRadius: "25px", width: "90%", maxWidth: "450px" }}>
