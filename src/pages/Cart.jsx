@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Container, Row, Col, Image, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Image, Button, Form, Modal } from "react-bootstrap";
 import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
 import AddressModal from "../components/AddressModal";
@@ -12,14 +12,12 @@ export default function CartPage() {
   const [coupon, setCoupon] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
   const [loading, setLoading] = useState(false);
-  
-  // 🔥 NEW: Customer Message State
   const [customerNote, setCustomerNote] = useState("");
-
-  // Modal State
   const [showAddressModal, setShowAddressModal] = useState(false);
 
-  // Backend URL
+  // State for Minimum Order Warning Popup
+  const [showMinOrderModal, setShowMinOrderModal] = useState(false);
+
   const API_BASE_URL = "https://serdeptry1st.onrender.com/api/customer-orders";
 
   useEffect(() => {
@@ -64,7 +62,6 @@ export default function CartPage() {
       msg += `\n📍 *Delivery Address*:\n${address.fullName}\n${address.phone}\n${address.street}, ${address.city}, ${address.state} - ${address.pincode}\n`;
     }
 
-    // 🔥 Added Customer Note to WhatsApp
     if (customerNote.trim()) {
       msg += `\n📝 *Customer Note*: ${customerNote}\n`;
     }
@@ -75,6 +72,13 @@ export default function CartPage() {
 
   const handlePlaceOrderClick = () => {
     if (cartItems.length === 0) return alert("Your cart is empty!");
+    
+    // Check minimum amount and show UI Popup
+    if (finalTotal < 119) {
+      setShowMinOrderModal(true);
+      return;
+    }
+
     const email = localStorage.getItem("userEmail");
     if (!email) return alert("Please login first!");
     
@@ -103,22 +107,17 @@ export default function CartPage() {
           subtotal: subtotal,
           discount: discountPercent,
           total: finalTotal,
-          // 🔥 UPDATED: Ab static text ki jagah customer ka note database mein jayega
           message: customerNote || "No special instructions",
         }),
       });
 
       const data = await res.json();
-
       if (data.success) {
         const shortOrderId = data.data.shortOrderId;
         alert(`✅ Order placed successfully! (ID: ${shortOrderId})`);
-
-        // WhatsApp redirect
         const whatsappUrl = `https://wa.me/917080981033?text=${encodeURIComponent(
           generateWhatsAppMessage(shortOrderId, addressData)
         )}`;
-        
         clearCart();
         window.location.href = whatsappUrl;
       } else {
@@ -126,7 +125,7 @@ export default function CartPage() {
       }
     } catch (err) {
       console.error("Order Error:", err);
-      alert("❌ Server Error: Check your backend status on Render.");
+      alert("❌ Server Error: Check your backend status.");
     } finally {
       setLoading(false);
     }
@@ -173,15 +172,18 @@ export default function CartPage() {
             <span>Total</span><span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
           </div>
 
-          {/* Coupon Code Section */}
-          <div className="mt-3 d-flex gap-2">
+          {/* 🔥 UPDATED: Note above Coupon Box */}
+          <p className="mb-1 mt-3" style={{ fontSize: "0.85rem", color: "#d9534f", fontWeight: "700" }}>
+            Note: Total amount must be ₹119 or above to place an order.
+          </p>
+
+          <div className="d-flex gap-2">
             <input type="text" placeholder="Coupon Code" value={coupon} onChange={(e) => setCoupon(e.target.value)} className="form-control" style={{ borderRadius: "8px" }} />
             <Button style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700", borderRadius: "8px", padding: "0 20px" }} onClick={applyCoupon}>Apply</Button>
           </div>
 
           <hr className="my-4" />
 
-          {/* 🔥 NEW: Customer Instructions Section */}
           <Form.Group className="mb-3">
             <Form.Label style={{ fontWeight: "700" }}>Add a note for your order (Optional):</Form.Label>
             <Form.Control 
@@ -212,6 +214,25 @@ export default function CartPage() {
           </Button>
         </div>
       )}
+
+      {/* UI Popup for Minimum Order Restriction */}
+      <Modal show={showMinOrderModal} onHide={() => setShowMinOrderModal(false)} centered>
+        <Modal.Header closeButton style={{ border: "none" }}>
+          <Modal.Title style={{ fontWeight: "800", color: "#fe3d00" }}>Minimum Order Required</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center" style={{ paddingBottom: "30px" }}>
+          <div style={{ fontSize: "1.1rem", marginBottom: "20px" }}>
+            Your current total is <strong>₹{finalTotal}</strong>. <br />
+            To place an order, the minimum amount must be <strong>₹119</strong> or more.
+          </div>
+          <Button 
+            onClick={() => setShowMinOrderModal(false)}
+            style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700", padding: "10px 30px", borderRadius: "8px" }}
+          >
+            Add More Items
+          </Button>
+        </Modal.Body>
+      </Modal>
 
       <AddressModal 
         show={showAddressModal} 
