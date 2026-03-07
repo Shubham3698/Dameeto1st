@@ -21,9 +21,10 @@ export default function CartPage() {
   const [tempAddress, setTempAddress] = useState(null);
   const [currentOrderId, setCurrentOrderId] = useState(""); 
 
+  // Deployed Backend URL
   const API_BASE_URL = "https://serdeptry1st.onrender.com/api/customer-orders";
 
-  // Auto-scroll logic
+  // Auto-scroll logic (Intact)
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
       cartEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,10 +77,14 @@ export default function CartPage() {
 
   const handlePlaceOrderClick = () => {
     if (cartItems.length === 0) return alert("Your cart is empty!");
-    if (finalTotal < 119) {
+
+    // 🔥 Minimum Order Check (Commented out temporarily)
+    /* if (finalTotal < 119) {
       setShowMinOrderModal(true);
       return;
     }
+    */
+
     const email = localStorage.getItem("userEmail");
     if (!email) return alert("Please login first!");
     
@@ -130,15 +135,41 @@ export default function CartPage() {
     }
   };
 
-  // Step 2: Final Success Redirect
-  const handlePaymentComplete = () => {
-    const whatsappUrl = `https://wa.me/917080981033?text=${encodeURIComponent(
-      generateWhatsAppMessage(currentOrderId, tempAddress)
-    )}`;
-    
-    clearCart();
-    setShowPayModal(false);
-    window.location.href = whatsappUrl;
+  // Step 2: Final Success Redirect with Verification
+  const handlePaymentComplete = async (razorpayResponse) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/verify-and-confirm`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shortOrderId: currentOrderId,
+          razorpay_order_id: razorpayResponse.razorpay_order_id,
+          razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+          razorpay_signature: razorpayResponse.razorpay_signature,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const whatsappUrl = `https://wa.me/917080981033?text=${encodeURIComponent(
+          generateWhatsAppMessage(currentOrderId, tempAddress)
+        )}`;
+        
+        clearCart();
+        setShowPayModal(false);
+        alert("✅ Order Placed & Payment Verified!");
+        window.location.href = whatsappUrl;
+      } else {
+        alert("❌ Verification Failed: " + (data.message || "Payment invalid"));
+      }
+    } catch (err) {
+      console.error("Final Confirmation Error:", err);
+      alert("❌ Server Error: Payment done but order update failed. Please contact us!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -182,9 +213,11 @@ export default function CartPage() {
             <span>Total</span><span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
           </div>
 
-          <p className="mb-1 mt-3" style={{ fontSize: "0.85rem", color: "#d9534f", fontWeight: "700" }}>
-             Note: Total amount must be ₹119 or above to place an order.
-          </p>
+          {/* 🔥 Min order warning text (Commented out) */}
+          {/* <p className="mb-1 mt-3" style={{ fontSize: "0.85rem", color: "#d9534f", fontWeight: "700" }}>
+              Note: Total amount must be ₹119 or above to place an order.
+          </p> 
+          */}
 
           <div className="d-flex gap-2">
             <input type="text" placeholder="Coupon Code" value={coupon} onChange={(e) => setCoupon(e.target.value)} className="form-control" style={{ borderRadius: "8px" }} />
@@ -224,7 +257,7 @@ export default function CartPage() {
         </div>
       )}
 
-      {/* Minimum Order Warning Modal */}
+      {/* Min order modal is still here but handlePlaceOrderClick won't trigger it */}
       <Modal show={showMinOrderModal} onHide={() => setShowMinOrderModal(false)} centered>
         <Modal.Header closeButton style={{ border: "none" }}>
           <Modal.Title style={{ fontWeight: "800", color: "#fe3d00" }}>Minimum Order Required</Modal.Title>
@@ -257,4 +290,4 @@ export default function CartPage() {
       <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage()} />
     </Container>
   );
-}   
+}

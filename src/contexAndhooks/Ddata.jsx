@@ -135,7 +135,7 @@ export const trendingData = [
     title: "Dark Anime Aesthetic Poster",
     shortDesc: "Premium matte finish wall poster",
     longDesc: "High quality HD anime aesthetic poster printed on thick premium paper with vibrant long-lasting colors.",
-    finalPrice: 199,
+    finalPrice: 1,
     originalPrice: 299,
     discount: 33,
     rating: 4.5,

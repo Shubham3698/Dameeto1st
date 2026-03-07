@@ -1,101 +1,79 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Button, Spinner } from "react-bootstrap";
-import { FaShareAlt } from "react-icons/fa";
+import axios from "axios";
 
 export default function PayModal({ show, handleClose, amount, orderId, onPaymentSuccess }) {
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [paymentInitiated, setPaymentInitiated] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  // UPI Configuration with Note
-  const upiId = "pandey0shubham3698@okhdfcbank";
-  const upiName = "Shubham Pandey";
-  // Adding Transaction Note for the customer
-  const transactionNote = `Dameeto Order Payment #${orderId}`;
-  const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+  // 🔥 Base URL updated to your Render link
+  const BASE_URL = "https://serdeptry1st.onrender.com";
 
-  useEffect(() => {
-    let timer;
-    if (paymentInitiated && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0) {
-      clearInterval(timer);
-    }
-    return () => clearInterval(timer);
-  }, [paymentInitiated, timeLeft]);
-
-  const handleShareUPI = async () => {
-    const shareText = `🛒 Dameeto Order #${orderId}\n💰 Amount: ₹${amount}\n🔗 Pay Link: ${upiLink}`;
-    
+  const handleRazorpayPayment = async () => {
+    setLoading(true);
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "Payment for Dameeto",
-          text: shareText,
-        });
-      } else {
-        await navigator.clipboard.writeText(upiLink);
-        alert("UPI Link copied to clipboard! 🚀");
-      }
+      // 1. Backend se Order ID mangvao - Deployed URL used here
+      const { data } = await axios.post(`${BASE_URL}/api/payment/create-order`, {
+        amount: amount,
+      });
+
+      const options = {
+        key: "rzp_live_SOPN1D2wGhStiM", // Aapki Live Key
+        amount: data.order.amount,
+        currency: "INR",
+        name: "Dameeto",
+        description: `Payment for Order #${orderId}`,
+        order_id: data.order.id,
+        handler: async (response) => {
+          // 2. Payment successful hone ke baad verify karo - Deployed URL used here
+          try {
+            const verifyRes = await axios.post(`${BASE_URL}/api/payment/verify-payment`, response);
+            if (verifyRes.data.success) {
+              onPaymentSuccess(response); // Response pass kar rahe hain verify-and-confirm ke liye
+            }
+          } catch (err) {
+            console.error("Verification failed", err);
+            alert("Verification Failed! Please contact support.");
+          }
+        },
+        prefill: {
+          name: "Customer", 
+          email: "customer@example.com",
+          contact: "9999999999",
+        },
+        theme: { color: "#fe3d00" },
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.open();
     } catch (error) {
-      navigator.clipboard.writeText(upiLink);
-      alert("UPI Link copied to clipboard! 🚀");
-    }
-  };
-
-  const handlePayClick = () => {
-    setPaymentInitiated(true);
-    setTimeLeft(20);
-    window.location.href = upiLink;
-  };
-
-  const handleConfirm = () => {
-    setIsConfirming(true);
-    setTimeout(() => {
-      setIsConfirming(false);
-      onPaymentSuccess(); 
-    }, 2000);
-  };
-
-  const onModalHide = () => {
-    if (!isConfirming && timeLeft === 0) {
-      setPaymentInitiated(false);
-      setTimeLeft(0);
-      handleClose();
+      console.error("Payment Error:", error);
+      alert("Payment initiation failed! Make sure your backend is awake on Render.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Modal show={show} onHide={onModalHide} centered backdrop="static" keyboard={false} style={{ zIndex: "10002" }}>
-      <Modal.Header closeButton={!isConfirming && timeLeft === 0} className="border-0 pb-0">
-        <Modal.Title style={{ fontWeight: "800", color: "#18181b" }}>Complete Payment</Modal.Title>
+    <Modal show={show} onHide={handleClose} centered backdrop="static">
+      <Modal.Header closeButton className="border-0">
+        <Modal.Title style={{ fontWeight: "800" }}>Final Payment</Modal.Title>
       </Modal.Header>
-
-      <Modal.Body style={{ textAlign: "center", padding: "30px" }}>
+      <Modal.Body className="text-center py-4">
         <div className="mb-3">
-            <span className="badge bg-light text-dark" style={{fontSize: '0.8rem'}}>Order ID: #{orderId}</span>
+            <span className="badge bg-light text-dark">Order ID: #{orderId}</span>
         </div>
-        <p className="text-muted mb-1" style={{ fontSize: "0.9rem" }}>Total Payable Amount</p>
-        <h2 style={{ color: "#fe3d00", fontWeight: "900", fontSize: "2.5rem", marginBottom: "25px" }}>₹{amount}</h2>
+        <p className="text-muted mb-1">Total Amount</p>
+        <h2 style={{ color: "#fe3d00", fontWeight: "900", fontSize: "2.5rem" }}>₹{amount}</h2>
         
-        <div style={{ background: "#f8f9fa", padding: "20px", borderRadius: "15px", marginBottom: "20px" }}>
-          <p style={{ fontSize: "0.9rem", fontWeight: "600", marginBottom: "12px" }}>Step 1: Pay via UPI App</p>
-          <div className="d-flex gap-2">
-            <Button onClick={handlePayClick} disabled={paymentInitiated && timeLeft > 0} style={{ backgroundColor: "#18181b", border: "none", flex: 1, fontWeight: "700", padding: "12px", borderRadius: "10px" }}>
-              {paymentInitiated && timeLeft > 0 ? `Opening App... (${timeLeft}s)` : "📱 Pay Now"}
-            </Button>
-            <Button onClick={handleShareUPI} style={{ backgroundColor: "white", border: "2px solid #18181b", color: "#18181b", width: "54px", borderRadius: "10px" }}>
-              <FaShareAlt size={18} />
-            </Button>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <p style={{ fontSize: "0.9rem", fontWeight: "600", color: (paymentInitiated && timeLeft === 0) ? "#18181b" : "#a1a1aa", marginBottom: "12px" }}>Step 2: Confirm Payment</p>
-          <Button onClick={handleConfirm} disabled={!paymentInitiated || timeLeft > 0 || isConfirming} style={{ backgroundColor: (paymentInitiated && timeLeft === 0) ? "#fe3d00" : "#ccc", border: "none", width: "100%", padding: "15px", fontWeight: "700", borderRadius: "12px" }}>
-            {isConfirming ? <><Spinner size="sm" animation="border" className="me-2"/> Verifying...</> : "✅ I Have Paid"}
+        <div className="mt-4 p-3 bg-light rounded-4">
+          <p className="small text-muted mb-3">Pay securely via Cards, UPI, or Netbanking</p>
+          <Button 
+            onClick={handleRazorpayPayment} 
+            disabled={loading}
+            className="w-100 py-3 border-0 fw-bold" 
+            style={{ backgroundColor: "#18181b", borderRadius: "12px" }}
+          >
+            {loading ? <Spinner size="sm" /> : "💳 Pay with Razorpay"}
           </Button>
         </div>
       </Modal.Body>
