@@ -17,12 +17,13 @@ export default function CartPage() {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showMinOrderModal, setShowMinOrderModal] = useState(false);
   
-  // States for Payment & Order Flow
   const [showPayModal, setShowPayModal] = useState(false);
   const [tempAddress, setTempAddress] = useState(null);
+  const [currentOrderId, setCurrentOrderId] = useState(""); 
 
   const API_BASE_URL = "https://serdeptry1st.onrender.com/api/customer-orders";
 
+  // Auto-scroll logic
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
       cartEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -85,15 +86,9 @@ export default function CartPage() {
     setShowAddressModal(true);
   };
 
-  // Step 1: Address Modal saves address temporary
-  const handleAddressSave = (addressData) => {
+  // Step 1: Create Order in DB & Get ID
+  const handleAddressSave = async (addressData) => {
     setTempAddress(addressData);
-    setShowAddressModal(false);
-    setShowPayModal(true);
-  };
-
-  // Step 2: After Payment is confirmed, Create Order in Backend
-  const handlePaymentComplete = async () => {
     setLoading(true);
     const email = localStorage.getItem("userEmail");
     const name = localStorage.getItem("userName") || "Customer";
@@ -105,7 +100,7 @@ export default function CartPage() {
         body: JSON.stringify({
           userName: name,
           userEmail: email,
-          address: tempAddress,
+          address: addressData,
           products: cartItems.map((item) => ({
             title: item.title,
             price: item.price,
@@ -121,18 +116,11 @@ export default function CartPage() {
 
       const data = await res.json();
       if (data.success) {
-        const shortOrderId = data.data.shortOrderId;
-        alert(`✅ Order placed successfully! (ID: ${shortOrderId})`);
-        
-        const whatsappUrl = `https://wa.me/917080981033?text=${encodeURIComponent(
-          generateWhatsAppMessage(shortOrderId, tempAddress)
-        )}`;
-        
-        clearCart();
-        setShowPayModal(false);
-        window.location.href = whatsappUrl;
+        setCurrentOrderId(data.data.shortOrderId);
+        setShowAddressModal(false);
+        setShowPayModal(true);
       } else {
-        alert("❌ Error: " + (data.message || "Something went wrong"));
+        alert("❌ Error: " + (data.message || "Failed to initiate order"));
       }
     } catch (err) {
       console.error("Order Error:", err);
@@ -140,6 +128,17 @@ export default function CartPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Step 2: Final Success Redirect
+  const handlePaymentComplete = () => {
+    const whatsappUrl = `https://wa.me/917080981033?text=${encodeURIComponent(
+      generateWhatsAppMessage(currentOrderId, tempAddress)
+    )}`;
+    
+    clearCart();
+    setShowPayModal(false);
+    window.location.href = whatsappUrl;
   };
 
   return (
@@ -184,7 +183,7 @@ export default function CartPage() {
           </div>
 
           <p className="mb-1 mt-3" style={{ fontSize: "0.85rem", color: "#d9534f", fontWeight: "700" }}>
-            Note: Total amount must be ₹119 or above to place an order.
+             Note: Total amount must be ₹119 or above to place an order.
           </p>
 
           <div className="d-flex gap-2">
@@ -251,10 +250,11 @@ export default function CartPage() {
         show={showPayModal}
         handleClose={() => setShowPayModal(false)}
         amount={finalTotal}
+        orderId={currentOrderId} 
         onPaymentSuccess={handlePaymentComplete} 
       />
 
       <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage()} />
     </Container>
   );
-}
+}   
