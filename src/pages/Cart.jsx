@@ -3,6 +3,7 @@ import { Container, Row, Col, Image, Button, Form, Modal } from "react-bootstrap
 import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
 import AddressModal from "../components/AddressModal";
+import PayModal from "../components/PayModal";
 
 export default function CartPage() {
   const { cartItems, updateQuantity, clearCart } = useContext(CartContext);
@@ -14,9 +15,11 @@ export default function CartPage() {
   const [loading, setLoading] = useState(false);
   const [customerNote, setCustomerNote] = useState("");
   const [showAddressModal, setShowAddressModal] = useState(false);
-
-  // State for Minimum Order Warning Popup
   const [showMinOrderModal, setShowMinOrderModal] = useState(false);
+  
+  // States for Payment & Order Flow
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [tempAddress, setTempAddress] = useState(null);
 
   const API_BASE_URL = "https://serdeptry1st.onrender.com/api/customer-orders";
 
@@ -72,20 +75,25 @@ export default function CartPage() {
 
   const handlePlaceOrderClick = () => {
     if (cartItems.length === 0) return alert("Your cart is empty!");
-    
-    // Check minimum amount and show UI Popup
     if (finalTotal < 119) {
       setShowMinOrderModal(true);
       return;
     }
-
     const email = localStorage.getItem("userEmail");
     if (!email) return alert("Please login first!");
     
     setShowAddressModal(true);
   };
 
-  const handleAddressSave = async (addressData) => {
+  // Step 1: Address Modal saves address temporary
+  const handleAddressSave = (addressData) => {
+    setTempAddress(addressData);
+    setShowAddressModal(false);
+    setShowPayModal(true);
+  };
+
+  // Step 2: After Payment is confirmed, Create Order in Backend
+  const handlePaymentComplete = async () => {
     setLoading(true);
     const email = localStorage.getItem("userEmail");
     const name = localStorage.getItem("userName") || "Customer";
@@ -97,7 +105,7 @@ export default function CartPage() {
         body: JSON.stringify({
           userName: name,
           userEmail: email,
-          address: addressData,
+          address: tempAddress,
           products: cartItems.map((item) => ({
             title: item.title,
             price: item.price,
@@ -115,17 +123,20 @@ export default function CartPage() {
       if (data.success) {
         const shortOrderId = data.data.shortOrderId;
         alert(`✅ Order placed successfully! (ID: ${shortOrderId})`);
+        
         const whatsappUrl = `https://wa.me/917080981033?text=${encodeURIComponent(
-          generateWhatsAppMessage(shortOrderId, addressData)
+          generateWhatsAppMessage(shortOrderId, tempAddress)
         )}`;
+        
         clearCart();
+        setShowPayModal(false);
         window.location.href = whatsappUrl;
       } else {
         alert("❌ Error: " + (data.message || "Something went wrong"));
       }
     } catch (err) {
       console.error("Order Error:", err);
-      alert("❌ Server Error: Check your backend status.");
+      alert("❌ Server Error: Order could not be created.");
     } finally {
       setLoading(false);
     }
@@ -172,7 +183,6 @@ export default function CartPage() {
             <span>Total</span><span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
           </div>
 
-          {/* 🔥 UPDATED: Note above Coupon Box */}
           <p className="mb-1 mt-3" style={{ fontSize: "0.85rem", color: "#d9534f", fontWeight: "700" }}>
             Note: Total amount must be ₹119 or above to place an order.
           </p>
@@ -189,7 +199,7 @@ export default function CartPage() {
             <Form.Control 
               as="textarea" 
               rows={3} 
-              placeholder="E.g. Wrap it as a gift or delivery instructions..." 
+              placeholder="E.g. Wrap it as a gift..." 
               value={customerNote}
               onChange={(e) => setCustomerNote(e.target.value)}
               style={{ borderRadius: "10px", border: "1px solid #ccc" }}
@@ -215,7 +225,7 @@ export default function CartPage() {
         </div>
       )}
 
-      {/* UI Popup for Minimum Order Restriction */}
+      {/* Minimum Order Warning Modal */}
       <Modal show={showMinOrderModal} onHide={() => setShowMinOrderModal(false)} centered>
         <Modal.Header closeButton style={{ border: "none" }}>
           <Modal.Title style={{ fontWeight: "800", color: "#fe3d00" }}>Minimum Order Required</Modal.Title>
@@ -225,10 +235,7 @@ export default function CartPage() {
             Your current total is <strong>₹{finalTotal}</strong>. <br />
             To place an order, the minimum amount must be <strong>₹119</strong> or more.
           </div>
-          <Button 
-            onClick={() => setShowMinOrderModal(false)}
-            style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700", padding: "10px 30px", borderRadius: "8px" }}
-          >
+          <Button onClick={() => setShowMinOrderModal(false)} style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700", padding: "10px 30px", borderRadius: "8px" }}>
             Add More Items
           </Button>
         </Modal.Body>
@@ -238,6 +245,13 @@ export default function CartPage() {
         show={showAddressModal} 
         handleClose={() => setShowAddressModal(false)} 
         handleSave={handleAddressSave} 
+      />
+
+      <PayModal
+        show={showPayModal}
+        handleClose={() => setShowPayModal(false)}
+        amount={finalTotal}
+        onPaymentSuccess={handlePaymentComplete} 
       />
 
       <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage()} />
