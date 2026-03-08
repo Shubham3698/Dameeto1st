@@ -77,23 +77,25 @@ export default function CartPage() {
 
   const handlePlaceOrderClick = () => {
     if (cartItems.length === 0) return alert("Your cart is empty!");
-
-    // 🔥 Minimum Order Check (Commented out temporarily)
-    /* if (finalTotal < 119) {
-      setShowMinOrderModal(true);
-      return;
-    }
-    */
-
     const email = localStorage.getItem("userEmail");
     if (!email) return alert("Please login first!");
-    
     setShowAddressModal(true);
   };
 
-  // Step 1: Create Order in DB & Get ID
-  const handleAddressSave = async (addressData) => {
+  // Step 1: Address Save & Pre-generate Order ID
+  const handleAddressSave = (addressData) => {
+    // 🔥 Pehle hi Order ID generate kar lo taaki PayModal aur DB dono ko mil sake
+    const name = localStorage.getItem("userName") || "CUS";
+    const generatedId = name.substring(0, 3).toUpperCase() + Date.now().toString().slice(-5);
+    
+    setCurrentOrderId(generatedId); // State mein save kiya
     setTempAddress(addressData);
+    setShowAddressModal(false);
+    setShowPayModal(true); // Asli ID ke saath PayModal khulega
+  };
+
+  // Step 2: 🔥 Final Success (DB Entry AFTER Payment)
+  const handlePaymentComplete = async (razorpayResponse) => {
     setLoading(true);
     const email = localStorage.getItem("userEmail");
     const name = localStorage.getItem("userName") || "Customer";
@@ -103,9 +105,10 @@ export default function CartPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          shortOrderId: currentOrderId, // 🔥 Wahi ID jo user ko payment popup mein dikhi
           userName: name,
           userEmail: email,
-          address: addressData,
+          address: tempAddress,
           products: cartItems.map((item) => ({
             title: item.title,
             price: item.price,
@@ -116,34 +119,7 @@ export default function CartPage() {
           discount: discountPercent,
           total: finalTotal,
           message: customerNote || "No special instructions",
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setCurrentOrderId(data.data.shortOrderId);
-        setShowAddressModal(false);
-        setShowPayModal(true);
-      } else {
-        alert("❌ Error: " + (data.message || "Failed to initiate order"));
-      }
-    } catch (err) {
-      console.error("Order Error:", err);
-      alert("❌ Server Error: Order could not be created.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Step 2: Final Success Redirect with Verification
-  const handlePaymentComplete = async (razorpayResponse) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/verify-and-confirm`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shortOrderId: currentOrderId,
+          paymentStatus: "Paid", 
           razorpay_order_id: razorpayResponse.razorpay_order_id,
           razorpay_payment_id: razorpayResponse.razorpay_payment_id,
           razorpay_signature: razorpayResponse.razorpay_signature,
@@ -159,14 +135,14 @@ export default function CartPage() {
         
         clearCart();
         setShowPayModal(false);
-        alert("✅ Order Placed & Payment Verified!");
+        alert(`✅ Order Confirmed! ID: ${currentOrderId}`);
         window.location.href = whatsappUrl;
       } else {
-        alert("❌ Verification Failed: " + (data.message || "Payment invalid"));
+        alert("❌ Order save failed. Please contact support with your payment ID.");
       }
     } catch (err) {
-      console.error("Final Confirmation Error:", err);
-      alert("❌ Server Error: Payment done but order update failed. Please contact us!");
+      console.error("Order Error:", err);
+      alert("❌ Server Error: Order could not be saved.");
     } finally {
       setLoading(false);
     }
@@ -213,13 +189,7 @@ export default function CartPage() {
             <span>Total</span><span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
           </div>
 
-          {/* 🔥 Min order warning text (Commented out) */}
-          {/* <p className="mb-1 mt-3" style={{ fontSize: "0.85rem", color: "#d9534f", fontWeight: "700" }}>
-              Note: Total amount must be ₹119 or above to place an order.
-          </p> 
-          */}
-
-          <div className="d-flex gap-2">
+          <div className="d-flex gap-2 mt-4">
             <input type="text" placeholder="Coupon Code" value={coupon} onChange={(e) => setCoupon(e.target.value)} className="form-control" style={{ borderRadius: "8px" }} />
             <Button style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700", borderRadius: "8px", padding: "0 20px" }} onClick={applyCoupon}>Apply</Button>
           </div>
@@ -256,22 +226,6 @@ export default function CartPage() {
           </Button>
         </div>
       )}
-
-      {/* Min order modal is still here but handlePlaceOrderClick won't trigger it */}
-      <Modal show={showMinOrderModal} onHide={() => setShowMinOrderModal(false)} centered>
-        <Modal.Header closeButton style={{ border: "none" }}>
-          <Modal.Title style={{ fontWeight: "800", color: "#fe3d00" }}>Minimum Order Required</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="text-center" style={{ paddingBottom: "30px" }}>
-          <div style={{ fontSize: "1.1rem", marginBottom: "20px" }}>
-            Your current total is <strong>₹{finalTotal}</strong>. <br />
-            To place an order, the minimum amount must be <strong>₹119</strong> or more.
-          </div>
-          <Button onClick={() => setShowMinOrderModal(false)} style={{ backgroundColor: "#fe3d00", border: "none", fontWeight: "700", padding: "10px 30px", borderRadius: "8px" }}>
-            Add More Items
-          </Button>
-        </Modal.Body>
-      </Modal>
 
       <AddressModal 
         show={showAddressModal} 
