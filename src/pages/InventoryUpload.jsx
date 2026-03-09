@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-// 🔥 Dynamic API URL: Localhost pe local chalega, Render pe Render wala
+// 🔥 Dynamic API URL
 const API = window.location.hostname === "localhost" 
   ? "http://localhost:3000/api/products" 
   : "https://serdeptry1st.onrender.com/api/products";
@@ -10,9 +10,8 @@ export default function InventoryUpload() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // 🔥 Nayi states local upload ke liye
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  // 🔥 Multi-file state (Purani states ki jagah ye naya system)
+  const [tempFiles, setTempFiles] = useState([]); // Array of { file, preview, role: 'main' | 'sub' }
 
   const [formData, setFormData] = useState({
     id: "",
@@ -26,39 +25,51 @@ export default function InventoryUpload() {
     discount: 0,
     rating: 4.5,
     stock: 10,
-    src: "",
+    src: "", 
     badge: "Hot",
-    subImages: "",
+    subImages: "", 
     tags: "",
   });
 
-  // Load Inventory
   const loadInventory = async () => {
     try {
       const res = await fetch(`${API}/${formData.pageType}`);
       const data = await res.json();
       setInventory(data);
-    } catch (e) {
-      console.error("Server Offline", e);
-    }
+    } catch (e) { console.error("Server Offline", e); }
   };
 
-  useEffect(() => {
-    loadInventory();
-  }, [formData.pageType]);
+  useEffect(() => { loadInventory(); }, [formData.pageType]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // 🔥 File select karne ka handle
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      setFormData({ ...formData, src: "" }); // File select hote hi manual URL clear
-    }
+  // 🔥 Multi-file Selection Logic (Refined)
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    const newFiles = files.map((file, index) => ({
+      file,
+      preview: URL.createObjectURL(file),
+      role: index === 0 && tempFiles.length === 0 ? "main" : "sub", 
+    }));
+    setTempFiles([...tempFiles, ...newFiles]);
+    setFormData({ ...formData, src: "" }); // Agar file select ki to manual URL clear
+  };
+
+  const removeFile = (index) => {
+    const updated = tempFiles.filter((_, i) => i !== index);
+    setTempFiles(updated);
+  };
+
+  const setRole = (index, role) => {
+    const updated = tempFiles.map((item, i) => {
+      if (role === "main") {
+        return { ...item, role: i === index ? "main" : "sub" };
+      }
+      return i === index ? { ...item, role } : item;
+    });
+    setTempFiles(updated);
   };
 
   const resetForm = () => {
@@ -68,10 +79,8 @@ export default function InventoryUpload() {
       originalPrice: 99, discount: 0, rating: 4.5, stock: 10,
       src: "", badge: "Hot", subImages: "", tags: "",
     });
-    setSelectedFile(null);
-    setPreviewUrl(null);
+    setTempFiles([]);
     setIsEditing(false);
-    // Reset file input element
     const fileInput = document.getElementById('file-upload');
     if (fileInput) fileInput.value = "";
   };
@@ -79,27 +88,26 @@ export default function InventoryUpload() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // 🔥 FormData ka use taaki file aur text dono saath ja sakein
       const dataToSend = new FormData();
       
-      // Saare fields dalo
+      // Basic Fields append karna (id chhod ke)
       Object.keys(formData).forEach((key) => {
-        if (key !== "id") {
-          dataToSend.append(key, formData[key]);
-        }
+        if (key !== "id") dataToSend.append(key, formData[key]);
       });
 
-      // 🔥 Agar local file select ki hai toh use "image" field mein dalo
-      if (selectedFile) {
-        dataToSend.append("image", selectedFile);
-      }
+      // 🔥 Files Logic: Kaunsi file kis field mein jayegi
+      const mainFile = tempFiles.find(f => f.role === "main");
+      const subFiles = tempFiles.filter(f => f.role === "sub");
+
+      if (mainFile) dataToSend.append("image", mainFile.file);
+      subFiles.forEach((f) => dataToSend.append("subImages", f.file));
 
       const endpoint = formData.id ? `${API}/update/${formData.id}` : `${API}/add`;
       const method = formData.id ? "PUT" : "POST";
 
       const res = await fetch(endpoint, {
         method: method,
-        body: dataToSend, // Headers auto-set ho jayenge multipart/form-data ke liye
+        body: dataToSend,
       });
 
       const result = await res.json();
@@ -146,14 +154,13 @@ export default function InventoryUpload() {
       const res = await fetch(`${API}/delete/${id}`, { method: "DELETE" });
       const result = await res.json();
       if (result.success) loadInventory();
-    } catch (err) {
-      alert("Delete failed!");
-    }
+    } catch (err) { alert("Delete failed!"); }
   };
 
   return (
     <div className="bg-[#0f172a] text-slate-200 p-5 font-sans min-h-screen">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
         {/* Form Section */}
         <div className="lg:col-span-5">
           <div className="bg-[#1e293b] p-8 rounded-2xl shadow-2xl border border-slate-700 sticky top-5">
@@ -172,20 +179,32 @@ export default function InventoryUpload() {
                 </select>
               </div>
 
-              {/* 🔥 NEW: Local File Upload UI */}
+              {/* 🔥 REFINED: Local File Upload UI */}
               <div className="p-4 bg-[#0f172a] border border-dashed border-slate-700 rounded-lg">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Method 1: Local Image Upload</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Upload Local Images (Multi)</label>
                 <input 
                   id="file-upload"
                   type="file" 
+                  multiple
                   accept="image/*" 
-                  onChange={handleFileChange} 
+                  onChange={handleFileSelect} 
                   className="w-full text-xs text-slate-400 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-slate-300 hover:file:bg-slate-700 cursor-pointer"
                 />
-                {previewUrl && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <img src={previewUrl} alt="Preview" className="h-20 w-20 object-cover rounded border border-slate-700" />
-                    <span className="text-[10px] text-yellow-500 font-bold italic">Image Selected!</span>
+                
+                {/* Image Previews with Role Selection */}
+                {tempFiles.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-4">
+                    {tempFiles.map((item, index) => (
+                      <div key={index} className={`relative p-1 rounded border ${item.role === 'main' ? 'border-yellow-500 bg-yellow-500/10' : 'border-slate-800'}`}>
+                        <img src={item.preview} className="h-16 w-full object-cover rounded" alt="p" />
+                        <div className="flex flex-col gap-1 mt-1">
+                          <button onClick={() => setRole(index, 'main')} className={`text-[7px] p-1 font-bold rounded ${item.role === 'main' ? 'bg-yellow-500 text-black' : 'bg-slate-700'}`}>
+                            {item.role === 'main' ? 'MAIN' : 'SET MAIN'}
+                          </button>
+                          <button onClick={() => removeFile(index)} className="text-[7px] p-1 bg-red-600/20 text-red-400 rounded">REMOVE</button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -229,8 +248,8 @@ export default function InventoryUpload() {
               <textarea id="shortDesc" value={formData.shortDesc} onChange={handleChange} placeholder="Short Description" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-14" />
               <textarea id="longDesc" value={formData.longDesc} onChange={handleChange} placeholder="Long Detailed Description..." className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-24" />
 
-              <input type="text" id="src" value={formData.src} onChange={handleChange} placeholder="Method 2: Main Image URL (Hot Link)" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none focus:border-yellow-500" />
-              <textarea id="subImages" value={formData.subImages} onChange={handleChange} placeholder="Gallery Images (comma separated)" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-16 text-xs" />
+              <input type="text" id="src" value={formData.src} onChange={handleChange} placeholder="Method 2: Main Image URL" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none focus:border-yellow-500" />
+              <textarea id="subImages" value={formData.subImages} onChange={handleChange} placeholder="Gallery URLs (comma separated)" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-16 text-xs" />
               <input type="text" id="tags" value={formData.tags} onChange={handleChange} placeholder="Tags (comma separated)" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none text-xs" />
 
               <div className="flex gap-2 pt-2">
@@ -242,16 +261,14 @@ export default function InventoryUpload() {
                   {loading ? "Processing..." : isEditing ? "Update Changes 🛠️" : "Add Product 🚀"}
                 </button>
                 {isEditing && (
-                  <button onClick={resetForm} className="bg-slate-700 hover:bg-slate-600 px-6 rounded-xl font-bold">
-                    Cancel
-                  </button>
+                  <button onClick={resetForm} className="bg-slate-700 hover:bg-slate-600 px-6 rounded-xl font-bold">Cancel</button>
                 )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Inventory Section */}
+        {/* Inventory Section (Unchanged) */}
         <div className="lg:col-span-7 space-y-6">
           <div className="bg-[#1e293b] p-6 rounded-2xl border border-slate-700">
             <div className="flex justify-between items-center mb-6">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaUserCircle, FaGift, FaShoppingCart, FaHeart, FaTools } from "react-icons/fa"; // FaTools added for Admin icon
+import { FaUserCircle, FaGift, FaShoppingCart, FaHeart, FaTools, FaClipboardList } from "react-icons/fa"; // FaClipboardList added
 import { useNavigate } from "react-router-dom";
 
 export default function UserAccount() {
@@ -56,7 +56,7 @@ export default function UserAccount() {
         <FaUserCircle style={{ fontSize: "80px", color: "#fe3d00" }} />
         <h2 style={{ marginTop: "10px", fontWeight: "700" }}>
           {name ? name : "User"} 
-          {isAdmin && <span style={{ fontSize: "12px", background: "#fe3d00", color: "#white", padding: "2px 8px", borderRadius: "10px", marginLeft: "10px", verticalAlign: "middle", color: 'white' }}>ADMIN</span>}
+          {isAdmin && <span style={{ fontSize: "12px", background: "#fe3d00", padding: "2px 8px", borderRadius: "10px", marginLeft: "10px", verticalAlign: "middle", color: 'white' }}>ADMIN</span>}
         </h2>
         <p style={{ opacity: 0.7 }}>{email}</p>
       </div>
@@ -82,15 +82,27 @@ export default function UserAccount() {
       </div>
 
       <div style={{ marginTop: "40px", maxWidth: "400px", marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>
-        {/* 🔥 ADMIN ONLY BUTTON */}
+        
+        {/* 🔥 ADMIN ONLY BUTTONS */}
         {isAdmin && (
-          <button 
-            style={{ ...actionButton, background: "#0f172a", border: "2px solid #fe3d00" }} 
-            onClick={() => navigate("/inventory")}
-          >
-            <FaTools style={{ marginRight: "10px" }} /> Admin Inventory
-          </button>
+          <>
+            <button 
+              style={{ ...actionButton, background: "#0f172a", border: "2px solid #fe3d00" }} 
+              onClick={() => navigate("/inventory")}
+            >
+              <FaTools style={{ marginRight: "10px" }} /> Admin Inventory
+            </button>
+
+            <button 
+              style={{ ...actionButton, background: "#0f172a", border: "2px solid #fe3d00", marginTop: "10px" }} 
+              onClick={() => navigate("/admin-orders")}
+            >
+              <FaClipboardList style={{ marginRight: "10px" }} /> Admin Order Panel
+            </button>
+          </>
         )}
+
+        <hr style={{ margin: "20px 0", opacity: 0.1 }} />
 
         <button style={actionButton}>Edit Profile</button>
         <button style={actionButton}>Top Up Credits</button>

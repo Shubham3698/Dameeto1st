@@ -17,6 +17,7 @@ import OrderDetails from "./pages/OrderDetails";
 import HomePage from "./pages/HomePage";
 import LearningProductsPage from "./pages/LearningProductsPage";
 import InventoryUpload from "./pages/InventoryUpload";
+import AdminOrders from "./pages/AdminOrders";
 
 import { CartProvider } from "./contexAndhooks/CartProvider";
 
@@ -174,6 +175,7 @@ function App() {
         <Route path="/image/:id" element={<ImageDetails />} />
         <Route path="/account" element={<User />} />
         <Route path="/inventory" element={<InventoryUpload />} />
+        <Route path="/admin-orders" element={<AdminOrders />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/view-order" element={<ViewOrders />} />
