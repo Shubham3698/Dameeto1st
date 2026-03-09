@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
 
 import About from "./pages/about";
 import Sticker from "./pages/Sticker";
@@ -13,10 +13,9 @@ import User from "./pages/User";
 import SearchPage from "./pages/SearchPage";
 import SearchResults from "./pages/SearchResults";
 import ViewOrders from "./pages/ViewOrders";
-import OrderDetails from "./pages/OrderDetails"; 
-import HomePage from "./pages/HomePage"; 
+import OrderDetails from "./pages/OrderDetails";
+import HomePage from "./pages/HomePage";
 import LearningProductsPage from "./pages/LearningProductsPage";
-
 
 import { CartProvider } from "./contexAndhooks/CartProvider";
 
@@ -31,28 +30,82 @@ function AppWrapper() {
 }
 
 function App() {
+
   const [loading, setLoading] = useState(true);
   const [fadeIn, setFadeIn] = useState(false);
-  const location = useLocation(); 
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // ---------------- POPUP SYSTEM ----------------
+
+  const popupList = [
+    {
+      title: "🔥 Special Offer",
+      text: "Buy 2 Stickers & Get 1 Free",
+    },
+    {
+      title: "🚀 New Arrival",
+      text: "Learning Products Now Available",
+    },
+    {
+  title: "🎁 Combo Pack",
+  text: "Special combo pack available — Stickers + Learning Books together at a better price!",
+},
+    {
+      title: "🎁 Free Delivery",
+      text: "Free delivery on orders above ₹499",
+    }
+  ];
+
+  const [popupIndex, setPopupIndex] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+
+  // popup after page load + 5 sec
+  useEffect(() => {
+
+    if (!loading) {
+
+      const timer = setTimeout(() => {
+        setShowPopup(true);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+
+    }
+
+  }, [loading]);
+
+  const closePopup = () => {
+
+    if (popupIndex < popupList.length - 1) {
+      setPopupIndex(popupIndex + 1);
+    } else {
+      setShowPopup(false);
+    }
+
+  };
+
+  // ---------------- LOADING ----------------
 
   useEffect(() => {
+
     const timer = setTimeout(() => {
       setLoading(false);
       setTimeout(() => setFadeIn(true), 50);
     }, 2500);
 
     return () => clearTimeout(timer);
+
   }, []);
 
-  // --- Logic to hide Floating Button on specific pages ---
-  // In pages par button hide ho jayega
+  // ---------------- FLOATING BTN LOGIC ----------------
+
   const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account"];
-  
-  // Isse check karte hain ki kya current path hidden list mein hai 
-  // ya fir Dynamic paths (jaise order details ya image details) hain
-  const isButtonHidden = 
-    hiddenRoutes.includes(location.pathname) || 
-    location.pathname.startsWith("/order/") || 
+
+  const isButtonHidden =
+    hiddenRoutes.includes(location.pathname) ||
+    location.pathname.startsWith("/order/") ||
     location.pathname.startsWith("/image/");
 
   if (loading) {
@@ -75,11 +128,42 @@ function App() {
         position: "relative",
       }}
     >
+
       <MNv />
+
+      {/* ---------- POPUP ---------- */}
+
+      {showPopup && (
+        <div style={popupOverlay}>
+          <div style={popupCard}>
+
+            <button style={popupClose} onClick={closePopup}>
+              ✖
+            </button>
+
+            <h2>{popupList[popupIndex].title}</h2>
+
+            <p>{popupList[popupIndex].text}</p>
+
+            <button
+              style={popupBtn}
+              onClick={() => {
+                navigate("/home");
+                setShowPopup(false);
+              }}
+            >
+              Explore
+            </button>
+
+          </div>
+        </div>
+      )}
+
+      {/* ---------- ROUTES ---------- */}
 
       <Routes>
         <Route path="/" element={<Trending />} />
-        <Route path="/home" element={<HomePage />} /> 
+        <Route path="/home" element={<HomePage />} />
         <Route path="/about" element={<About />} />
         <Route path="/sticker" element={<Sticker />} />
         <Route path="/poster" element={<Poster />} />
@@ -95,7 +179,8 @@ function App() {
         <Route path="*" element={<div style={{ textAlign: "center", marginTop: "100px" }}><h2>404 - Not Found</h2></div>} />
       </Routes>
 
-      {/* ✅ Floating Button Hidden on specific pages */}
+      {/* ---------- FLOATING BUTTON ---------- */}
+
       {!isButtonHidden && (
         <Link
           to="/home"
@@ -110,11 +195,55 @@ function App() {
           🏠
         </Link>
       )}
+
     </div>
   );
 }
 
-// --- Styles (No changes here) ---
+// ---------------- POPUP STYLE ----------------
+
+const popupOverlay = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(0,0,0,0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 10000,
+};
+
+const popupCard = {
+  width: "320px",
+  background: "white",
+  padding: "25px",
+  borderRadius: "14px",
+  textAlign: "center",
+  position: "relative",
+  boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+};
+
+const popupClose = {
+  position: "absolute",
+  right: "12px",
+  top: "10px",
+  border: "none",
+  background: "none",
+  fontSize: "18px",
+  cursor: "pointer",
+};
+
+const popupBtn = {
+  marginTop: "15px",
+  padding: "10px 18px",
+  background: "#fe3d00",
+  border: "none",
+  borderRadius: "8px",
+  color: "white",
+  cursor: "pointer",
+};
+
+// ---------------- EXISTING STYLES ----------------
+
 const loadingStyles = {
   display: "flex",
   justifyContent: "center",
