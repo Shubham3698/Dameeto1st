@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaUserCircle, FaGift, FaShoppingCart, FaHeart, FaTools, FaClipboardList } from "react-icons/fa"; // FaClipboardList added
+import { FaUserCircle, FaGift, FaShoppingCart, FaHeart, FaTools, FaClipboardList } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function UserAccount() {
@@ -62,7 +62,9 @@ export default function UserAccount() {
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "20px" }}>
-        <div style={cardStyle}>
+        
+        {/* 🔥 Credits Card - Ab ye clickable hai aur game pe jayega */}
+        <div style={cardStyle} onClick={() => navigate("/memory-game")}>
           <FaGift style={{ fontSize: "28px", color: "#fe3d00" }} />
           <h3>0</h3>
           <p>Credits</p>
@@ -105,7 +107,12 @@ export default function UserAccount() {
         <hr style={{ margin: "20px 0", opacity: 0.1 }} />
 
         <button style={actionButton}>Edit Profile</button>
-        <button style={actionButton}>Top Up Credits</button>
+        
+        {/* 🔥 Top Up Credits Button - Ispe bhi game navigation laga diya hai */}
+        <button style={actionButton} onClick={() => navigate("/memory-game")}>
+          Top Up Credits
+        </button>
+
         <button style={actionButton} onClick={() => navigate("/view-order")}>View Orders</button>
         <button style={actionButton} onClick={handleLogout}>Logout</button>
       </div>

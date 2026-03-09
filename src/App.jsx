@@ -18,6 +18,7 @@ import HomePage from "./pages/HomePage";
 import LearningProductsPage from "./pages/LearningProductsPage";
 import InventoryUpload from "./pages/InventoryUpload";
 import AdminOrders from "./pages/AdminOrders";
+import MemoryGame from './pages/MemoryGame';
 
 import { CartProvider } from "./contexAndhooks/CartProvider";
 
@@ -103,7 +104,7 @@ function App() {
 
   // ---------------- FLOATING BTN LOGIC ----------------
 
-  const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account"];
+  const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game"];
 
   const isButtonHidden =
     hiddenRoutes.includes(location.pathname) ||
@@ -177,6 +178,7 @@ function App() {
         <Route path="/inventory" element={<InventoryUpload />} />
         <Route path="/admin-orders" element={<AdminOrders />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/memory-game" element={<MemoryGame />} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/view-order" element={<ViewOrders />} />
         <Route path="/order/:id" element={<OrderDetails />} />
