@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaUserCircle, FaGift, FaShoppingCart, FaHeart } from "react-icons/fa";
+import { FaUserCircle, FaGift, FaShoppingCart, FaHeart, FaTools } from "react-icons/fa"; // FaTools added for Admin icon
 import { useNavigate } from "react-router-dom";
 
 export default function UserAccount() {
@@ -10,33 +10,28 @@ export default function UserAccount() {
 
   const [orderCount, setOrderCount] = useState(0);
 
-  // 🔥 UPDATED: Render Backend URL
+  // 🔥 Admin Check
+  const isAdmin = email === "pandey0shubham3698@gmail.com";
+
   const API_BASE_URL = "https://serdeptry1st.onrender.com";
 
-  // Redirect if not logged in
   useEffect(() => {
     if (!email) {
       navigate("/");
     }
   }, [email, navigate]);
 
-  // Fetch Order Count (Render Backend)
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         if (!email) return;
-
         const encodedEmail = encodeURIComponent(email);
-        
-        // 🔥 FIXED: Localhost ko Render URL se replace kiya
         const res = await fetch(
           `${API_BASE_URL}/api/customer-orders/user/${encodedEmail}`
         );
-
         const data = await res.json();
 
         if (data.success) {
-          // Maan lete hain ki data.data ek array hai orders ki
           setOrderCount(data.data.length);
         } else {
           setOrderCount(0);
@@ -46,7 +41,6 @@ export default function UserAccount() {
         setOrderCount(0);
       }
     };
-
     fetchOrders();
   }, [email]);
 
@@ -61,7 +55,8 @@ export default function UserAccount() {
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <FaUserCircle style={{ fontSize: "80px", color: "#fe3d00" }} />
         <h2 style={{ marginTop: "10px", fontWeight: "700" }}>
-          {name ? name : "User"}
+          {name ? name : "User"} 
+          {isAdmin && <span style={{ fontSize: "12px", background: "#fe3d00", color: "#white", padding: "2px 8px", borderRadius: "10px", marginLeft: "10px", verticalAlign: "middle", color: 'white' }}>ADMIN</span>}
         </h2>
         <p style={{ opacity: 0.7 }}>{email}</p>
       </div>
@@ -87,6 +82,16 @@ export default function UserAccount() {
       </div>
 
       <div style={{ marginTop: "40px", maxWidth: "400px", marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>
+        {/* 🔥 ADMIN ONLY BUTTON */}
+        {isAdmin && (
+          <button 
+            style={{ ...actionButton, background: "#0f172a", border: "2px solid #fe3d00" }} 
+            onClick={() => navigate("/inventory")}
+          >
+            <FaTools style={{ marginRight: "10px" }} /> Admin Inventory
+          </button>
+        )}
+
         <button style={actionButton}>Edit Profile</button>
         <button style={actionButton}>Top Up Credits</button>
         <button style={actionButton} onClick={() => navigate("/view-order")}>View Orders</button>
@@ -107,7 +112,9 @@ const cardStyle = {
 };
 
 const actionButton = {
-  display: "block",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
   width: "100%",
   padding: "12px",
   margin: "10px 0",
