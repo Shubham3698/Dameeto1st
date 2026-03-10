@@ -9,11 +9,14 @@ export default function UserAccount() {
   const email = localStorage.getItem("userEmail");
 
   const [orderCount, setOrderCount] = useState(0);
+  const [userCredits, setUserCredits] = useState(0);
 
-  // 🔥 Admin Check
   const isAdmin = email === "pandey0shubham3698@gmail.com";
 
-  const API_BASE_URL = "https://serdeptry1st.onrender.com";
+  // 🔥 DYNAMIC URL LOGIC: Localhost pe localhost chalega, Render pe Render chalega
+  const API_BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:3000" 
+    : "https://serdeptry1st.onrender.com";
 
   useEffect(() => {
     if (!email) {
@@ -22,32 +25,69 @@ export default function UserAccount() {
   }, [email, navigate]);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        if (!email) return;
-        const encodedEmail = encodeURIComponent(email);
-        const res = await fetch(
-          `${API_BASE_URL}/api/customer-orders/user/${encodedEmail}`
-        );
-        const data = await res.json();
+    const fetchData = async () => {
+      if (!email) return;
+      const encodedEmail = encodeURIComponent(email);
 
-        if (data.success) {
-          setOrderCount(data.data.length);
-        } else {
-          setOrderCount(0);
+      try {
+        // 📦 1. Fetch Orders
+        const orderRes = await fetch(`${API_BASE_URL}/api/customer-orders/user/${encodedEmail}`);
+        const orderData = await orderRes.json();
+        if (orderData.success) {
+          setOrderCount(orderData.data.length);
+        }
+
+        // 🪙 2. Fetch Latest Credits from Backend
+        const creditRes = await fetch(`${API_BASE_URL}/api/user-credits/${encodedEmail}`);
+        
+        if (creditRes.status === 404) {
+           console.warn("Backend route not found. Make sure to push code to Render!");
+           return;
+        }
+
+        const creditData = await creditRes.json();
+        if (creditData.success) {
+          setUserCredits(creditData.credits || 0);
         }
       } catch (err) {
-        console.error("Order fetch error:", err);
-        setOrderCount(0);
+        console.error("Error fetching data:", err);
       }
     };
-    fetchOrders();
-  }, [email]);
+
+    fetchData();
+  }, [email, API_BASE_URL]);
 
   const handleLogout = () => {
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userName");
     navigate("/");
+  };
+
+  // --- STYLES ---
+  const cardStyle = {
+    background: "white",
+    borderRadius: "16px",
+    padding: "20px",
+    minWidth: "120px",
+    textAlign: "center",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    cursor: "pointer",
+  };
+
+  const actionButton = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    padding: "12px",
+    margin: "10px 0",
+    borderRadius: "50px",
+    border: "none",
+    background: "#fe3d00",
+    color: "white",
+    fontWeight: "600",
+    fontSize: "16px",
+    cursor: "pointer",
   };
 
   return (
@@ -63,10 +103,9 @@ export default function UserAccount() {
 
       <div style={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "20px" }}>
         
-        {/* 🔥 Credits Card - Ab ye clickable hai aur game pe jayega */}
         <div style={cardStyle} onClick={() => navigate("/memory-game")}>
           <FaGift style={{ fontSize: "28px", color: "#fe3d00" }} />
-          <h3>0</h3>
+          <h3>{userCredits}</h3>
           <p>Credits</p>
         </div>
 
@@ -85,7 +124,6 @@ export default function UserAccount() {
 
       <div style={{ marginTop: "40px", maxWidth: "400px", marginLeft: "auto", marginRight: "auto", textAlign: "center" }}>
         
-        {/* 🔥 ADMIN ONLY BUTTONS */}
         {isAdmin && (
           <>
             <button 
@@ -108,7 +146,6 @@ export default function UserAccount() {
 
         <button style={actionButton}>Edit Profile</button>
         
-        {/* 🔥 Top Up Credits Button - Ispe bhi game navigation laga diya hai */}
         <button style={actionButton} onClick={() => navigate("/memory-game")}>
           Top Up Credits
         </button>
@@ -119,29 +156,3 @@ export default function UserAccount() {
     </div>
   );
 }
-
-const cardStyle = {
-  background: "white",
-  borderRadius: "16px",
-  padding: "20px",
-  minWidth: "120px",
-  textAlign: "center",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-  cursor: "pointer",
-};
-
-const actionButton = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "100%",
-  padding: "12px",
-  margin: "10px 0",
-  borderRadius: "50px",
-  border: "none",
-  background: "#fe3d00",
-  color: "white",
-  fontWeight: "600",
-  fontSize: "16px",
-  cursor: "pointer",
-};
