@@ -1,13 +1,27 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-const symbols = ["🔥","⚡","🌈","💎","🍎","🚗","🍕","🎮","👻","🎸","⚽","🚀"];
+// ✅ 1. Aapki di hui 12 Sticker Images (Logic intact: 12 pairs = 24 cards)
+const stickers = [
+  "https://i.pinimg.com/1200x/5a/ad/0a/5aad0a8534ff652ffab1788930547741.jpg",
+  "https://i.pinimg.com/736x/e2/c4/13/e2c41353d25e9aaaaeff36bbf125beea.jpg",
+  "https://i.pinimg.com/1200x/8b/0c/14/8b0c14adee9fc943bc139a125a0fc400.jpg",
+  "https://i.pinimg.com/736x/f1/02/64/f102649980fc75461d4d78239847772a.jpg",
+  "https://i.pinimg.com/1200x/80/2c/6d/802c6df0611780efb775913bc18ad73a.jpg",
+  "https://i.pinimg.com/736x/c5/31/c3/c531c3a450cb52d496b132bea6dee5fb.jpg",
+  "https://i.pinimg.com/736x/59/25/04/5925040a9c9e5814e66af9e93ffb31ff.jpg",
+  "https://i.pinimg.com/736x/01/c2/ad/01c2ad7a7c93fc6508ed6753daf04455.jpg",
+  "https://i.pinimg.com/736x/91/a2/1e/91a21e1ae32dd8f7d353f13bcac7cd07.jpg",
+  "https://i.pinimg.com/1200x/da/d0/ae/dad0ae19bc31931008317564ba5ff832.jpg",
+  "https://i.pinimg.com/736x/0c/15/a0/0c15a0ac00f2242e18148d374cb89cdc.jpg",
+  "https://i.pinimg.com/736x/03/a5/7d/03a57dcb9c8d55026d079cc4db3d2265.jpg"
+];
 
-// Helper function to create cards (Component ke bahar)
+// Helper function to create cards (Component ke bahar) - Logic same as original
 const generateCards = () => {
-  return [...symbols, ...symbols]
+  return [...stickers, ...stickers]
     .sort(() => Math.random() - 0.5)
-    .map((symbol, index) => ({ id: index, symbol }));
+    .map((imgUrl, index) => ({ id: index, imgUrl })); // symbol ki jagah imgUrl
 };
 
 const MemoryGame = () => {
@@ -19,7 +33,7 @@ const MemoryGame = () => {
 
   const email = localStorage.getItem("userEmail");
 
-  // ✅ FIX: Initial data direct useState mein daal diya (No useEffect call needed)
+  // ✅ Same Initial State as original
   const [cards, setCards] = useState(() => generateCards());
   const [flippedCards, setFlippedCards] = useState([]);
   const [solved, setSolved] = useState([]);
@@ -30,13 +44,13 @@ const MemoryGame = () => {
   const [time, setTime] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
 
-  // Accuracy calculation (Derived state)
+  // ✅ Accuracy calculation (Intact)
   const accuracy = useMemo(() => {
     if (moves <= 12) return 100;
     return Math.max(10, Math.round((12 / moves) * 100));
   }, [moves]);
 
-  // Credits calculation (Derived state)
+  // ✅ Credits calculation (Intact)
   const credits = useMemo(() => {
     if (!gameFinished) return 0;
     const accuracyScore = Math.round(accuracy / 2);
@@ -47,7 +61,7 @@ const MemoryGame = () => {
     return accuracyScore + speedBonus;
   }, [gameFinished, accuracy, time]);
 
-  // ✅ Restart Game Logic (Ab ye useEffect mein nahi chalega, sirf button click par chalega)
+  // ✅ Restart Game Logic (Intact)
   const initializeGame = useCallback(() => {
     setCards(generateCards());
     setSolved([]);
@@ -59,7 +73,7 @@ const MemoryGame = () => {
     setTimerActive(false);
   }, []);
 
-  // Timer Logic
+  // Timer Logic (Intact)
   useEffect(() => {
     let interval;
     if (timerActive) {
@@ -86,7 +100,8 @@ const MemoryGame = () => {
       const firstCard = cards[flippedCards[0]];
       const secondCard = cards[id];
 
-      if (firstCard.symbol === secondCard.symbol) {
+      // ✅ Matching Logic now uses image URL
+      if (firstCard.imgUrl === secondCard.imgUrl) {
         const newSolved = [...solved, flippedCards[0], id];
         setSolved(newSolved);
         setFlippedCards([]);
@@ -136,6 +151,7 @@ const MemoryGame = () => {
     }
   };
 
+  // ✅ Styles updated for image fitting
   const styles = {
     wrapper: { background: "#0f172a", minHeight: "100vh", width: "100%", padding: "20px 10px", color: "white", display: "flex", flexDirection: "column", alignItems: "center", fontFamily: "sans-serif" },
     statsRow: { display: "flex", gap: "15px", marginBottom: "20px" },
@@ -146,9 +162,10 @@ const MemoryGame = () => {
       transform: isFlipped || isSolved ? "rotateY(180deg)" : "rotateY(0deg)",
       opacity: !gameStarted ? 0.5 : 1, pointerEvents: !gameStarted ? "none" : "auto"
     }),
-    face: { position: "absolute", width: "100%", height: "100%", backfaceVisibility: "hidden", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px" },
-    back: { background: "#fe3d00", color: "white" },
+    face: { position: "absolute", width: "100%", height: "100%", backfaceVisibility: "hidden", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" },
+    back: { background: "#fe3d00", color: "white", fontSize: "24px" },
     front: { background: "white", color: "#000", transform: "rotateY(180deg)" },
+    sticker: { width: "100%", height: "100%", objectFit: "cover" }, // ✅ Sticker image fitting
     modal: { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "#1e293b", padding: "30px", borderRadius: "20px", border: "2px solid #fe3d00", textAlign: "center", zIndex: 100, width: "90%", maxWidth: "350px" }
   };
 
@@ -169,7 +186,10 @@ const MemoryGame = () => {
             <div key={card.id} style={{ perspective: "1000px" }} onClick={() => handleClick(card.id)}>
               <div style={styles.card(isFlipped, isSolved)}>
                 <div style={{ ...styles.face, ...styles.back }}>?</div>
-                <div style={{ ...styles.face, ...styles.front }}>{card.symbol}</div>
+                <div style={{ ...styles.face, ...styles.front }}>
+                   {/* ✅ Text Symbol ki jagah Image Sticker */}
+                   <img src={card.imgUrl} alt="sticker" style={styles.sticker} />
+                </div>
               </div>
             </div>
           );
