@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
 
 import About from "./pages/about";
 import Sticker from "./pages/Sticker";
@@ -21,6 +21,21 @@ import AdminOrders from "./pages/AdminOrders";
 import MemoryGame from './pages/MemoryGame';
 
 import { CartProvider } from "./contexAndhooks/CartProvider";
+
+// ---------------- PROTECTED ROUTE COMPONENT ----------------
+const ProtectedRoute = ({ children }) => {
+  // Aapke UserAccount page ke logic ke mutabik hum 'userEmail' check karenge
+  const isAuthenticated = localStorage.getItem("userEmail"); 
+
+  if (!isAuthenticated) {
+    // Agar userEmail nahi hai, matlab login nahi hai. 
+    // Isliye usko "/account" par bhej do
+    return <Navigate to="/account" replace />;
+  }
+  
+  // Agar email mil gaya, toh game khul jayega
+  return children;
+};
 
 function AppWrapper() {
   return (
@@ -52,9 +67,9 @@ function App() {
       text: "Learning Products Now Available",
     },
     {
-  title: "🎁 Combo Pack",
-  text: "Special combo pack available — Stickers + Learning Books together at a better price!",
-},
+      title: "🎁 Combo Pack",
+      text: "Special combo pack available — Stickers + Learning Books together at a better price!",
+    },
     {
       title: "🎁 Free Delivery",
       text: "Free delivery on orders above ₹499",
@@ -178,7 +193,17 @@ function App() {
         <Route path="/inventory" element={<InventoryUpload />} />
         <Route path="/admin-orders" element={<AdminOrders />} />
         <Route path="/search" element={<SearchPage />} />
-        <Route path="/memory-game" element={<MemoryGame />} />
+        
+        {/* Yahan par Memory Game ko protect kar diya gaya hai */}
+        <Route 
+          path="/memory-game" 
+          element={
+            <ProtectedRoute>
+              <MemoryGame />
+            </ProtectedRoute>
+          } 
+        />
+        
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/view-order" element={<ViewOrders />} />
         <Route path="/order/:id" element={<OrderDetails />} />
