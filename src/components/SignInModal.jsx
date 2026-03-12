@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { auth } from "../firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { 
+  RecaptchaVerifier, 
+  signInWithPhoneNumber, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail
+} from "firebase/auth";
 
 export default function SignInModal({ onClose }) {
   const [isLogin, setIsLogin] = useState(false);
@@ -17,7 +24,13 @@ export default function SignInModal({ onClose }) {
   const [confirmation, setConfirmation] = useState(null);
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(""); 
   const [loading, setLoading] = useState(false);
+
+  // 🔥 DYNAMIC API URL (Local vs Production)
+  const API_BASE_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:3000" 
+    : "https://serdeptry1st.onrender.com";
 
   useEffect(() => {
     return () => {
@@ -28,20 +41,32 @@ export default function SignInModal({ onClose }) {
     };
   }, []);
 
+  // --- FORGOT PASSWORD LOGIC ---
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address first.");
+      return;
+    }
+    try {
+      setLoading(true);
+      await sendPasswordResetEmail(auth, email);
+      setSuccess("Password reset link sent! Check your inbox.");
+      setError("");
+    } catch (err) {
+      setError("Reset error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
 
     if (!email || !password) {
-      setError("Email & password required");
-      setLoading(false);
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Invalid email format");
+      setError("Email & password are required");
       setLoading(false);
       return;
     }
@@ -50,76 +75,87 @@ export default function SignInModal({ onClose }) {
       if (!name) { setError("Name is required"); setLoading(false); return; }
       if (email !== confirmEmail) { setError("Emails do not match"); setLoading(false); return; }
       if (password !== confirmPassword) { setError("Passwords do not match"); setLoading(false); return; }
+      if (password.length < 6) { setError("Password: Min 6 characters"); setLoading(false); return; }
     }
 
     try {
-      const url = isLogin
-        ? "https://serdeptry1st.onrender.com/api/users/login"
-        : "https://serdeptry1st.onrender.com/api/users/signup";
+      let userCredential;
 
-      const body = isLogin
-        ? { email, password }
-        : { name, email, password };
+      if (!isLogin) {
+        // 1. Firebase Signup
+        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // 2. Send Verification Email
+        await sendEmailVerification(userCredential.user);
+        
+        // 3. Sync with MongoDB
+        const res = await fetch(`${API_BASE_URL}/api/users/signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            name, 
+            email, 
+            password, 
+            firebaseUid: userCredential.user.uid 
+          }),
+        });
 
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Something went wrong");
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.message || "Backend sync failed");
+        }
+        
+        setSuccess("Verification email sent! Please check your inbox.");
         setLoading(false);
-        return;
-      }
+      } else {
+        // 4. LOGIN FLOW
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
+        
+        // 5. Check if Verified
+        if (!userCredential.user.emailVerified) {
+          setError("Please verify your email first. Check your inbox.");
+          setLoading(false);
+          return;
+        }
 
-      localStorage.setItem("userEmail", data.email);
-      localStorage.setItem("userName", data.name);
-      window.location.href = "/account";
-    } catch {
-      setError("Server error, try again");
+        // 6. Backend Login Check
+        const res = await fetch(`${API_BASE_URL}/api/users/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.setItem("userEmail", data.email);
+          localStorage.setItem("userName", data.name);
+          window.location.href = "/account";
+        } else {
+          setError(data.message || "Login failed");
+        }
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
 
+  // --- OTP LOGIC ---
   const sendOtp = async () => {
     try {
       setLoading(true);
       setError("");
-
       if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(
-          auth,
-          "recaptcha-container",
-          {
-            size: "invisible",
-            callback: () => {},
-            "expired-callback": () => {
-              setError("reCAPTCHA expired. Try again.");
-            }
-          }
-        );
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
       }
-
       const formattedPhone = phone.startsWith("+") ? phone : "+91" + phone;
-      const result = await signInWithPhoneNumber(
-        auth,
-        formattedPhone,
-        window.recaptchaVerifier
-      );
-
+      const result = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
       setConfirmation(result);
       setLoading(false);
     } catch (err) {
       setLoading(false);
-      setError(err.message || "Failed to send OTP");
-
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-        window.recaptchaVerifier = null;
-      }
+      setError(err.message);
     }
   };
 
@@ -132,7 +168,7 @@ export default function SignInModal({ onClose }) {
       window.location.href = "/account";
     } catch {
       setLoading(false);
-      setError("Invalid OTP or expired");
+      setError("Invalid OTP");
     }
   };
 
@@ -144,101 +180,54 @@ export default function SignInModal({ onClose }) {
         </h2>
 
         {error && <p style={errorStyle}>{error}</p>}
+        {success && <p style={successStyle}>{success}</p>}
 
         <div style={switchWrapper}>
-          <button
-            type="button"
-            onClick={() => { setIsPhoneLogin(false); setError(""); }}
-            style={{
-              ...switchBtn,
-              ...( !isPhoneLogin ? activeSwitch : {} )
-            }}
-          >
-            Email
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setIsPhoneLogin(true); setError(""); }}
-            style={{
-              ...switchBtn,
-              ...( isPhoneLogin ? activeSwitch : {} )
-            }}
-          >
-            Phone
-          </button>
+          <button type="button" onClick={() => { setIsPhoneLogin(false); setError(""); setSuccess(""); }} style={{...switchBtn, ...(!isPhoneLogin ? activeSwitch : {})}}>Email</button>
+          <button type="button" onClick={() => { setIsPhoneLogin(true); setError(""); setSuccess(""); }} style={{...switchBtn, ...(isPhoneLogin ? activeSwitch : {})}}>Phone</button>
         </div>
 
         <form onSubmit={handleSubmit}>
-
           {!isPhoneLogin && (
             <>
-              {!isLogin && (
-                <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
-              )}
-
+              {!isLogin && <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />}
               <input placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
-
-              {!isLogin && (
-                <input placeholder="Confirm Email" value={confirmEmail} onChange={(e) => setConfirmEmail(e.target.value)} style={inputStyle} />
-              )}
-
+              {!isLogin && <input placeholder="Confirm Email" value={confirmEmail} onChange={(e) => setConfirmEmail(e.target.value)} style={inputStyle} />}
               <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} />
-
-              {!isLogin && (
-                <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={inputStyle} />
-              )}
-
+              {!isLogin && <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={inputStyle} />}
+              
               <button type="submit" style={primaryBtn} disabled={loading}>
-                {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
+                {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up & Verify"}
               </button>
+
+              {isLogin && (
+                <p style={forgotText} onClick={handleForgotPassword}>
+                  Forgot Password?
+                </p>
+              )}
             </>
           )}
 
           {isPhoneLogin && (
             <>
-              <input
-                placeholder="Enter Phone (9876543210)"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                style={inputStyle}
-                disabled={!!confirmation}
-              />
-
+              <input placeholder="Enter Phone (e.g. 9876543210)" value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} disabled={!!confirmation} />
               {!confirmation ? (
-                <button type="button" onClick={sendOtp} style={primaryBtn} disabled={loading}>
-                  {loading ? "Sending..." : "Send OTP"}
-                </button>
+                <button type="button" onClick={sendOtp} style={primaryBtn} disabled={loading}>Send OTP</button>
               ) : (
                 <>
-                  <input
-                    placeholder="Enter 6-digit OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    style={inputStyle}
-                  />
-                  <button type="button" onClick={verifyOtp} style={primaryBtn} disabled={loading}>
-                    {loading ? "Verifying..." : "Verify OTP"}
-                  </button>
+                  <input placeholder="6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} style={inputStyle} />
+                  <button type="button" onClick={verifyOtp} style={primaryBtn} disabled={loading}>Verify OTP</button>
                 </>
               )}
-
               <div id="recaptcha-container"></div>
             </>
           )}
 
-          <button type="button" onClick={onClose} style={secondaryBtn}>
-            Cancel
-          </button>
+          <button type="button" onClick={onClose} style={secondaryBtn}>Cancel</button>
 
           {!isPhoneLogin && (
-            <p
-              style={bottomText}
-              onClick={() => { setIsLogin(!isLogin); setError(""); }}
-            >
-              {isLogin
-                ? "Don't have an account? Sign Up"
-                : "Already have an account? Login"}
+            <p style={bottomText} onClick={() => { setIsLogin(!isLogin); setError(""); setSuccess(""); }}>
+              {isLogin ? "New here? Create an Account" : "Already have an account? Login"}
             </p>
           )}
         </form>
@@ -247,102 +236,17 @@ export default function SignInModal({ onClose }) {
   );
 }
 
-/* ================= STYLES ================= */
-
-const overlayStyle = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(0,0,0,0.6)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 9999,
-  backdropFilter: "blur(4px)"
-};
-
-const modalStyle = {
-  background: "#ffffff",
-  width: "100%",
-  maxWidth: "420px",
-  padding: "30px",
-  borderRadius: "16px",
-  boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
-  animation: "fadeIn 0.3s ease"
-};
-
-const headingStyle = {
-  textAlign: "center",
-  marginBottom: "20px",
-  fontWeight: "700",
-  fontSize: "22px"
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "12px",
-  borderRadius: "10px",
-  border: "1px solid #ddd",
-  fontSize: "14px",
-  outline: "none"
-};
-
-const primaryBtn = {
-  width: "100%",
-  padding: "12px",
-  background: "linear-gradient(135deg, #fe3d00, #ff6a00)",
-  border: "none",
-  color: "#fff",
-  fontWeight: "600",
-  borderRadius: "10px",
-  cursor: "pointer",
-  marginBottom: "10px"
-};
-
-const secondaryBtn = {
-  width: "100%",
-  padding: "10px",
-  background: "transparent",
-  border: "1px solid #fe3d00",
-  color: "#fe3d00",
-  borderRadius: "10px",
-  cursor: "pointer"
-};
-
-const errorStyle = {
-  color: "#ff3b3b",
-  fontSize: "13px",
-  marginBottom: "10px",
-  textAlign: "center"
-};
-
-const switchWrapper = {
-  display: "flex",
-  background: "#f3f3f3",
-  borderRadius: "10px",
-  padding: "4px",
-  marginBottom: "18px"
-};
-
-const switchBtn = {
-  flex: 1,
-  padding: "8px",
-  border: "none",
-  background: "transparent",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600"
-};
-
-const activeSwitch = {
-  background: "#fe3d00",
-  color: "#fff"
-};
-
-const bottomText = {
-  textAlign: "center",
-  marginTop: "15px",
-  fontSize: "14px",
-  color: "#fe3d00",
-  cursor: "pointer"
-};
+// --- UPDATED STYLES ---
+const successStyle = { color: "#28a745", fontSize: "13px", marginBottom: "12px", textAlign: "center", background: "#e8f5e9", padding: "10px", borderRadius: "8px" };
+const errorStyle = { color: "#ff3b3b", fontSize: "13px", marginBottom: "12px", textAlign: "center", background: "#ffebee", padding: "10px", borderRadius: "8px" };
+const forgotText = { textAlign: "center", color: "#666", fontSize: "12px", cursor: "pointer", marginTop: "5px", textDecoration: "underline" };
+const overlayStyle = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" };
+const modalStyle = { background: "#ffffff", width: "90%", maxWidth: "400px", padding: "25px", borderRadius: "16px", boxShadow: "0 20px 50px rgba(0,0,0,0.15)" };
+const headingStyle = { textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "20px" };
+const inputStyle = { width: "100%", padding: "12px", marginBottom: "10px", borderRadius: "10px", border: "1px solid #eee", fontSize: "14px", boxSizing: "border-box" };
+const primaryBtn = { width: "100%", padding: "12px", background: "linear-gradient(135deg, #fe3d00, #ff6a00)", border: "none", color: "#fff", fontWeight: "600", borderRadius: "10px", cursor: "pointer", marginBottom: "10px" };
+const secondaryBtn = { width: "100%", padding: "12px", background: "transparent", border: "1px solid #fe3d00", color: "#fe3d00", borderRadius: "10px", cursor: "pointer" };
+const switchWrapper = { display: "flex", background: "#f8f8f8", borderRadius: "10px", padding: "4px", marginBottom: "20px" };
+const switchBtn = { flex: 1, padding: "10px", border: "none", background: "transparent", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "14px" };
+const activeSwitch = { background: "#fe3d00", color: "#fff" };
+const bottomText = { textAlign: "center", marginTop: "15px", fontSize: "14px", color: "#fe3d00", cursor: "pointer", fontWeight: "500" };
