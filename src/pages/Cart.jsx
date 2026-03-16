@@ -29,6 +29,7 @@ export default function CartPage() {
     ? "http://localhost:3000/api/customer-orders" 
     : "https://serdeptry1st.onrender.com/api/customer-orders";
 
+  // 1. Scroll Effect
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
       cartEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -37,6 +38,23 @@ export default function CartPage() {
   }, [cartItems]);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  // 🔥 AUTO-REMOVE GIFT LOGIC: Agar subtotal 299 se kam ho toh gift hatao
+  useEffect(() => {
+    const threshold = 299;
+    // Un items ko dhundo jinka price 0 hai (Gifts)
+    const hasGift = cartItems.some(item => item.price === 0);
+
+    if (subtotal < threshold && hasGift) {
+      cartItems.forEach((item, index) => {
+        if (item.price === 0) {
+          // Toh unki quantity khatam kar do taaki wo cart se hat jayein
+          updateQuantity(index, -item.quantity);
+        }
+      });
+    }
+  }, [subtotal, cartItems, updateQuantity]);
+
   const discountAmount = (subtotal * discountPercent) / 100;
   const finalTotal = subtotal - discountAmount;
 
@@ -140,7 +158,7 @@ export default function CartPage() {
         )}
       </div>
 
-      {/* 2. 🔥 GIFT CAROUSEL (Yahan vapas daal diya!) */}
+      {/* 2. 🔥 GIFT CAROUSEL */}
       <div className="my-4">
         <GiftCarousel 
           subtotal={subtotal} 
@@ -178,7 +196,6 @@ export default function CartPage() {
             <span>Total</span><span style={{ color: "#fe3d00" }}>₹{finalTotal}</span>
           </div>
 
-          {/* Coupon Section */}
           <div className="d-flex gap-2 mt-4">
             <Form.Control 
               type="text" placeholder="Apply Coupon" value={coupon} 
@@ -195,7 +212,6 @@ export default function CartPage() {
 
           <hr className="my-4" />
 
-          {/* Note Box */}
           <Form.Group className="mb-4">
             <Form.Label style={{ fontWeight: "700", color: "#444" }}>Add a note (Optional):</Form.Label>
             <Form.Control 
@@ -205,7 +221,6 @@ export default function CartPage() {
             />
           </Form.Group>
 
-          {/* Checkout Button */}
           <Button 
             onClick={handlePlaceOrderClick} 
             disabled={loading} 

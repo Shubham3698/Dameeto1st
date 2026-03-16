@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Image, Button } from "react-bootstrap";
 
-// 🔥 FIX: Added default value [] for cartItems to prevent crash
 const GiftCarousel = ({ subtotal, cartItems = [], onAddGift, onRemoveGift }) => {
   const [gifts, setGifts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +14,7 @@ const GiftCarousel = ({ subtotal, cartItems = [], onAddGift, onRemoveGift }) => 
     ? "http://localhost:3000/api/free-gifts" 
     : "https://serdeptry1st.onrender.com/api/free-gifts";
 
+  // 1. Fetch Gifts from API
   useEffect(() => {
     const fetchGifts = async () => {
       try {
@@ -26,6 +26,18 @@ const GiftCarousel = ({ subtotal, cartItems = [], onAddGift, onRemoveGift }) => 
     };
     fetchGifts();
   }, [API_BASE_URL]);
+
+  // 🔥 AUTO-SYNC: Agar amount kam ho jaye, toh carousel se bhi removal ensure karein
+  useEffect(() => {
+    if (isLocked) {
+      gifts.forEach(gift => {
+        const isInCart = cartItems.some(item => item.title === gift.title);
+        if (isInCart) {
+          onRemoveGift(gift.title);
+        }
+      });
+    }
+  }, [isLocked, cartItems, gifts, onRemoveGift]);
 
   if (loading || gifts.length === 0) return null;
 
@@ -45,7 +57,6 @@ const GiftCarousel = ({ subtotal, cartItems = [], onAddGift, onRemoveGift }) => 
 
       <div className="d-flex overflow-x-auto gap-3 pb-2 no-scrollbar" style={{ display: "flex", overflowX: "auto", gap: "12px", scrollbarWidth: 'none' }}>
         {gifts.map((gift) => {
-          // 🔥 Added safety check Array.isArray
           const isInCart = Array.isArray(cartItems) && cartItems.some(item => item.title === gift.title);
           
           return (

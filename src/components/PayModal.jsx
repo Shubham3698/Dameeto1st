@@ -23,9 +23,27 @@ export default function PayModal({ show, handleClose, amount, orderId, onPayment
         name: "Dameeto",
         description: `Payment for Order #${orderId}`, // 🔥 Asli ID dikhegi
         order_id: data.order.id,
+        // 🔥 QR aur UPI ko upar dikhane ke liye config
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via QR / UPI",
+                instruments: [
+                  {
+                    method: "upi",
+                  },
+                ],
+              },
+            },
+            sequence: ["block.upi"],
+            preferences: {
+              show_default_blocks: true,
+            },
+          },
+        },
         handler: async (response) => {
           // 2. Payment successful! Ab CartPage ko response bhej do
-          // CartPage is response ko lekar seedha '/create' hit karega
           onPaymentSuccess(response); 
         },
         prefill: {
