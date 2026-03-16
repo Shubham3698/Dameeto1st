@@ -32,15 +32,13 @@ export default function PayModal({ show, handleClose, amount, orderId, onPayment
                 instruments: [
                   {
                     method: "upi",
-                    // 🔥 Mobile par QR ko priority dene ke liye
-                    display: "qr", 
                   },
                 ],
               },
             },
             sequence: ["block.upi"],
             preferences: {
-              show_default_blocks: false, // Isse QR direct dikhne ke chances badh jate hain
+              show_default_blocks: true,
             },
           },
         },
