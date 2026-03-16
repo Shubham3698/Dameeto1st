@@ -1,9 +1,10 @@
 import React, { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Link ki zarurat nahi ab navigate use karenge
+import { useNavigate } from "react-router-dom"; 
 import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import Logo from "../assets/lg.png";
 import SignInModal from "./SignInModal";
 import { CartContext } from "../contexAndhooks/CartContext";
+import toast from "react-hot-toast"; // 🔹 NAYA: Toaster import kiya
 
 export default function TopNavbar() {
   const [query, setQuery] = useState("");
@@ -14,12 +15,24 @@ export default function TopNavbar() {
   // 🔹 Context se cartItems aur hamara naya Loading state nikala
   const { cartItems, setIsGlobalLoading } = useContext(CartContext);
 
-  // 🔹 Cart Click Handler: Ye screen lock karega aur fir navigate karega
+  // 🔹 Cart Click Handler: Ye screen lock karega, patti dikhayega aur fir navigate karega
   const handleCartClick = (e) => {
-    setIsGlobalLoading(true); // Screen Lock ON
+    // 1. Toaster Patti dikhao (4 seconds duration ke saath)
+    toast.loading("Fetching page... Server is waking up 🚀", {
+      duration: 4000, // 🔹 4 seconds tak patti dikhegi
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+    });
+
+    setIsGlobalLoading(true); // 2. Global Screen Lock ON
+
     setTimeout(() => {
       navigate("/cart");
-      setIsGlobalLoading(false); // Screen Lock OFF
+      setIsGlobalLoading(false); // 3. Screen Lock OFF
+      // toast.dismiss() ko hata diya hai taaki patti fixed 4s tak dikhe
     }, 400); // 0.4 second ka chota sa delay taki multiple clicks na ho
   };
 
@@ -133,14 +146,14 @@ export default function TopNavbar() {
             onClick={handleUserClick}
           />
 
-          {/* 🔹 Cart Icon Wrapper: Link ko div mein badla hai click handle karne ke liye */}
+          {/* 🔹 Cart Icon Wrapper: Div click handle karega */}
           <div
             onClick={handleCartClick}
             style={{ 
               color: "#fe3d00", 
               position: "relative", 
               display: "flex", 
-              cursor: "pointer" // Cursor pointer zaroori hai
+              cursor: "pointer" 
             }}
           >
             <FaShoppingCart style={{ fontSize: "26px" }} />

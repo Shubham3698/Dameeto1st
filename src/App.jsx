@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"; // 🔹 useContext add kiya
 import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast"; // 🔹 Toaster import kiya
 
 import About from "./pages/about";
 import Sticker from "./pages/Sticker";
@@ -116,13 +117,20 @@ function App() {
         position: "relative",
       }}
     >
-      {/* 🔹 GLOBAL OVERLAY: Jab user Cart icon pe click karega, ye dikhega */}
+      {/* 🔹 GLOBAL OVERLAY: Pehle Overlay (zIndex: 20000) */}
       {isGlobalLoading && (
         <div style={globalOverlayStyles}>
           <div style={spinnerStyles} />
           <p style={{ marginTop: "15px", color: "#fe3d00", fontWeight: "bold" }}>Opening Cart...</p>
         </div>
       )}
+
+      {/* 🔹 TOASTER: Overlay ke baad taaki ye sabse upar chamke (zIndex: 30000) */}
+      <Toaster 
+        position="top-center" 
+        reverseOrder={false} 
+        containerStyle={{ zIndex: 30000 }} 
+      />
 
       <MNv />
 
@@ -194,13 +202,13 @@ function App() {
 const globalOverlayStyles = {
   position: "fixed",
   inset: 0,
-  background: "rgba(255, 243, 235, 0.7)", // Theme color with transparency
-  backdropFilter: "blur(5px)", // Modern blur
+  background: "rgba(255, 243, 235, 0.7)", 
+  backdropFilter: "blur(5px)", 
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  zIndex: 20000, // Popup se bhi upar
+  zIndex: 20000, 
   cursor: "wait",
 };
 
