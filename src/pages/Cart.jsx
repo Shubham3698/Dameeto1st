@@ -42,13 +42,11 @@ export default function CartPage() {
   // 🔥 AUTO-REMOVE GIFT LOGIC: Agar subtotal 299 se kam ho toh gift hatao
   useEffect(() => {
     const threshold = 299;
-    // Un items ko dhundo jinka price 0 hai (Gifts)
     const hasGift = cartItems.some(item => item.price === 0);
 
     if (subtotal < threshold && hasGift) {
       cartItems.forEach((item, index) => {
         if (item.price === 0) {
-          // Toh unki quantity khatam kar do taaki wo cart se hat jayein
           updateQuantity(index, -item.quantity);
         }
       });
@@ -237,8 +235,25 @@ export default function CartPage() {
 
       {/* Modals & Components */}
       {showGiftModal && <GiftUploadModal onClose={() => setShowGiftModal(false)} API_BASE_URL={API_BASE_URL} />}
-      <AddressModal show={showAddressModal} handleClose={() => setShowAddressModal(false)} handleSave={handleAddressSave} />
-      <PayModal show={showPayModal} handleClose={() => setShowPayModal(false)} amount={finalTotal} orderId={currentOrderId} onPaymentSuccess={handlePaymentComplete} />
+      
+      <AddressModal 
+        show={showAddressModal} 
+        handleClose={() => setShowAddressModal(false)} 
+        handleSave={handleAddressSave} 
+      />
+
+      {/* 🔥 Updated PayModal with all props */}
+      <PayModal 
+        show={showPayModal} 
+        handleClose={() => setShowPayModal(false)} 
+        amount={finalTotal} 
+        orderId={currentOrderId} 
+        onPaymentSuccess={handlePaymentComplete}
+        tempAddress={tempAddress} 
+        cartItems={cartItems}
+        subtotal={subtotal}
+      />
+
       <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage(currentOrderId, tempAddress)} />
     </Container>
   );
