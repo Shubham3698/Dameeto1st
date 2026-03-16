@@ -18,7 +18,7 @@ export default function TopNavbar() {
   // 🔹 Cart Click Handler: Ye screen lock karega, patti dikhayega aur fir navigate karega
   const handleCartClick = (e) => {
     // 1. Toaster Patti dikhao (4 seconds duration ke saath)
-    toast.loading("Fetching page... Server is waking up 🚀", {
+    toast.loading("Fetching page... Server is waking up, pls reload page  🚀", {
       duration: 4000, // 🔹 4 seconds tak patti dikhegi
       style: {
         borderRadius: "10px",
