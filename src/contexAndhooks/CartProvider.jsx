@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { CartContext } from "./CartContext";
 
 export const CartProvider = ({ children }) => {
-
   // Safe localStorage load
   const [cartItems, setCartItems] = useState(() => {
     try {
@@ -13,6 +12,9 @@ export const CartProvider = ({ children }) => {
       return [];
     }
   });
+
+  // 🔹 NAYA: Sirf ye state add ki hai screen freeze karne ke liye
+  const [isGlobalLoading, setIsGlobalLoading] = useState(false);
 
   // Save to localStorage
   useEffect(() => {
@@ -82,6 +84,9 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         updateQuantity,
         clearCart,
+        // 🔹 NAYA: Ye dono value mein pass kar diye
+        isGlobalLoading,
+        setIsGlobalLoading,
       }}
     >
       {children}

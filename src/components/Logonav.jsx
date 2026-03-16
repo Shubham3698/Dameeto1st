@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Link ki zarurat nahi ab navigate use karenge
 import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import Logo from "../assets/lg.png";
 import SignInModal from "./SignInModal";
@@ -10,7 +10,18 @@ export default function TopNavbar() {
   const [showSignIn, setShowSignIn] = useState(false);
   const [pop, setPop] = useState(false); // animation state
   const navigate = useNavigate();
-  const { cartItems } = useContext(CartContext);
+
+  // 🔹 Context se cartItems aur hamara naya Loading state nikala
+  const { cartItems, setIsGlobalLoading } = useContext(CartContext);
+
+  // 🔹 Cart Click Handler: Ye screen lock karega aur fir navigate karega
+  const handleCartClick = (e) => {
+    setIsGlobalLoading(true); // Screen Lock ON
+    setTimeout(() => {
+      navigate("/cart");
+      setIsGlobalLoading(false); // Screen Lock OFF
+    }, 400); // 0.4 second ka chota sa delay taki multiple clicks na ho
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && query.trim() !== "") {
@@ -30,7 +41,7 @@ export default function TopNavbar() {
   // Total quantity for badge
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // 🔹 Pop animation effect with safe setState
+  // 🔹 Pop animation effect (Wahi purana logic)
   useEffect(() => {
     if (totalQuantity > 0) {
       const timer = setTimeout(() => {
@@ -122,10 +133,15 @@ export default function TopNavbar() {
             onClick={handleUserClick}
           />
 
-          {/* Cart Icon */}
-          <Link
-            to="/cart"
-            style={{ color: "#fe3d00", position: "relative", display: "flex" }}
+          {/* 🔹 Cart Icon Wrapper: Link ko div mein badla hai click handle karne ke liye */}
+          <div
+            onClick={handleCartClick}
+            style={{ 
+              color: "#fe3d00", 
+              position: "relative", 
+              display: "flex", 
+              cursor: "pointer" // Cursor pointer zaroori hai
+            }}
           >
             <FaShoppingCart style={{ fontSize: "26px" }} />
             {totalQuantity > 0 && (
@@ -154,7 +170,7 @@ export default function TopNavbar() {
                 {totalQuantity}
               </span>
             )}
-          </Link>
+          </div>
         </div>
       </nav>
 
