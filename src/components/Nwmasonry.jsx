@@ -23,6 +23,7 @@ export default function Nwmasonry({ images = [], categoryName }) {
   /* NEW STATES */
   const [touchIndex, setTouchIndex] = useState(null);
   const lastTapRef = useRef(0);
+  const holdTimer = useRef(null);
 
   useLayoutEffect(() => {
     const withRandom = images.map((item) => ({
@@ -54,20 +55,51 @@ export default function Nwmasonry({ images = [], categoryName }) {
     setDragIndex(index);
   };
 
+  /* MOBILE LONG PRESS */
+  const handleTouchStart = (e, index) => {
+    const touch = e.touches[0];
+
+    dragStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+
+    holdTimer.current = setTimeout(() => {
+      setDragIndex(index);
+    }, 250);
+  };
+
   useEffect(() => {
     const move = (e) => {
       if (dragIndex === null) return;
-      setDragOffset({ x: e.clientX - dragStart.current.x, y: e.clientY - dragStart.current.y });
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      setDragOffset({
+        x: clientX - dragStart.current.x,
+        y: clientY - dragStart.current.y,
+      });
     };
+
     const up = () => {
+      clearTimeout(holdTimer.current);
       setDragIndex(null);
       setDragOffset({ x: 0, y: 0 });
     };
+
     window.addEventListener("mousemove", move);
     window.addEventListener("mouseup", up);
+
+    window.addEventListener("touchmove", move);
+    window.addEventListener("touchend", up);
+
     return () => {
       window.removeEventListener("mousemove", move);
       window.removeEventListener("mouseup", up);
+
+      window.removeEventListener("touchmove", move);
+      window.removeEventListener("touchend", up);
     };
   }, [dragIndex]);
 
@@ -164,9 +196,7 @@ export default function Nwmasonry({ images = [], categoryName }) {
             <div
               key={i}
               onMouseDown={(e) => handleMouseDown(e, i)}
-
-              onTouchStart={() => setTouchIndex(i)}
-              onTouchEnd={() => setTouchIndex(null)}
+              onTouchStart={(e) => handleTouchStart(e, i)}
 
               className="group relative cursor-grab active:cursor-grabbing"
               style={{
