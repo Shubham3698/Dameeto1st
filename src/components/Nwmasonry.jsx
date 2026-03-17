@@ -18,7 +18,6 @@ export default function Nwmasonry({ images = [], categoryName }) {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const dragStart = useRef({ x: 0, y: 0 });
 
-  /* NEW STATES FOR MOBILE & HOLD */
   const [touchIndex, setTouchIndex] = useState(null);
   const [isHolding, setIsHolding] = useState(false);
   const lastTapRef = useRef(0);
@@ -67,21 +66,18 @@ export default function Nwmasonry({ images = [], categoryName }) {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       setMouse({ x: clientX, y: clientY });
-
       if (dragIndex === null) return;
       setDragOffset({
         x: clientX - dragStart.current.x,
         y: clientY - dragStart.current.y,
       });
     };
-
     const up = () => {
       clearTimeout(holdTimer.current);
       setIsHolding(false);
       setDragIndex(null);
       setDragOffset({ x: 0, y: 0 });
     };
-
     window.addEventListener("mousemove", move);
     window.addEventListener("mouseup", up);
     window.addEventListener("touchmove", move, { passive: false });
@@ -117,7 +113,6 @@ export default function Nwmasonry({ images = [], categoryName }) {
     let raf;
     const animate = () => {
       const idleTime = Date.now() - lastScroll.current;
-      // HOLD logic added to idle animation
       if (idleTime > 2000 && !isHolding) {
         velocityRef.current += 0.04;
         setIdleOffset((prev) => {
@@ -188,7 +183,8 @@ export default function Nwmasonry({ images = [], categoryName }) {
                   lastTapRef.current = now;
                 }}
                 onDoubleClick={() => handleClick(item)}
-                className={`w-full rounded-[14px] border-none shadow-none transition-all duration-500 ease-out ${isTouch ? "scale-[1.1] shadow-2xl shadow-black/30 grayscale-0 opacity-100 z-50" : "grayscale-[30%] opacity-90 group-hover:scale-[1.1] group-hover:shadow-2xl group-hover:shadow-black/30 group-hover:grayscale-0 group-hover:opacity-100 group-hover:z-50"}`}
+                // Yahan maine grayscale 70% aur opacity 70% kar di hai (Line below)
+                className={`w-full rounded-[14px] border-none shadow-none transition-all duration-500 ease-out ${isTouch ? "scale-[1.1] shadow-2xl shadow-black/30 grayscale-0 opacity-100 z-50" : "grayscale-[70%] opacity-70 group-hover:scale-[1.1] group-hover:shadow-2xl group-hover:shadow-black/30 group-hover:grayscale-0 group-hover:opacity-100 group-hover:z-50"}`}
               />
             </div>
           );
