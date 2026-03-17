@@ -36,6 +36,7 @@ export default function Nwmasonry({ images = [], categoryName }) {
     const shuffled = [...withRandom].sort((a, b) => a.randomKey - b.randomKey);
 
     setTimeout(() => {
+      // 3 sets zaroori hain seamless loop ke liye
       setLoopImages([...shuffled, ...shuffled, ...shuffled]);
     }, 0);
 
@@ -89,26 +90,36 @@ export default function Nwmasonry({ images = [], categoryName }) {
     const handleScroll = () => {
 
       const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const visibleHeight = container.clientHeight;
 
       setScrollY(scrollTop);
       lastScroll.current = Date.now();
 
-      const scrollHeight = container.scrollHeight;
-      const visibleHeight = container.clientHeight;
-
-      if (scrollTop + visibleHeight >= scrollHeight - 5) {
-        container.scrollTop = scrollTop - scrollHeight / 3;
+      // FIXED SEAMLESS LOGIC: 
+      // Reset point ko edge se thoda pehle rakha hai taaki jump feel na ho
+      const oneThird = scrollHeight / 3;
+      if (scrollTop >= oneThird * 2) {
+        container.scrollTop = scrollTop - oneThird;
+      } else if (scrollTop <= 5) {
+        // Sirf top pe reset taaki infinite upar bhi chale
+        container.scrollTop = scrollTop + oneThird;
       }
 
     };
 
-    setTimeout(() => (container.scrollTop = container.scrollHeight / 3), 100);
+    // Initial position center set par
+    setTimeout(() => {
+        if(container.scrollHeight > 0) {
+            container.scrollTop = container.scrollHeight / 3;
+        }
+    }, 150);
 
     container.addEventListener("scroll", handleScroll);
 
     return () => container.removeEventListener("scroll", handleScroll);
 
-  }, []);
+  }, [loopImages.length]);
 
   useEffect(() => {
 
@@ -142,6 +153,8 @@ export default function Nwmasonry({ images = [], categoryName }) {
       } else {
 
         setCollapse(prev => prev * 0.85);
+        // Reset velocity when active
+        velocityRef.current = 0;
 
       }
 
@@ -175,9 +188,10 @@ export default function Nwmasonry({ images = [], categoryName }) {
         background: "#fff3eb",
         height: "100vh",
         overflowY: "auto",
-        perspective: "900px"
+        perspective: "900px",
+        scrollBehavior: "auto" // Jump hide karne ke liye auto must hai
       }}
-      className="container py-4"
+      className="container py-4 no-scrollbar"
     >
 
       <div className="masonry">
@@ -187,8 +201,9 @@ export default function Nwmasonry({ images = [], categoryName }) {
           const floatOffset = scrollY * item.depth * 0.02;
           const push = Math.sin(scrollY * 0.02 + i) * 6 * item.pushDir;
 
+          // Magnet detection adjustment for scrolling position
           const rectX = (i % 4) * 200 + 100;
-          const rectY = Math.floor(i / 4) * 250;
+          const rectY = Math.floor(i / 4) * 250 - (scrollY % (containerRef.current?.scrollHeight / 3 || 1));
 
           const dx = mouse.x - rectX;
           const dy = mouse.y - rectY;
@@ -217,7 +232,9 @@ export default function Nwmasonry({ images = [], categoryName }) {
               key={i}
               className="image-wrapper"
               style={{
-                transition: dragIndex === i ? "none" : "transform .2s ease-out",
+                // IMPORTANT: Scrolling ke waqt transition 'none' taaki jump na dikhe
+                transition: (dragIndex === i || (Date.now() - lastScroll.current > 2000)) ? "transform .2s ease-out" : "none",
+                willChange: "transform",
                 transform: `
                   translateY(${floatOffset + idleOffset + magnetY + dragY + collapse}px)
                   translateX(${item.randomTranslateX + push + magnetX + dragX}px)
@@ -254,6 +271,8 @@ export default function Nwmasonry({ images = [], categoryName }) {
       </div>
 
       <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .masonry{
           display:grid;
@@ -307,6 +326,7 @@ export default function Nwmasonry({ images = [], categoryName }) {
           text-transform:uppercase;
           letter-spacing:.3px;
           animation:rgbFlow 4s linear infinite;
+          z-index: 5;
         }
 
         .badge-text{
