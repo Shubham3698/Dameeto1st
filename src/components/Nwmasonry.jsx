@@ -174,11 +174,11 @@ export default function Nwmasonry({ images = [], categoryName }) {
     >
       <div className="grid grid-cols-2 gap-3 px-4 md:grid-cols-3 lg:grid-cols-4">
         {loopImages.map((item, i) => {
-          const floatOffset = scrollY * item.depth * 0.006; // 30% of original
-          const push = Math.sin(scrollY * 0.02 + i) * 2 * item.pushDir; // 30% of original
+          const floatOffset = scrollY * item.depth * 0.006;
+          const push = Math.sin(scrollY * 0.02 + i) * 2 * item.pushDir;
 
-          let dragX = dragIndex === i ? dragOffset.x * 0.3 : 0; // 30% drag
-          let dragY = dragIndex === i ? dragOffset.y * 0.3 : 0; // 30% drag
+          let dragX = dragIndex === i ? dragOffset.x * 0.3 : 0;
+          let dragY = dragIndex === i ? dragOffset.y * 0.3 : 0;
 
           const isTouch = touchIndex === i;
 
@@ -201,6 +201,15 @@ export default function Nwmasonry({ images = [], categoryName }) {
                 `,
               }}
             >
+              {/* ✅ Badge ALWAYS visible */}
+              {item.badge && (
+                <div className="absolute left-[6px] top-[6px] z-20 flex h-[18px] w-[30px] items-center justify-center overflow-hidden rounded-lg text-[7px] font-semibold uppercase tracking-wider text-white animate-rgb-flow">
+                  <div className={`${item.badge.length > 4 ? "animate-scroll-text pl-[100%]" : ""}`}>
+                    {item.badge}
+                  </div>
+                </div>
+              )}
+
               <img
                 src={item.src}
                 alt={item.title}
@@ -233,6 +242,22 @@ export default function Nwmasonry({ images = [], categoryName }) {
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { scrollbar-width: none; }
         img { -webkit-user-drag:none; user-select:none; }
+
+        @keyframes rgb-flow {
+          0% { background: rgb(255, 60, 60); }
+          25% { background: rgb(255, 120, 60); }
+          50% { background: rgb(255, 60, 140); }
+          75% { background: rgb(200, 60, 255); }
+          100% { background: rgb(255, 60, 60); }
+        }
+
+        @keyframes scroll-text {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-100%); }
+        }
+
+        .animate-rgb-flow { animation: rgb-flow 4s linear infinite; }
+        .animate-scroll-text { animation: scroll-text 5s linear infinite; }
       `}</style>
     </div>
   );
