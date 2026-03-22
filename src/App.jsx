@@ -176,45 +176,48 @@ function App() {
       </Routes>
 
       {/* 🔥 CANDY FAB MENU (Tailwind) */}
-      {!isButtonHidden && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[2000]">
-          
-          {/* Sub Buttons */}
-          <div 
-            onClick={() => { navigate("/home"); setMenuOpen(false); }}
-            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? '-translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
-          >🏠</div>
+{/* 🔥 UPDATED SEQUENCE: CART -> HOME -> HAMBURGER */}
+{!isButtonHidden && (
+  <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[2000]">
+    
+    {/* 1. CART (Left Side) */}
+    <div 
+      onClick={() => { navigate("/cart"); setMenuOpen(false); }}
+      className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? '-translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
+    >🛒</div>
 
-          <div 
-            onClick={() => { navigate("/cart"); setMenuOpen(false); }}
-            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-y-[-110px] scale-100' : 'scale-0'}`}
-          >🛒</div>
+    {/* 2. HOME (Top Center) */}
+    <div 
+      onClick={() => { navigate("/home"); setMenuOpen(false); }}
+      className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-y-[-110px] scale-100' : 'scale-0'}`}
+    >🏠</div>
 
-          <div 
-            onClick={() => { setIsSidebarOpen(true); setMenuOpen(false); }}
-            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
-          >
-            <div className="flex flex-col gap-1">
-              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-            </div>
-          </div>
+    {/* 3. HAMBURGER (Right Side) */}
+    <div 
+      onClick={() => { setIsSidebarOpen(true); setMenuOpen(false); }}
+      className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
+    >
+      <div className="flex flex-col gap-1">
+        <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+        <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+        <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+      </div>
+    </div>
 
-          {/* Main Candy Box FAB */}
-          <button 
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="w-16 h-16 bg-[#fe3d00] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(254,61,0,0.5)] transition-transform active:scale-90"
-          >
-            <div className="grid grid-cols-2 gap-1.5 transition-transform duration-300">
-              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 translate-x-1.5 translate-y-1.5' : ''}`} />
-              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 -translate-x-1.5 translate-y-1.5' : ''}`} />
-              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 translate-x-1.5 -translate-y-1.5' : ''}`} />
-              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 -translate-x-1.5 -translate-y-1.5' : ''}`} />
-            </div>
-          </button>
-        </div>
-      )}
+    {/* Main FAB (Candy Box) - No Change Here */}
+    <button 
+      onClick={() => setMenuOpen(!menuOpen)}
+      className="w-16 h-16 bg-[#fe3d00] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(254,61,0,0.5)] transition-transform active:scale-90"
+    >
+      <div className="grid grid-cols-2 gap-1.5 transition-transform duration-300">
+        <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 translate-x-1.5 translate-y-1.5' : ''}`} />
+        <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 -translate-x-1.5 translate-y-1.5' : ''}`} />
+        <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 translate-x-1.5 -translate-y-1.5' : ''}`} />
+        <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 -translate-x-1.5 -translate-y-1.5' : ''}`} />
+      </div>
+    </button>
+  </div>
+)}
     </div>
   );
 }
