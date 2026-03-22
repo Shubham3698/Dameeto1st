@@ -27,7 +27,7 @@ export default function InventoryUpload() {
     badge: "Hot",
     subImages: "", 
     tags: "",
-    removeBg: false, 
+    removeBg: false, // 🔥 New AI Feature
   });
 
   const loadInventory = async () => {
@@ -101,40 +101,34 @@ export default function InventoryUpload() {
     try {
       const dataToSend = new FormData();
       
-      // 1. Check for AI Background Removal on Main Image
+      // 1. AI Background Removal logic
       const mainFileObj = tempFiles.find(f => f.role === "main");
       let mainFileToUpload = mainFileObj ? mainFileObj.file : null;
 
       if (formData.removeBg && mainFileToUpload) {
-        console.log("AI: Removing Background...");
         const aiFormData = new FormData();
         aiFormData.append("image_file", mainFileToUpload);
         aiFormData.append("size", "auto");
 
         const aiRes = await fetch("https://api.remove.bg/v1.0/removebg", {
           method: "POST",
-          headers: { "X-Api-Key": "RXuK8dw7KH4zrFWZA1FYj3f6" }, // 👈 Your API Key
+          headers: { "X-Api-Key": "RXuK8dw7KH4zrFWZA1FYj3f6" }, 
           body: aiFormData,
         });
 
         if (aiRes.ok) {
           const blob = await aiRes.blob();
           mainFileToUpload = new File([blob], "cleaned_image.png", { type: "image/png" });
-          console.log("AI: Background Cleaned!");
-        } else {
-          console.error("AI Error:", await aiRes.json());
-          alert("AI Background removal failed. Uploading original instead.");
         }
       }
 
-      // 2. Append Form Data
+      // 2. Append ALL Data Fields (Restore all missing fields)
       Object.keys(formData).forEach((key) => {
         if (key !== "id") dataToSend.append(key, formData[key]);
       });
 
-      // 3. Append Files
+      // 3. Append Main Image & SubImages
       if (mainFileToUpload) dataToSend.append("image", mainFileToUpload);
-      
       const subFiles = tempFiles.filter(f => f.role === "sub");
       subFiles.forEach((f) => dataToSend.append("subImages", f.file));
 
@@ -144,16 +138,14 @@ export default function InventoryUpload() {
       const res = await fetch(endpoint, { method, body: dataToSend });
       const result = await res.json();
       if (result.success) {
-        alert(formData.id ? "Updated!" : "Success!");
+        alert("Action Successful! 🚀");
         resetForm();
         loadInventory();
       }
     } catch (err) { 
       console.error(err); 
-      alert("Submission failed. Check console.");
-    } finally { 
-      setLoading(false); 
-    }
+      alert("Error occurred. Check console.");
+    } finally { setLoading(false); }
   };
 
   const startEdit = (item) => {
@@ -170,12 +162,13 @@ export default function InventoryUpload() {
       originalPrice: item.originalPrice,
       discount: item.discount || 0,
       rating: item.rating,
-      stock: item.stock,
+      stock: item.stock || 10,
       src: item.src,
       badge: item.badge || "",
       removeBg: item.removeBg || false,
-      subImages: (item.subImages || []).join(", "),
-      tags: (item.tags || []).join(", "),
+      // Fix array-to-string conversion for subImages and tags
+      subImages: Array.isArray(item.subImages) ? item.subImages.join(", ") : (item.subImages || ""),
+      tags: Array.isArray(item.tags) ? item.tags.join(", ") : (item.tags || ""),
     });
   };
 
@@ -199,46 +192,41 @@ export default function InventoryUpload() {
               <h1 className="text-2xl font-black text-yellow-500 uppercase tracking-tight">
                 {isEditing ? "Edit Item 🛠️" : "New Entry 🚀"}
               </h1>
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <span className="text-[10px] font-bold text-slate-400 group-hover:text-yellow-500 transition-colors uppercase">Clean BG</span>
-                <input 
-                  type="checkbox" id="removeBg" 
-                  checked={formData.removeBg} 
-                  onChange={handleChange} 
-                  className="w-4 h-4 accent-yellow-500 cursor-pointer" 
-                />
+              <label className="flex items-center gap-2 cursor-pointer group bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                <span className="text-[10px] font-bold text-slate-400 group-hover:text-yellow-500 transition-colors uppercase tracking-widest">AI Clean BG</span>
+                <input type="checkbox" id="removeBg" checked={formData.removeBg} onChange={handleChange} className="w-4 h-4 accent-yellow-500 cursor-pointer" />
               </label>
             </div>
 
             <div className="space-y-4 text-sm">
-              <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Page</label>
-                <select id="pageType" value={formData.pageType} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none focus:ring-1 focus:ring-yellow-500 transition-all text-slate-300">
-                  <option value="trendingData">Trending (tr-)</option>
-                  <option value="stickerData">Stickers (st-)</option>
-                  <option value="posterData">Posters (pos-)</option>
-                  <option value="goodiesData">Goodies (gies-)</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Page</label>
+                  <select id="pageType" value={formData.pageType} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none text-slate-300">
+                    <option value="trendingData">Trending</option>
+                    <option value="stickerData">Stickers</option>
+                    <option value="posterData">Posters</option>
+                    <option value="goodiesData">Goodies</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Stock Amount</label>
+                  <input type="number" id="stock" value={formData.stock} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none" />
+                </div>
               </div>
 
-              <div className="p-4 bg-[#0f172a] border border-dashed border-slate-700 rounded-xl group hover:border-yellow-500/50 transition-colors">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Media Upload (Images/GIFs)</label>
+              <div className="p-4 bg-[#0f172a] border border-dashed border-slate-700 rounded-xl">
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Upload Files</label>
                 <input id="file-upload" type="file" multiple accept="image/*" onChange={handleFileSelect} className="w-full text-xs text-slate-400 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-slate-300 hover:file:bg-slate-700 cursor-pointer" />
                 
                 {tempFiles.length > 0 && (
                   <div className="grid grid-cols-3 gap-2 mt-4">
                     {tempFiles.map((item, index) => (
                       <div key={index} className={`relative p-1 rounded-lg border bg-white overflow-hidden ${item.role === 'main' ? 'border-yellow-500 ring-1 ring-yellow-500' : 'border-slate-200'}`}>
-                        <img 
-                          src={item.preview} 
-                          className={`h-16 w-full object-contain ${formData.removeBg && item.role === 'main' ? 'mix-blend-multiply brightness-110 contrast-110' : ''}`} 
-                          alt="p" 
-                        />
+                        <img src={item.preview} className={`h-16 w-full object-contain ${formData.removeBg && item.role === 'main' ? 'mix-blend-multiply' : ''}`} alt="p" />
                         <div className="flex flex-col gap-1 mt-1">
-                          <button onClick={() => setRole(index, 'main')} className={`text-[7px] p-1 font-bold rounded ${item.role === 'main' ? 'bg-yellow-500 text-black' : 'bg-slate-200 text-slate-700'}`}>
-                            {item.role === 'main' ? 'MAIN' : 'SET MAIN'}
-                          </button>
-                          <button onClick={() => removeFile(index)} className="text-[7px] p-1 bg-red-50 text-red-500 rounded font-bold uppercase">Remove</button>
+                          <button onClick={() => setRole(index, 'main')} className={`text-[7px] p-1 font-bold rounded ${item.role === 'main' ? 'bg-yellow-500 text-black' : 'bg-slate-200 text-slate-700'}`}>MAIN</button>
+                          <button onClick={() => removeFile(index)} className="text-[7px] p-1 bg-red-50 text-red-500 rounded font-bold uppercase">Del</button>
                         </div>
                       </div>
                     ))}
@@ -249,40 +237,38 @@ export default function InventoryUpload() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Title</label>
-                  <input type="text" id="title" value={formData.title} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none focus:border-yellow-500 transition-all" required />
+                  <input type="text" id="title" value={formData.title} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none" required />
                 </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Category</label>
-                  <input type="text" id="category" value={formData.category} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Badge</label>
-                  <input type="text" id="badge" value={formData.badge} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none" />
-                </div>
+                <input type="text" id="category" value={formData.category} onChange={handleChange} placeholder="Category" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none" />
+                <input type="text" id="badge" value={formData.badge} onChange={handleChange} placeholder="Badge (Hot/New)" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none" />
               </div>
 
-              <div className="grid grid-cols-4 gap-2 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+              <div className="grid grid-cols-4 gap-2 bg-slate-900/50 p-4 rounded-xl border border-slate-800 text-xs">
                 {["finalPrice", "originalPrice", "discount", "rating"].map((field) => (
                   <div key={field}>
-                    <label className="text-[9px] font-bold text-slate-500 uppercase">{field.replace("Price", "")}</label>
-                    <input type="number" step={field === "rating" ? "0.1" : "1"} id={field} value={formData[field]} onChange={handleChange} className="w-full p-2 bg-[#0f172a] rounded border border-slate-700 outline-none text-xs" />
+                    <label className="text-[9px] font-bold text-slate-500 uppercase mb-1 block">{field}</label>
+                    <input type="number" step={field === "rating" ? "0.1" : "1"} id={field} value={formData[field]} onChange={handleChange} className="w-full p-2 bg-[#0f172a] rounded border border-slate-700" />
                   </div>
                 ))}
               </div>
 
-              <textarea id="shortDesc" value={formData.shortDesc} onChange={handleChange} placeholder="Short Description" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-14" />
-              <textarea id="longDesc" value={formData.longDesc} onChange={handleChange} placeholder="Long Detailed Description..." className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-24 text-slate-300" />
+              <textarea id="shortDesc" value={formData.shortDesc} onChange={handleChange} placeholder="Short Description" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 h-14" />
+              <textarea id="longDesc" value={formData.longDesc} onChange={handleChange} placeholder="Long Detailed Description..." className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 h-24" />
+
+              {/* RESTORED MISSING FIELDS BELOW */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold text-slate-500 uppercase">External Sources & Metadata</label>
+                <input type="text" id="src" value={formData.src} onChange={handleChange} placeholder="OR: Manual Image URL" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 text-xs" />
+                <textarea id="subImages" value={formData.subImages} onChange={handleChange} placeholder="Manual Gallery URLs (comma separated)" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 h-14 text-xs" />
+                <input type="text" id="tags" value={formData.tags} onChange={handleChange} placeholder="Tags (comma separated)" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 text-xs" />
+              </div>
 
               <div className="flex gap-2 pt-2">
-                <button 
-                  onClick={handleSubmit} 
-                  disabled={loading}
-                  className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-black py-4 rounded-xl transition-all shadow-xl uppercase disabled:bg-slate-600 active:scale-95"
-                >
-                  {loading ? (isEditing ? "Updating..." : "AI Cleaning...") : (isEditing ? "Update Item 🛠️" : "Deploy Item 🚀")}
+                <button onClick={handleSubmit} disabled={loading} className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-black py-4 rounded-xl shadow-xl uppercase disabled:bg-slate-600">
+                  {loading ? "Processing..." : isEditing ? "Update Item 🛠️" : "Deploy Item 🚀"}
                 </button>
                 {isEditing && (
-                  <button onClick={resetForm} className="bg-slate-700 hover:bg-slate-600 px-6 rounded-xl font-bold transition-colors">Cancel</button>
+                  <button onClick={resetForm} className="bg-slate-700 hover:bg-slate-600 px-6 rounded-xl font-bold">Cancel</button>
                 )}
               </div>
             </div>
@@ -292,46 +278,26 @@ export default function InventoryUpload() {
         {/* Inventory Section */}
         <div className="lg:col-span-7 space-y-6">
           <div className="bg-[#1e293b] p-6 rounded-2xl border border-slate-700 shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-400">Inventory Explorer</h2>
-              <span className="bg-yellow-500/10 px-3 py-1 rounded-full text-xs text-yellow-500 font-bold border border-yellow-500/20">{inventory.length} Assets</span>
-            </div>
-            
+            <h2 className="text-xl font-bold text-slate-400 mb-6">Inventory Explorer ({inventory.length} Items)</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[85vh] overflow-y-auto pr-2 custom-scrollbar">
-              {inventory.length > 0 ? (
-                inventory.map((item) => (
-                  <div key={item._id} className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 group hover:border-slate-600 transition-all">
-                    <div className={`w-full h-44 rounded-xl mb-3 overflow-hidden shadow-inner relative ${item.removeBg ? 'bg-white p-2' : 'bg-slate-800'}`}>
-                      <img 
-                        src={item.src} 
-                        alt={item.title} 
-                        className={`w-full h-full transition-transform duration-500 group-hover:scale-110 ${item.removeBg ? 'object-contain mix-blend-multiply' : 'object-cover'}`} 
-                      />
-                      {item.badge && (
-                        <span className="absolute top-2 left-2 bg-yellow-500 text-black text-[8px] font-black px-2 py-0.5 rounded-full uppercase">
-                          {item.badge}
-                        </span>
-                      )}
+              {inventory.map((item) => (
+                <div key={item._id} className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 group hover:border-slate-600 transition-all">
+                  <div className={`w-full h-44 rounded-xl mb-3 overflow-hidden relative ${item.removeBg ? 'bg-white p-2' : 'bg-slate-800'}`}>
+                    <img src={item.src} alt={item.title} className={`w-full h-full transition-all duration-500 ${item.removeBg ? 'object-contain mix-blend-multiply' : 'object-cover'}`} />
+                  </div>
+                  <h4 className="text-sm font-bold truncate text-slate-200">{item.title}</h4>
+                  <div className="flex justify-between items-center mt-3">
+                    <div className="flex flex-col">
+                      <span className="text-yellow-500 font-black text-sm">₹{item.finalPrice}</span>
+                      <span className="text-[10px] text-slate-500 uppercase">Stock: {item.stock}</span>
                     </div>
-
-                    <h4 className="text-sm font-bold truncate text-slate-200">{item.title}</h4>
-                    <div className="flex justify-between items-center mt-3">
-                      <div className="flex flex-col">
-                        <span className="text-yellow-500 font-black text-sm">₹{item.finalPrice}</span>
-                        <span className="text-[10px] text-slate-500 line-through">₹{item.originalPrice}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => startEdit(item)} className="p-2 bg-blue-500/10 text-blue-400 rounded-lg hover:bg-blue-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-tighter">Edit</button>
-                        <button onClick={() => deleteItem(item._id)} className="p-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all text-[9px] font-bold uppercase tracking-tighter">Delete</button>
-                      </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => startEdit(item)} className="p-2 bg-blue-500/10 text-blue-400 rounded-lg text-[9px] font-bold uppercase hover:bg-blue-500 hover:text-white transition-all">Edit</button>
+                      <button onClick={() => deleteItem(item._id)} className="p-2 bg-red-500/10 text-red-400 rounded-lg text-[9px] font-bold uppercase hover:bg-red-500 hover:text-white transition-all">Delete</button>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="col-span-2 text-center py-20 bg-slate-900/30 rounded-3xl border border-dashed border-slate-800">
-                  <p className="text-slate-600 italic">No assets found in this category.</p>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </div>
