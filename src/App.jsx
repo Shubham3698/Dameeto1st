@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 
 import About from "./pages/about";
 import Sticker from "./pages/Sticker";
@@ -24,23 +24,19 @@ import MemoryGame from './pages/MemoryGame';
 import { CartProvider } from "./contexAndhooks/CartProvider";
 import { CartContext } from "./contexAndhooks/CartContext";
 
-// ---------------- SIDEBAR COMPONENT (Tailwind) ----------------
+// ---------------- SIDEBAR COMPONENT ----------------
 const Sidebar = ({ isOpen, onClose, navigate }) => {
   return (
     <>
-      {/* Overlay Backdrop */}
       <div 
         className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[5000] transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
         onClick={onClose}
       />
-      
-      {/* Side Drawer */}
       <div className={`fixed top-0 right-0 h-full w-72 bg-white z-[5001] shadow-2xl transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'} p-6 flex flex-col`}>
         <div className="flex justify-between items-center border-b pb-4 mb-4">
           <h3 className="text-xl font-bold text-[#fe3d00]">Menu</h3>
           <button onClick={onClose} className="text-2xl text-gray-500 hover:text-black">✖</button>
         </div>
-
         <nav className="flex flex-col gap-2">
           {["Sticker", "Poster", "Learning Products", "Goodies", "About", "View Order", "Account"].map((item) => (
             <div 
@@ -79,18 +75,19 @@ function App() {
   const [fadeIn, setFadeIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isChecking, setIsChecking] = useState(false); // Naya logic: Screen Disable ke liye
 
   const location = useLocation();
   const navigate = useNavigate();
   const { isGlobalLoading } = useContext(CartContext);
 
+  // WAPAS ADD KIYA: Popups Logic
   const popupList = [
     { title: "🔥 Special Offer", text: "Buy 2 Stickers & Get 1 Free" },
     { title: "🚀 New Arrival", text: "Learning Products Now Available" },
     { title: "🎁 Combo Pack", text: "Special combo pack available!" },
     { title: "🎁 Free Delivery", text: "Free delivery on orders above ₹499" }
   ];
-
   const [popupIndex, setPopupIndex] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
 
@@ -114,6 +111,25 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // --- GAME CLICK HANDLER (Block Screen -> Check -> Open) ---
+  const handleGameClick = () => {
+    setIsChecking(true); // Screen block aur color change
+    setMenuOpen(false);
+
+    setTimeout(() => {
+      const isAuthenticated = localStorage.getItem("userEmail");
+      if (!isAuthenticated) {
+        toast.error("Please login first to play! 🎮", {
+          style: { border: '1px solid #fe3d00', padding: '16px', color: '#fe3d00', background: '#fff3eb' },
+        });
+        navigate("/account");
+      } else {
+        navigate("/memory-game");
+      }
+      setIsChecking(false); // Screen khol do
+    }, 1000); // 1 sec ka smooth delay
+  };
+
   const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game"];
   const isButtonHidden = hiddenRoutes.includes(location.pathname) || location.pathname.startsWith("/order/") || location.pathname.startsWith("/image/");
 
@@ -129,6 +145,14 @@ function App() {
   return (
     <div className={`bg-[#fff3eb] min-h-screen transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
       
+      {/* 🔥 SCREEN BLOCKER / BLUR OVERLAY */}
+      {isChecking && (
+        <div className="fixed inset-0 bg-[#fe3d00]/30 backdrop-blur-[3px] z-[30000] flex flex-col items-center justify-center transition-all">
+          <div className="w-14 h-14 border-4 border-white border-t-transparent rounded-full animate-spin" />
+          <p className="mt-4 text-white font-bold text-xl tracking-widest animate-pulse">CHECKING ACCESS...</p>
+        </div>
+      )}
+
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} navigate={navigate} />
 
       {isGlobalLoading && (
@@ -138,9 +162,10 @@ function App() {
         </div>
       )}
 
-      <Toaster position="top-center" containerStyle={{ zIndex: 30000 }} />
+      <Toaster position="top-center" containerStyle={{ zIndex: 40000 }} />
       <MNv />
 
+      {/* Popups Wapas Add Kar Diye */}
       {showPopup && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[10000] p-4">
           <div className="relative w-full max-w-sm bg-white p-8 rounded-2xl text-center shadow-2xl">
@@ -175,54 +200,41 @@ function App() {
         <Route path="*" element={<div className="text-center mt-24 text-2xl font-bold">404 - Not Found</div>} />
       </Routes>
 
-      {/* 🔥 CANDY FAB MENU (Tailwind) */}
-{/* 🔥 UPDATED SEQUENCE: CART -> HOME -> HAMBURGER */}
-{/* 🔥 UPDATED CANDY FAB MENU: MEMORY GAME -> HOME -> HAMBURGER */}
-{!isButtonHidden && (
-  <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[2000]">
-    
-    {/* 1. MEMORY GAME (Pehle yahan Cart tha) */}
-    <div 
-      onClick={() => { navigate("/memory-game"); setMenuOpen(false); }}
-      className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? '-translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
-    >
-      🎮
-    </div>
-
-    {/* 2. HOME (Top Center) */}
-    <div 
-      onClick={() => { navigate("/home"); setMenuOpen(false); }}
-      className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-y-[-110px] scale-100' : 'scale-0'}`}
-    >
-      🏠
-    </div>
-
-    {/* 3. HAMBURGER (Right Side) - Sidebar Open karega */}
-    <div 
-      onClick={() => { setIsSidebarOpen(true); setMenuOpen(false); }}
-      className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
-    >
-      <div className="flex flex-col gap-1">
-        <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-        <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-        <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-      </div>
-    </div>
-
-    {/* Main FAB (Candy Box) */}
-    <button 
-      onClick={() => setMenuOpen(!menuOpen)}
-      className="w-16 h-16 bg-[#fe3d00] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(254,61,0,0.5)] transition-transform active:scale-90"
-    >
-      <div className="grid grid-cols-2 gap-1.5 transition-transform duration-300">
-        <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 translate-x-1.5 translate-y-1.5' : ''}`} />
-        <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 -translate-x-1.5 translate-y-1.5' : ''}`} />
-        <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 translate-x-1.5 -translate-y-1.5' : ''}`} />
-        <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 -translate-x-1.5 -translate-y-1.5' : ''}`} />
-      </div>
-    </button>
-  </div>
-)}
+      {/* FAB MENU */}
+      {!isButtonHidden && (
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[2000]">
+          <div 
+            onClick={handleGameClick}
+            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? '-translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
+          >
+            🎮
+          </div>
+          <div 
+            onClick={() => { navigate("/home"); setMenuOpen(false); }}
+            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-y-[-110px] scale-100' : 'scale-0'}`}
+          >
+            🏠
+          </div>
+          <div 
+            onClick={() => { setIsSidebarOpen(true); setMenuOpen(false); }}
+            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
+          >
+            <div className="flex flex-col gap-1">
+              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+            </div>
+          </div>
+          <button onClick={() => setMenuOpen(!menuOpen)} className="w-16 h-16 bg-[#fe3d00] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(254,61,0,0.5)] transition-transform active:scale-90">
+            <div className="grid grid-cols-2 gap-1.5 transition-transform duration-300">
+              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 translate-x-1.5 translate-y-1.5' : ''}`} />
+              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 -translate-x-1.5 translate-y-1.5' : ''}`} />
+              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 translate-x-1.5 -translate-y-1.5' : ''}`} />
+              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 -translate-x-1.5 -translate-y-1.5' : ''}`} />
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

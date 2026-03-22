@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast"; // 1. Toast import kiya
 import StickerAdmin from "../components/StickerAdmin"; 
 
 const MemoryGame = () => {
@@ -23,7 +24,25 @@ const MemoryGame = () => {
   const [currentTheme, setCurrentTheme] = useState("");
   const [userCredits, setUserCredits] = useState(0);
 
-  // 1. Fetch User Current Credits (Fixing the 404 issue)
+  // --- LOGIN CHECK LOGIC (Naya Add Kiya) ---
+  useEffect(() => {
+    if (!email) {
+      toast.error("Please login first to play! 🎮", {
+        duration: 3000,
+        style: {
+          border: '1px solid #fe3d00',
+          padding: '16px',
+          color: '#fe3d00',
+          background: '#fff3eb',
+        },
+      });
+      // Thoda wait karke redirect karenge taaki toast dikh jaye
+      const timer = setTimeout(() => navigate("/account"), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [email, navigate]);
+
+  // 1. Fetch User Current Credits
   const fetchUserCredits = useCallback(async () => {
     if (!email) return;
     try {
@@ -44,18 +63,17 @@ const MemoryGame = () => {
         setCurrentTheme(data.categoryName || "Dameeto Special");
         const urls = data.stickers.map(s => s.url);
         
-        // 12 stickers ko double karke 24 cards banana aur shuffle karna
         const generated = [...urls, ...urls]
           .sort(() => Math.random() - 0.5)
           .map((imgUrl, index) => ({ id: index, imgUrl }));
         
         setCards(generated);
       } else {
-        alert("No stickers found! Please upload from Admin.");
+        toast.error("No stickers found! Please upload from Admin.");
       }
     } catch (e) { 
       console.error("Game init error:", e);
-      alert("Backend connection failed!");
+      toast.error("Backend connection failed!");
     } finally { 
       setLoading(false); 
       setSolved([]); 
@@ -69,9 +87,11 @@ const MemoryGame = () => {
   }, [API_BASE_URL]);
 
   useEffect(() => { 
-    initializeGame(); 
-    fetchUserCredits();
-  }, [initializeGame, fetchUserCredits]);
+    if (email) { // Sirf tabhi load kare jab email ho
+      initializeGame(); 
+      fetchUserCredits();
+    }
+  }, [initializeGame, fetchUserCredits, email]);
 
   // Stats Logic
   const accuracy = useMemo(() => moves <= 12 ? 100 : Math.max(10, Math.round((12 / moves) * 100)), [moves]);
@@ -126,7 +146,10 @@ const MemoryGame = () => {
         body: JSON.stringify({ email, credits: calculatedCredits })
       });
       const data = await res.json();
-      if(data.success) navigate("/account");
+      if(data.success) {
+        toast.success(`🪙 ${calculatedCredits} Credits added to your wallet!`);
+        navigate("/account");
+      }
     } catch (e) { console.error(e); }
   };
 
