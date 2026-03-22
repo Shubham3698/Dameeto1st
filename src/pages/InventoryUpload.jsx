@@ -27,7 +27,7 @@ export default function InventoryUpload() {
     badge: "Hot",
     subImages: "", 
     tags: "",
-    removeBg: false, // 🔥 NEW: Toggle for background removal
+    removeBg: false, 
   });
 
   const loadInventory = async () => {
@@ -100,14 +100,42 @@ export default function InventoryUpload() {
     setLoading(true);
     try {
       const dataToSend = new FormData();
+      
+      // 1. Check for AI Background Removal on Main Image
+      const mainFileObj = tempFiles.find(f => f.role === "main");
+      let mainFileToUpload = mainFileObj ? mainFileObj.file : null;
+
+      if (formData.removeBg && mainFileToUpload) {
+        console.log("AI: Removing Background...");
+        const aiFormData = new FormData();
+        aiFormData.append("image_file", mainFileToUpload);
+        aiFormData.append("size", "auto");
+
+        const aiRes = await fetch("https://api.remove.bg/v1.0/removebg", {
+          method: "POST",
+          headers: { "X-Api-Key": "RXuK8dw7KH4zrFWZA1FYj3f6" }, // 👈 Your API Key
+          body: aiFormData,
+        });
+
+        if (aiRes.ok) {
+          const blob = await aiRes.blob();
+          mainFileToUpload = new File([blob], "cleaned_image.png", { type: "image/png" });
+          console.log("AI: Background Cleaned!");
+        } else {
+          console.error("AI Error:", await aiRes.json());
+          alert("AI Background removal failed. Uploading original instead.");
+        }
+      }
+
+      // 2. Append Form Data
       Object.keys(formData).forEach((key) => {
         if (key !== "id") dataToSend.append(key, formData[key]);
       });
 
-      const mainFile = tempFiles.find(f => f.role === "main");
+      // 3. Append Files
+      if (mainFileToUpload) dataToSend.append("image", mainFileToUpload);
+      
       const subFiles = tempFiles.filter(f => f.role === "sub");
-
-      if (mainFile) dataToSend.append("image", mainFile.file);
       subFiles.forEach((f) => dataToSend.append("subImages", f.file));
 
       const endpoint = formData.id ? `${API}/update/${formData.id}` : `${API}/add`;
@@ -116,11 +144,16 @@ export default function InventoryUpload() {
       const res = await fetch(endpoint, { method, body: dataToSend });
       const result = await res.json();
       if (result.success) {
-        alert("Success!");
+        alert(formData.id ? "Updated!" : "Success!");
         resetForm();
         loadInventory();
       }
-    } catch (err) { console.error(err); } finally { setLoading(false); }
+    } catch (err) { 
+      console.error(err); 
+      alert("Submission failed. Check console.");
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   const startEdit = (item) => {
@@ -166,7 +199,6 @@ export default function InventoryUpload() {
               <h1 className="text-2xl font-black text-yellow-500 uppercase tracking-tight">
                 {isEditing ? "Edit Item 🛠️" : "New Entry 🚀"}
               </h1>
-              {/* 🔥 REMOVE BG TOGGLE UI */}
               <label className="flex items-center gap-2 cursor-pointer group">
                 <span className="text-[10px] font-bold text-slate-400 group-hover:text-yellow-500 transition-colors uppercase">Clean BG</span>
                 <input 
@@ -181,7 +213,7 @@ export default function InventoryUpload() {
             <div className="space-y-4 text-sm">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Page</label>
-                <select id="pageType" value={formData.pageType} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none focus:ring-1 focus:ring-yellow-500 transition-all">
+                <select id="pageType" value={formData.pageType} onChange={handleChange} className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none focus:ring-1 focus:ring-yellow-500 transition-all text-slate-300">
                   <option value="trendingData">Trending (tr-)</option>
                   <option value="stickerData">Stickers (st-)</option>
                   <option value="posterData">Posters (pos-)</option>
@@ -197,17 +229,16 @@ export default function InventoryUpload() {
                   <div className="grid grid-cols-3 gap-2 mt-4">
                     {tempFiles.map((item, index) => (
                       <div key={index} className={`relative p-1 rounded-lg border bg-white overflow-hidden ${item.role === 'main' ? 'border-yellow-500 ring-1 ring-yellow-500' : 'border-slate-200'}`}>
-                        {/* 🔥 PREVIEW WITH CONDITIONAL BG REMOVAL */}
                         <img 
                           src={item.preview} 
-                          className={`h-16 w-full object-contain ${formData.removeBg ? 'mix-blend-multiply' : ''}`} 
+                          className={`h-16 w-full object-contain ${formData.removeBg && item.role === 'main' ? 'mix-blend-multiply brightness-110 contrast-110' : ''}`} 
                           alt="p" 
                         />
                         <div className="flex flex-col gap-1 mt-1">
                           <button onClick={() => setRole(index, 'main')} className={`text-[7px] p-1 font-bold rounded ${item.role === 'main' ? 'bg-yellow-500 text-black' : 'bg-slate-200 text-slate-700'}`}>
                             {item.role === 'main' ? 'MAIN' : 'SET MAIN'}
                           </button>
-                          <button onClick={() => removeFile(index)} className="text-[7px] p-1 bg-red-50 text-red-500 rounded font-bold">REMOVE</button>
+                          <button onClick={() => removeFile(index)} className="text-[7px] p-1 bg-red-50 text-red-500 rounded font-bold uppercase">Remove</button>
                         </div>
                       </div>
                     ))}
@@ -240,7 +271,7 @@ export default function InventoryUpload() {
               </div>
 
               <textarea id="shortDesc" value={formData.shortDesc} onChange={handleChange} placeholder="Short Description" className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-14" />
-              <textarea id="longDesc" value={formData.longDesc} onChange={handleChange} placeholder="Long Detailed Description..." className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-24" />
+              <textarea id="longDesc" value={formData.longDesc} onChange={handleChange} placeholder="Long Detailed Description..." className="w-full p-3 bg-[#0f172a] rounded-lg border border-slate-700 outline-none h-24 text-slate-300" />
 
               <div className="flex gap-2 pt-2">
                 <button 
@@ -248,7 +279,7 @@ export default function InventoryUpload() {
                   disabled={loading}
                   className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-black py-4 rounded-xl transition-all shadow-xl uppercase disabled:bg-slate-600 active:scale-95"
                 >
-                  {loading ? "Saving..." : isEditing ? "Update Item 🛠️" : "Deploy Item 🚀"}
+                  {loading ? (isEditing ? "Updating..." : "AI Cleaning...") : (isEditing ? "Update Item 🛠️" : "Deploy Item 🚀")}
                 </button>
                 {isEditing && (
                   <button onClick={resetForm} className="bg-slate-700 hover:bg-slate-600 px-6 rounded-xl font-bold transition-colors">Cancel</button>
@@ -270,8 +301,7 @@ export default function InventoryUpload() {
               {inventory.length > 0 ? (
                 inventory.map((item) => (
                   <div key={item._id} className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 group hover:border-slate-600 transition-all">
-                    {/* 🔥 LIST DISPLAY WITH CONDITIONAL BG REMOVAL */}
-                    <div className={`w-full h-44 rounded-xl mb-3 overflow-hidden shadow-inner relative ${item.removeBg ? 'bg-white' : 'bg-slate-800'}`}>
+                    <div className={`w-full h-44 rounded-xl mb-3 overflow-hidden shadow-inner relative ${item.removeBg ? 'bg-white p-2' : 'bg-slate-800'}`}>
                       <img 
                         src={item.src} 
                         alt={item.title} 
