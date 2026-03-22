@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
+// 1. Toast library import ki gayi
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Nwmasonry({ images = [], categoryName }) {
   const navigate = useNavigate();
@@ -22,6 +24,9 @@ export default function Nwmasonry({ images = [], categoryName }) {
   const [isHolding, setIsHolding] = useState(false);
   const lastTapRef = useRef(0);
   const holdTimer = useRef(null);
+
+  // 2. Multi-click tracking ke liye Set (Unique IDs store karne ke liye)
+  const clickedStickers = useRef(new Set());
 
   useLayoutEffect(() => {
     const withRandom = images.map((item) => ({
@@ -172,6 +177,9 @@ export default function Nwmasonry({ images = [], categoryName }) {
       className="h-screen w-full overflow-y-auto bg-[#fff3eb] py-4 no-scrollbar"
       style={{ perspective: "1000px" }}
     >
+      {/* 3. Toaster container yahan add kiya */}
+      <Toaster position="bottom-center" reverseOrder={false} />
+
       <div className="grid grid-cols-2 gap-3 px-4 md:grid-cols-3 lg:grid-cols-4">
         {loopImages.map((item, i) => {
           const floatOffset = scrollY * item.depth * 0.006;
@@ -220,8 +228,30 @@ export default function Nwmasonry({ images = [], categoryName }) {
 
                   if (now - lastTapRef.current < 300) {
                     handleClick(item);
+                    // Reset counter when they actually double tap
+                    clickedStickers.current.clear();
                   } else {
                     setTouchIndex(i);
+
+                    // 4. Logic: Har 3 alag stickers click hone par baar-baar toast dikhao
+                    clickedStickers.current.add(item.id || i);
+                    
+                    if (clickedStickers.current.size >= 3) {
+                      toast.dismiss(); // Purane toast hatao naya dikhane se pehle
+                      toast("Double tap on sticker to view more about sticker!", {
+                        icon: '✨',
+                        duration: 3000,
+                        style: {
+                          borderRadius: '12px',
+                          background: '#333',
+                          color: '#fff',
+                          fontSize: '14px',
+                          fontWeight: '500'
+                        },
+                      });
+                      // Reset counter so it shows again after next 3 unique clicks
+                      clickedStickers.current.clear();
+                    }
                   }
 
                   lastTapRef.current = now;
