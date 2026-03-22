@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react"; // 🔹 useContext add kiya
-import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast"; // 🔹 Toaster import kiya
+import React, { useState, useEffect, useContext } from "react";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import About from "./pages/about";
 import Sticker from "./pages/Sticker";
@@ -22,14 +22,45 @@ import AdminOrders from "./pages/AdminOrders";
 import MemoryGame from './pages/MemoryGame';
 
 import { CartProvider } from "./contexAndhooks/CartProvider";
-import { CartContext } from "./contexAndhooks/CartContext"; // 🔹 Context import kiya
+import { CartContext } from "./contexAndhooks/CartContext";
 
-// ---------------- PROTECTED ROUTE COMPONENT ----------------
+// ---------------- SIDEBAR COMPONENT (Tailwind) ----------------
+const Sidebar = ({ isOpen, onClose, navigate }) => {
+  return (
+    <>
+      {/* Overlay Backdrop */}
+      <div 
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[5000] transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+        onClick={onClose}
+      />
+      
+      {/* Side Drawer */}
+      <div className={`fixed top-0 right-0 h-full w-72 bg-white z-[5001] shadow-2xl transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'} p-6 flex flex-col`}>
+        <div className="flex justify-between items-center border-b pb-4 mb-4">
+          <h3 className="text-xl font-bold text-[#fe3d00]">Menu</h3>
+          <button onClick={onClose} className="text-2xl text-gray-500 hover:text-black">✖</button>
+        </div>
+
+        <nav className="flex flex-col gap-2">
+          {["Sticker", "Poster", "Learning Products", "Goodies", "About", "View Order", "Account"].map((item) => (
+            <div 
+              key={item}
+              onClick={() => { navigate(`/${item.toLowerCase().replace(" ", "-")}`); onClose(); }}
+              className="p-3 text-lg font-medium text-gray-700 hover:bg-[#fff3eb] hover:text-[#fe3d00] rounded-xl cursor-pointer transition-all"
+            >
+              {item}
+            </div>
+          ))}
+        </nav>
+      </div>
+    </>
+  );
+};
+
+// ---------------- PROTECTED ROUTE ----------------
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem("userEmail"); 
-  if (!isAuthenticated) {
-    return <Navigate to="/account" replace />;
-  }
+  if (!isAuthenticated) return <Navigate to="/account" replace />;
   return children;
 };
 
@@ -46,18 +77,17 @@ function AppWrapper() {
 function App() {
   const [loading, setLoading] = useState(true);
   const [fadeIn, setFadeIn] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  // 🔹 Global Loading State nikala context se
   const { isGlobalLoading } = useContext(CartContext);
 
-  // ---------------- POPUP SYSTEM ----------------
   const popupList = [
     { title: "🔥 Special Offer", text: "Buy 2 Stickers & Get 1 Free" },
     { title: "🚀 New Arrival", text: "Learning Products Now Available" },
-    { title: "🎁 Combo Pack", text: "Special combo pack available — Stickers + Learning Books together at a better price!" },
+    { title: "🎁 Combo Pack", text: "Special combo pack available!" },
     { title: "🎁 Free Delivery", text: "Free delivery on orders above ₹499" }
   ];
 
@@ -66,22 +96,16 @@ function App() {
 
   useEffect(() => {
     if (!loading) {
-      const timer = setTimeout(() => {
-        setShowPopup(true);
-      }, 5000);
+      const timer = setTimeout(() => setShowPopup(true), 5000);
       return () => clearTimeout(timer);
     }
   }, [loading]);
 
   const closePopup = () => {
-    if (popupIndex < popupList.length - 1) {
-      setPopupIndex(popupIndex + 1);
-    } else {
-      setShowPopup(false);
-    }
+    if (popupIndex < popupList.length - 1) setPopupIndex(popupIndex + 1);
+    else setShowPopup(false);
   };
 
-  // ---------------- LOADING ----------------
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -90,71 +114,46 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // ---------------- FLOATING BTN LOGIC ----------------
   const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game"];
-  const isButtonHidden =
-    hiddenRoutes.includes(location.pathname) ||
-    location.pathname.startsWith("/order/") ||
-    location.pathname.startsWith("/image/");
+  const isButtonHidden = hiddenRoutes.includes(location.pathname) || location.pathname.startsWith("/order/") || location.pathname.startsWith("/image/");
 
   if (loading) {
     return (
-      <div style={loadingStyles}>
+      <div className="flex flex-col justify-center items-center h-screen bg-[#fff3eb] text-[#fe3d00] text-3xl">
         Loading...
-        <div style={spinnerStyles} />
-        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        <div className="mt-4 w-12 h-12 border-4 border-[#fe3d00] border-t-[#fff3eb] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        background: "#fff3eb",
-        minHeight: "100vh",
-        opacity: fadeIn ? 1 : 0,
-        transition: "opacity 0.8s ease-in",
-        position: "relative",
-      }}
-    >
-      {/* 🔹 GLOBAL OVERLAY: Pehle Overlay (zIndex: 20000) */}
+    <div className={`bg-[#fff3eb] min-h-screen transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
+      
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} navigate={navigate} />
+
       {isGlobalLoading && (
-        <div style={globalOverlayStyles}>
-          <div style={spinnerStyles} />
-          <p style={{ marginTop: "15px", color: "#fe3d00", fontWeight: "bold" }}>Opening Cart...</p>
+        <div className="fixed inset-0 bg-[#fff3eb]/70 backdrop-blur-md flex flex-col justify-center items-center z-[20000]">
+          <div className="w-12 h-12 border-4 border-[#fe3d00] border-t-transparent rounded-full animate-spin" />
+          <p className="mt-4 text-[#fe3d00] font-bold">Opening Cart...</p>
         </div>
       )}
 
-      {/* 🔹 TOASTER: Overlay ke baad taaki ye sabse upar chamke (zIndex: 30000) */}
-      <Toaster 
-        position="top-center" 
-        reverseOrder={false} 
-        containerStyle={{ zIndex: 30000 }} 
-      />
-
+      <Toaster position="top-center" containerStyle={{ zIndex: 30000 }} />
       <MNv />
 
-      {/* ---------- POPUP ---------- */}
       {showPopup && (
-        <div style={popupOverlay}>
-          <div style={popupCard}>
-            <button style={popupClose} onClick={closePopup}>✖</button>
-            <h2>{popupList[popupIndex].title}</h2>
-            <p>{popupList[popupIndex].text}</p>
-            <button
-              style={popupBtn}
-              onClick={() => {
-                navigate("/home");
-                setShowPopup(false);
-              }}
-            >
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[10000] p-4">
+          <div className="relative w-full max-w-sm bg-white p-8 rounded-2xl text-center shadow-2xl">
+            <button className="absolute right-4 top-4 text-xl" onClick={closePopup}>✖</button>
+            <h2 className="text-2xl font-bold mb-2">{popupList[popupIndex].title}</h2>
+            <p className="text-gray-600 mb-6">{popupList[popupIndex].text}</p>
+            <button className="bg-[#fe3d00] text-white px-8 py-2 rounded-lg font-bold" onClick={() => { navigate("/home"); setShowPopup(false); }}>
               Explore
             </button>
           </div>
         </div>
       )}
 
-      {/* ---------- ROUTES ---------- */}
       <Routes>
         <Route path="/" element={<Trending />} />
         <Route path="/home" element={<HomePage />} />
@@ -169,58 +168,55 @@ function App() {
         <Route path="/inventory" element={<InventoryUpload />} />
         <Route path="/admin-orders" element={<AdminOrders />} />
         <Route path="/search" element={<SearchPage />} />
-        <Route 
-          path="/memory-game" 
-          element={
-            <ProtectedRoute>
-              <MemoryGame />
-            </ProtectedRoute>
-          } 
-        />
+        <Route path="/memory-game" element={<ProtectedRoute><MemoryGame /></ProtectedRoute>} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/view-order" element={<ViewOrders />} />
         <Route path="/order/:id" element={<OrderDetails />} />
-        <Route path="*" element={<div style={{ textAlign: "center", marginTop: "100px" }}><h2>404 - Not Found</h2></div>} />
+        <Route path="*" element={<div className="text-center mt-24 text-2xl font-bold">404 - Not Found</div>} />
       </Routes>
 
-      {/* ---------- FLOATING BUTTON ---------- */}
+      {/* 🔥 CANDY FAB MENU (Tailwind) */}
       {!isButtonHidden && (
-        <Link
-          to="/home"
-          style={floatingBtnStyle}
-          onMouseEnter={(e) => { e.currentTarget.style.transform = "translateX(-50%) scale(1.1)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.transform = "translateX(-50%) scale(1)"; }}
-        >
-          🏠
-        </Link>
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[2000]">
+          
+          {/* Sub Buttons */}
+          <div 
+            onClick={() => { navigate("/home"); setMenuOpen(false); }}
+            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? '-translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
+          >🏠</div>
+
+          <div 
+            onClick={() => { navigate("/cart"); setMenuOpen(false); }}
+            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-y-[-110px] scale-100' : 'scale-0'}`}
+          >🛒</div>
+
+          <div 
+            onClick={() => { setIsSidebarOpen(true); setMenuOpen(false); }}
+            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
+          >
+            <div className="flex flex-col gap-1">
+              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
+            </div>
+          </div>
+
+          {/* Main Candy Box FAB */}
+          <button 
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="w-16 h-16 bg-[#fe3d00] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(254,61,0,0.5)] transition-transform active:scale-90"
+          >
+            <div className="grid grid-cols-2 gap-1.5 transition-transform duration-300">
+              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 translate-x-1.5 translate-y-1.5' : ''}`} />
+              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 -translate-x-1.5 translate-y-1.5' : ''}`} />
+              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? '-rotate-45 translate-x-1.5 -translate-y-1.5' : ''}`} />
+              <div className={`w-2 h-2 bg-white rounded-sm transition-all ${menuOpen ? 'rotate-45 -translate-x-1.5 -translate-y-1.5' : ''}`} />
+            </div>
+          </button>
+        </div>
       )}
     </div>
   );
 }
-
-// ---------------- NEW: GLOBAL OVERLAY STYLE ----------------
-const globalOverlayStyles = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(255, 243, 235, 0.7)", 
-  backdropFilter: "blur(5px)", 
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 20000, 
-  cursor: "wait",
-};
-
-// ---------------- POPUP STYLE ----------------
-const popupOverlay = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 10000 };
-const popupCard = { width: "320px", background: "white", padding: "25px", borderRadius: "14px", textAlign: "center", position: "relative", boxShadow: "0 20px 40px rgba(0,0,0,0.25)" };
-const popupClose = { position: "absolute", right: "12px", top: "10px", border: "none", background: "none", fontSize: "18px", cursor: "pointer" };
-const popupBtn = { marginTop: "15px", padding: "10px 18px", background: "#fe3d00", border: "none", borderRadius: "8px", color: "white", cursor: "pointer" };
-
-// ---------------- EXISTING STYLES ----------------
-const loadingStyles = { display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#fff3eb", fontSize: "28px", fontWeight: "700", color: "#fe3d00", flexDirection: "column", gap: "20px" };
-const spinnerStyles = { width: "50px", height: "50px", border: "5px solid #fe3d00", borderTop: "5px solid #fff3eb", borderRadius: "50%", animation: "spin 1s linear infinite" };
-const floatingBtnStyle = { position: "fixed", bottom: "40px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#fe3d00", color: "white", width: "60px", height: "60px", borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", textDecoration: "none", fontSize: "24px", boxShadow: "0px 4px 20px rgba(254, 61, 0, 0.4)", zIndex: 1000, transition: "all 0.3s ease" };
 
 export default AppWrapper;

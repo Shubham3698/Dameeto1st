@@ -118,7 +118,7 @@ export default function BottomMenu({ items }) {
           whiteSpace: "nowrap",
           alignItems: "center",
           paddingLeft: "8px",
-          zIndex: 9998,
+          zIndex: 2,
           transition: "transform 0.3s ease",
           transform: show ? "translateY(0)" : "translateY(-100%)",
         }}
