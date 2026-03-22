@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth"; 
 import { 
   RecaptchaVerifier, 
   signInWithPhoneNumber, 
@@ -12,6 +13,8 @@ import {
 export default function SignInModal({ onClose }) {
   const [isLogin, setIsLogin] = useState(false);
   const [isPhoneLogin, setIsPhoneLogin] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 🔥 UX: Toggle Password
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,207 +30,192 @@ export default function SignInModal({ onClose }) {
   const [success, setSuccess] = useState(""); 
   const [loading, setLoading] = useState(false);
 
-  // 🔥 DYNAMIC API URL (Local vs Production)
   const API_BASE_URL = window.location.hostname === "localhost" 
     ? "http://localhost:3000" 
     : "https://serdeptry1st.onrender.com";
 
   useEffect(() => {
+    let interval;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        setIsVerifying(false);
+        if (interval) clearInterval(interval);
+        return;
+      }
+      if (user && isVerifying && !isLogin && !isPhoneLogin) {
+        interval = setInterval(async () => {
+          try {
+            await user.reload();
+            if (user.emailVerified) {
+              clearInterval(interval);
+              setIsVerifying(false);
+              const res = await fetch(`${API_BASE_URL}/api/users/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: user.email }),
+              });
+              const data = await res.json();
+              if (res.ok) {
+                localStorage.setItem("userEmail", data.email);
+                localStorage.setItem("userName", data.name);
+                window.location.href = "/account";
+              }
+            }
+          } catch (err) {
+            console.error("Verification error:", err);
+          }
+        }, 3000);
+      }
+    });
     return () => {
+      unsubscribe();
+      if (interval) clearInterval(interval);
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
         window.recaptchaVerifier = null;
       }
     };
-  }, []);
+  }, [isVerifying, isLogin, isPhoneLogin, API_BASE_URL]);
 
-  // --- FORGOT PASSWORD LOGIC ---
   const handleForgotPassword = async () => {
-    if (!email) {
-      setError("Please enter your email address first.");
-      return;
-    }
+    if (!email) { setError("Please enter your email address first."); return; }
     try {
       setLoading(true);
       await sendPasswordResetEmail(auth, email);
       setSuccess("Password reset link sent! Check your inbox.");
       setError("");
-    } catch (err) {
-      setError("Reset error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError("Reset error: " + err.message); } finally { setLoading(false); }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
-
-    if (!email || !password) {
-      setError("Email & password are required");
-      setLoading(false);
-      return;
-    }
-
+    setError(""); setSuccess(""); setLoading(true);
+    if (!email || !password) { setError("Email & password are required"); setLoading(false); return; }
     if (!isLogin) {
       if (!name) { setError("Name is required"); setLoading(false); return; }
       if (email !== confirmEmail) { setError("Emails do not match"); setLoading(false); return; }
       if (password !== confirmPassword) { setError("Passwords do not match"); setLoading(false); return; }
       if (password.length < 6) { setError("Password: Min 6 characters"); setLoading(false); return; }
     }
-
     try {
       let userCredential;
-
       if (!isLogin) {
-        // 1. Firebase Signup
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        
-        // 2. Send Verification Email
         await sendEmailVerification(userCredential.user);
-        
-        // 3. Sync with MongoDB
         const res = await fetch(`${API_BASE_URL}/api/users/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            name, 
-            email, 
-            password, 
-            firebaseUid: userCredential.user.uid 
-          }),
+          body: JSON.stringify({ name, email, password, firebaseUid: userCredential.user.uid }),
         });
-
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.message || "Backend sync failed");
-        }
-        
-        setSuccess("Verification email sent! Please check your inbox.");
+        if (!res.ok) { const data = await res.json(); throw new Error(data.message || "Backend sync failed"); }
+        setSuccess("Verification email sent! Auto-redirecting after verification...");
+        setIsVerifying(true);
         setLoading(false);
       } else {
-        // 4. LOGIN FLOW
         userCredential = await signInWithEmailAndPassword(auth, email, password);
-        
-        // 5. Check if Verified
-        if (!userCredential.user.emailVerified) {
-          setError("Please verify your email first. Check your inbox.");
-          setLoading(false);
-          return;
-        }
-
-        // 6. Backend Login Check
+        if (!userCredential.user.emailVerified) { setError("Please verify your email first."); setLoading(false); return; }
         const res = await fetch(`${API_BASE_URL}/api/users/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
         });
-
         const data = await res.json();
         if (res.ok) {
           localStorage.setItem("userEmail", data.email);
           localStorage.setItem("userName", data.name);
           window.location.href = "/account";
-        } else {
-          setError(data.message || "Login failed");
-        }
+        } else { setError(data.message || "Login failed"); }
       }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError(err.message); } finally { setLoading(false); }
   };
 
-  // --- OTP LOGIC ---
   const sendOtp = async () => {
     try {
-      setLoading(true);
-      setError("");
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
-      }
+      setLoading(true); setError("");
+      if (!window.recaptchaVerifier) { window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" }); }
       const formattedPhone = phone.startsWith("+") ? phone : "+91" + phone;
       const result = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
       setConfirmation(result);
       setLoading(false);
-    } catch (err) {
-      setLoading(false);
-      setError(err.message);
-    }
+    } catch (err) { setLoading(false); setError(err.message); }
   };
 
   const verifyOtp = async () => {
     try {
-      setLoading(true);
-      setError("");
+      setLoading(true); setError("");
       const result = await confirmation.confirm(otp);
+      await fetch(`${API_BASE_URL}/api/users/signup`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Phone User", email: result.user.phoneNumber + "@phone.com", password: "phone_login_no_password", firebaseUid: result.user.uid }),
+      });
+      await fetch(`${API_BASE_URL}/api/users/login`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: result.user.phoneNumber + "@phone.com" }),
+      });
       localStorage.setItem("userPhone", result.user.phoneNumber);
       window.location.href = "/account";
-    } catch {
-      setLoading(false);
-      setError("Invalid OTP");
-    }
+    } catch (err) { setLoading(false); setError("Invalid OTP or Sync Failed"); }
   };
 
+  const inputClass = "w-full p-3 mb-2.5 rounded-xl border border-gray-100 text-sm outline-none focus:border-orange-500 transition-colors bg-white";
+
   return (
-    <div style={overlayStyle}>
-      <div style={modalStyle}>
-        <h2 style={headingStyle}>
+    <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-[9999] backdrop-blur-[4px] p-4">
+      <div className="bg-white w-full max-w-[400px] p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[95vh]">
+        <h2 className="text-center mb-6 font-bold text-2xl text-gray-800">
           {isPhoneLogin ? "Phone Login" : isLogin ? "Welcome Back" : "Create Account"}
         </h2>
 
-        {error && <p style={errorStyle}>{error}</p>}
-        {success && <p style={successStyle}>{success}</p>}
+        {error && <p className="text-red-500 text-sm mb-4 text-center bg-red-50 p-3 rounded-xl border border-red-100">{error}</p>}
+        {success && <p className="text-green-600 text-sm mb-4 text-center bg-green-50 p-3 rounded-xl border border-green-100">{success}</p>}
 
-        <div style={switchWrapper}>
-          <button type="button" onClick={() => { setIsPhoneLogin(false); setError(""); setSuccess(""); }} style={{...switchBtn, ...(!isPhoneLogin ? activeSwitch : {})}}>Email</button>
-          <button type="button" onClick={() => { setIsPhoneLogin(true); setError(""); setSuccess(""); }} style={{...switchBtn, ...(isPhoneLogin ? activeSwitch : {})}}>Phone</button>
+        <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+          <button type="button" onClick={() => { setIsPhoneLogin(false); setIsVerifying(false); setError(""); setSuccess(""); }} 
+            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${!isPhoneLogin ? 'bg-[#fe3d00] text-white shadow-md' : 'text-gray-500'}`}>Email</button>
+          <button type="button" onClick={() => { setIsPhoneLogin(true); setIsVerifying(false); setError(""); setSuccess(""); }} 
+            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${isPhoneLogin ? 'bg-[#fe3d00] text-white shadow-md' : 'text-gray-500'}`}>Phone</button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          {!isPhoneLogin && (
+        <form onSubmit={handleSubmit} className="space-y-1">
+          {!isPhoneLogin ? (
             <>
-              {!isLogin && <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />}
-              <input placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
-              {!isLogin && <input placeholder="Confirm Email" value={confirmEmail} onChange={(e) => setConfirmEmail(e.target.value)} style={inputStyle} />}
-              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} />
-              {!isLogin && <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={inputStyle} />}
+              {!isLogin && <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />}
+              <input placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+              {!isLogin && <input placeholder="Confirm Email" value={confirmEmail} onChange={(e) => setConfirmEmail(e.target.value)} className={inputClass} />}
               
-              <button type="submit" style={primaryBtn} disabled={loading}>
-                {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up & Verify"}
+              <div className="relative">
+                <input type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-gray-400 text-xs font-bold uppercase">{showPassword ? "Hide" : "Show"}</button>
+              </div>
+
+              {!isLogin && <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />}
+              
+              <button type="submit" disabled={loading} className="w-full p-3.5 bg-gradient-to-r from-[#fe3d00] to-[#ff6a00] text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all flex justify-center items-center gap-2">
+                {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>}
+                {loading ? "Processing..." : isLogin ? "Login Now" : "Register & Verify"}
               </button>
 
-              {isLogin && (
-                <p style={forgotText} onClick={handleForgotPassword}>
-                  Forgot Password?
-                </p>
-              )}
+              {isLogin && <p className="text-center text-gray-400 text-xs cursor-pointer pt-2 hover:text-orange-500 transition-colors" onClick={handleForgotPassword}>Forgot Password?</p>}
             </>
-          )}
-
-          {isPhoneLogin && (
+          ) : (
             <>
-              <input placeholder="Enter Phone (e.g. 9876543210)" value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} disabled={!!confirmation} />
+              <input placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} disabled={!!confirmation} />
               {!confirmation ? (
-                <button type="button" onClick={sendOtp} style={primaryBtn} disabled={loading}>Send OTP</button>
+                <button type="button" onClick={sendOtp} disabled={loading} className="w-full p-3.5 bg-gradient-to-r from-[#fe3d00] to-[#ff6a00] text-white font-bold rounded-xl shadow-lg">Send OTP</button>
               ) : (
                 <>
-                  <input placeholder="6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} style={inputStyle} />
-                  <button type="button" onClick={verifyOtp} style={primaryBtn} disabled={loading}>Verify OTP</button>
+                  <input placeholder="6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} className={inputClass} />
+                  <button type="button" onClick={verifyOtp} disabled={loading} className="w-full p-3.5 bg-gradient-to-r from-[#fe3d00] to-[#ff6a00] text-white font-bold rounded-xl shadow-lg">Verify & Login</button>
                 </>
               )}
               <div id="recaptcha-container"></div>
             </>
           )}
 
-          <button type="button" onClick={onClose} style={secondaryBtn}>Cancel</button>
+          <button type="button" onClick={onClose} className="w-full p-3.5 mt-3 bg-white border-2 border-gray-100 text-gray-400 font-bold rounded-xl hover:bg-gray-50 transition-all">Cancel</button>
 
           {!isPhoneLogin && (
-            <p style={bottomText} onClick={() => { setIsLogin(!isLogin); setError(""); setSuccess(""); }}>
-              {isLogin ? "New here? Create an Account" : "Already have an account? Login"}
+            <p className="text-center mt-6 text-sm font-bold text-[#fe3d00] cursor-pointer" onClick={() => { setIsLogin(!isLogin); setIsVerifying(false); setError(""); setSuccess(""); }}>
+              {isLogin ? "Don't have an account? Sign Up" : "Already a member? Sign In"}
             </p>
           )}
         </form>
@@ -235,18 +223,3 @@ export default function SignInModal({ onClose }) {
     </div>
   );
 }
-
-// --- UPDATED STYLES ---
-const successStyle = { color: "#28a745", fontSize: "13px", marginBottom: "12px", textAlign: "center", background: "#e8f5e9", padding: "10px", borderRadius: "8px" };
-const errorStyle = { color: "#ff3b3b", fontSize: "13px", marginBottom: "12px", textAlign: "center", background: "#ffebee", padding: "10px", borderRadius: "8px" };
-const forgotText = { textAlign: "center", color: "#666", fontSize: "12px", cursor: "pointer", marginTop: "5px", textDecoration: "underline" };
-const overlayStyle = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" };
-const modalStyle = { background: "#ffffff", width: "90%", maxWidth: "400px", padding: "25px", borderRadius: "16px", boxShadow: "0 20px 50px rgba(0,0,0,0.15)" };
-const headingStyle = { textAlign: "center", marginBottom: "20px", fontWeight: "700", fontSize: "20px" };
-const inputStyle = { width: "100%", padding: "12px", marginBottom: "10px", borderRadius: "10px", border: "1px solid #eee", fontSize: "14px", boxSizing: "border-box" };
-const primaryBtn = { width: "100%", padding: "12px", background: "linear-gradient(135deg, #fe3d00, #ff6a00)", border: "none", color: "#fff", fontWeight: "600", borderRadius: "10px", cursor: "pointer", marginBottom: "10px" };
-const secondaryBtn = { width: "100%", padding: "12px", background: "transparent", border: "1px solid #fe3d00", color: "#fe3d00", borderRadius: "10px", cursor: "pointer" };
-const switchWrapper = { display: "flex", background: "#f8f8f8", borderRadius: "10px", padding: "4px", marginBottom: "20px" };
-const switchBtn = { flex: 1, padding: "10px", border: "none", background: "transparent", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "14px" };
-const activeSwitch = { background: "#fe3d00", color: "#fff" };
-const bottomText = { textAlign: "center", marginTop: "15px", fontSize: "14px", color: "#fe3d00", cursor: "pointer", fontWeight: "500" };
