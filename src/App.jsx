@@ -177,22 +177,27 @@ function App() {
 
       {/* 🔥 CANDY FAB MENU (Tailwind) */}
 {/* 🔥 UPDATED SEQUENCE: CART -> HOME -> HAMBURGER */}
+{/* 🔥 UPDATED CANDY FAB MENU: MEMORY GAME -> HOME -> HAMBURGER */}
 {!isButtonHidden && (
   <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[2000]">
     
-    {/* 1. CART (Left Side) */}
+    {/* 1. MEMORY GAME (Pehle yahan Cart tha) */}
     <div 
-      onClick={() => { navigate("/cart"); setMenuOpen(false); }}
+      onClick={() => { navigate("/memory-game"); setMenuOpen(false); }}
       className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? '-translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
-    >🛒</div>
+    >
+      🎮
+    </div>
 
     {/* 2. HOME (Top Center) */}
     <div 
       onClick={() => { navigate("/home"); setMenuOpen(false); }}
       className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-y-[-110px] scale-100' : 'scale-0'}`}
-    >🏠</div>
+    >
+      🏠
+    </div>
 
-    {/* 3. HAMBURGER (Right Side) */}
+    {/* 3. HAMBURGER (Right Side) - Sidebar Open karega */}
     <div 
       onClick={() => { setIsSidebarOpen(true); setMenuOpen(false); }}
       className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
@@ -204,7 +209,7 @@ function App() {
       </div>
     </div>
 
-    {/* Main FAB (Candy Box) - No Change Here */}
+    {/* Main FAB (Candy Box) */}
     <button 
       onClick={() => setMenuOpen(!menuOpen)}
       className="w-16 h-16 bg-[#fe3d00] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(254,61,0,0.5)] transition-transform active:scale-90"
