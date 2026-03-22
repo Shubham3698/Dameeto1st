@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 
 export default function OrderDetails() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [cancelReason, setCancelReason] = useState(""); 
-  const [otherReason, setOtherReason] = useState(""); 
+  const [cancelReason, setCancelReason] = useState("");
+  const [otherReason, setOtherReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [linkLoading, setLinkLoading] = useState(false);
 
-  const API_BASE_URL = "https://serdeptry1st.onrender.com"; 
+  const API_BASE_URL = "https://serdeptry1st.onrender.com";
 
   const fetchOrder = async () => {
     try {
@@ -27,9 +29,27 @@ export default function OrderDetails() {
     fetchOrder();
   }, [id]);
 
+  const handlePayNow = async () => {
+    setLinkLoading(true);
+    try {
+      const { data } = await axios.post(`${API_BASE_URL}/api/payment/create-link`, {
+        amount: order.total,
+        orderId: order.shortOrderId || order._id,
+      });
+
+      if (data.success) {
+        const message = `Hello 👋, please complete the payment of ₹${order.total} for Order #${order.shortOrderId || order._id} using this secure link: ${data.short_url}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank");
+      }
+    } catch (error) {
+      alert("Error generating payment link.");
+    } finally {
+      setLinkLoading(false);
+    }
+  };
+
   const handleCancelRequest = async () => {
     const finalReason = cancelReason === "Other" ? otherReason : cancelReason;
-    
     if (!finalReason || (cancelReason === "Other" && !otherReason.trim())) {
       return alert("Please select or provide a reason.");
     }
@@ -56,119 +76,139 @@ export default function OrderDetails() {
 
   if (!order)
     return (
-      <p style={{ textAlign: "center", marginTop: "100px", fontWeight: "600" }}>
-        ⌛ Loading order details...
-      </p>
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-lg font-semibold animate-pulse">⌛ Loading order details...</p>
+      </div>
     );
 
   const trackingSteps = ["Received", "Processing", "Shipped", "Delivered"];
   const cancelOptions = ["Changed my mind", "Mistakenly ordered", "Better price elsewhere", "Other"];
 
   return (
-    <div style={{ background: "#f4f6f9", minHeight: "100vh", padding: "80px 20px 40px 20px" }}>
-      <h2 style={{ textAlign: "center", fontWeight: 800, marginBottom: "30px", color: "#333" }}>
-        📦 Order Tracking
-      </h2>
+    <div className="bg-slate-50 min-h-screen pt-20 px-4 pb-10">
+      <h2 className="text-center text-3xl font-extrabold mb-8 text-slate-800">📦 Order Tracking</h2>
 
-      <div style={{ background: "white", borderRadius: 20, padding: 30, maxWidth: 750, margin: "auto", boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}>
+      <div className="bg-white rounded-3xl p-6 md:p-8 max-w-3xl mx-auto shadow-xl shadow-slate-200/60 border border-slate-100">
         
         {/* --- Header Section --- */}
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 25, borderBottom: "1px solid #eee", paddingBottom: "15px" }}>
-            <div>
-                <p style={{ margin: 0, fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Order ID</p>
-                <span style={{ fontWeight: 800, color: "#fe3d00", fontSize: "1.1rem" }}>#{order.shortOrderId || order._id}</span>
+        <div className="flex justify-between items-start mb-6 border-b border-slate-100 pb-5">
+          <div>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Order ID</p>
+            <span className="font-black text-orange-600 text-lg">#{order.shortOrderId || order._id}</span>
+            <div className={`mt-2 inline-block px-3 py-1 rounded-full text-[10px] font-black border ${order.paymentStatus === "Paid" ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}>
+              {order.paymentStatus === "Paid" ? "PAID ✅" : "UNPAID ⏳"}
             </div>
-            <div style={{ textAlign: "right" }}>
-                <p style={{ margin: 0, fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Placed On</p>
-                <span style={{ fontSize: 14, fontWeight: "700", color: "#555" }}>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Placed On</p>
+            <span className="text-sm font-bold text-slate-600">
+              {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </span>
+          </div>
         </div>
 
         {/* --- Products List --- */}
-        <h4 style={{ marginBottom: "15px", fontSize: "1.1rem", fontWeight: "800" }}>Items Ordered:</h4>
-        {order.products.map((item, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 15, padding: "10px", background: "#fcfcfc", borderRadius: "12px" }}>
-            <img src={item.image} alt={item.title} style={{ width: 65, height: 65, objectFit: "cover", borderRadius: 12, border: "1px solid #eee" }} />
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 700, margin: 0, color: "#333" }}>{item.title}</p>
-              <p style={{ margin: 0, fontSize: 14, color: "#777", fontWeight: "600" }}>₹{item.price} × {item.quantity}</p>
+        <h4 className="mb-4 text-lg font-extrabold text-slate-800">Items Ordered:</h4>
+        <div className="space-y-4">
+          {order.products.map((item, i) => (
+            <div key={i} className="flex items-center gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+              <img src={item.image} alt={item.title} className="w-16 h-16 object-cover rounded-xl border border-white shadow-sm" />
+              <div className="flex-1">
+                <p className="font-bold text-slate-800 leading-tight">{item.title}</p>
+                <p className="text-sm text-slate-500 font-semibold mt-1">₹{item.price} × {item.quantity}</p>
+              </div>
+              <p className="font-black text-orange-600">₹{item.price * item.quantity}</p>
             </div>
-            <p style={{ fontWeight: 800, margin: 0, color: "#fe3d00" }}>₹{item.price * item.quantity}</p>
-          </div>
-        ))}
-
-        {/* --- Totals Section --- */}
-        <div style={{ textAlign: "right", background: "#fafafa", padding: "15px", borderRadius: 15, border: "1px solid #f0f0f0" }}>
-          <p style={{ margin: "0 0 5px 0", fontSize: "14px", color: "#666" }}>Subtotal: <strong>₹{order.subtotal}</strong></p>
-          {order.discount > 0 && <p style={{ margin: "0 0 5px 0", fontSize: "14px", color: "#27ae60", fontWeight: "700" }}>Discount Applied: -{order.discount}%</p>}
-          <h5 style={{ color: "#fe3d00", margin: 0, fontSize: "22px", fontWeight: "900" }}>Amount Paid: ₹{order.total}</h5>
+          ))}
         </div>
 
-        <hr style={{ margin: "25px 0", opacity: 0.1 }} />
+        {/* --- Totals Section --- */}
+        <div className="mt-6 text-right bg-slate-900 text-white p-6 rounded-3xl shadow-lg shadow-slate-200">
+          <p className="text-sm text-slate-400">Subtotal: <strong className="text-white">₹{order.subtotal}</strong></p>
+          {order.discount > 0 && <p className="text-sm text-emerald-400 font-bold mt-1">Discount Applied: -{order.discount}%</p>}
+          
+          <div className="mt-4 pt-4 border-t border-slate-700">
+            {order.paymentStatus === "Paid" ? (
+              <h5 className="text-2xl font-black text-emerald-400">Amount Paid: ₹{order.total}</h5>
+            ) : (
+              <div className="flex flex-col items-end gap-3">
+                <h5 className="text-2xl font-black text-orange-500">Total Payable: ₹{order.total}</h5>
+                <button 
+                  onClick={handlePayNow}
+                  disabled={linkLoading}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                >
+                  {linkLoading ? "Generating..." : "📤 Pay via WhatsApp Link"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
-        {/* --- Delivery Address Section --- */}
-        <h4 style={{ marginBottom: "15px", fontSize: "1.1rem", fontWeight: "800" }}>📍 Shipping To:</h4>
+        <hr className="my-8 opacity-50" />
+
+        {/* --- Delivery Address --- */}
+        <h4 className="mb-4 text-lg font-extrabold text-slate-800">📍 Shipping To:</h4>
         {order.address ? (
-          <div style={{ background: "#fff9f7", padding: "20px", borderRadius: "15px", border: "1px dashed #fe3d00", fontSize: "15px", lineHeight: "1.7" }}>
-            <p style={{ margin: "0 0 5px 0", fontWeight: "800", fontSize: "17px", color: "#222" }}>{order.address.fullName}</p>
-            <p style={{ margin: "0 0 10px 0", color: "#fe3d00", fontWeight: "700" }}>📞 +91 {order.address.phone}</p>
-            <p style={{ margin: 0, color: "#555", fontWeight: "500" }}>
-              {order.address.street}, {order.address.city}, {order.address.state} - <strong style={{color: "#000"}}>{order.address.pincode}</strong>
+          <div className="bg-orange-50/50 p-5 rounded-2xl border-2 border-dashed border-orange-200">
+            <p className="font-black text-lg text-slate-800">{order.address.fullName}</p>
+            <p className="text-orange-600 font-bold mt-1">📞 +91 {order.address.phone}</p>
+            <p className="text-slate-600 font-medium mt-2 leading-relaxed">
+              {order.address.street}, {order.address.city}, {order.address.state} - <strong className="text-slate-900">{order.address.pincode}</strong>
             </p>
           </div>
         ) : (
-          <p style={{ color: "gray", fontStyle: "italic", background: "#f9f9f9", padding: "15px", borderRadius: "10px" }}>Address details not found.</p>
+          <p className="text-slate-400 italic bg-slate-50 p-4 rounded-xl">Address details not found.</p>
         )}
 
-        <hr style={{ margin: "25px 0", opacity: 0.1 }} />
+        <hr className="my-8 opacity-50" />
 
-        {/* --- Tracking Status UI & Cancel Button --- */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <h4 style={{ margin: 0, fontSize: "1.1rem", fontWeight: "800" }}>🚚 Order Status:</h4>
-            {/* Button only shows if not Cancelled/Delivered/Shipped/Requested */}
-            {order.orderStatus !== "Cancelled" && 
-             order.orderStatus !== "Delivered" && 
-             order.orderStatus !== "Shipped" && 
-             order.orderStatus !== "Cancel Requested" && (
-                <button 
-                    onClick={() => setShowCancelModal(true)}
-                    style={{ background: "#fff", border: "1px solid #e74c3c", color: "#e74c3c", padding: "8px 16px", borderRadius: "10px", fontWeight: "700", cursor: "pointer" }}>
-                    Request Cancellation
-                </button>
-            )}
+        {/* --- Tracking Status UI & Cancel --- */}
+        <div className="flex justify-between items-center mb-6">
+          <h4 className="text-lg font-extrabold text-slate-800">🚚 Order Status:</h4>
+          {order.orderStatus !== "Cancelled" && 
+           order.orderStatus !== "Delivered" && 
+           order.orderStatus !== "Shipped" && 
+           order.orderStatus !== "Cancel Requested" && (
+            <button 
+              onClick={() => setShowCancelModal(true)}
+              className="bg-white border-2 border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white px-4 py-2 rounded-xl font-bold text-sm transition-all"
+            >
+              Request Cancellation
+            </button>
+          )}
         </div>
         
-        {/* Yahan logic update kiya hai taaki status UI sahi dikhe */}
         {order.orderStatus === "Cancelled" ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "18px", background: "#fff5f5", borderRadius: "12px", color: "#e74c3c", border: "1px solid #feb2b2" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#e74c3c", boxShadow: "0 0 10px rgba(231, 76, 60, 0.4)" }} />
-                <span style={{ fontWeight: 800, fontSize: "16px" }}>This order was cancelled.</span>
+          <div className="p-5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-600">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-rose-500 animate-ping" />
+              <span className="font-black">Order Cancelled</span>
             </div>
-            {order.cancelReason && <p style={{margin: 0, fontSize: "14px", color: "#666"}}>Reason: {order.cancelReason}</p>}
+            {order.cancelReason && <p className="mt-2 text-sm text-rose-500/80 italic font-medium">Reason: {order.cancelReason}</p>}
           </div>
         ) : order.orderStatus === "Cancel Requested" ? (
-          <div style={{ padding: "18px", background: "#fff9eb", borderRadius: "12px", color: "#d97706", border: "1px solid #fef3c7" }}>
-             <p style={{ fontWeight: 800, margin: 0, fontSize: "16px" }}>⏳ Cancellation Pending</p>
-             <p style={{ margin: "5px 0 0 0", fontSize: "14px" }}>Admin is reviewing your request for: "{order.cancelReason}"</p>
+          <div className="p-5 bg-amber-50 border border-amber-200 rounded-2xl text-amber-600">
+             <p className="font-black flex items-center gap-2">⏳ Cancellation Pending</p>
+             <p className="mt-1 text-sm font-medium opacity-80">Admin is reviewing your request for: "{order.cancelReason}"</p>
           </div>
         ) : (
-          <div style={{ marginTop: 10, paddingLeft: "10px" }}>
+          <div className="space-y-6 ml-2">
             {trackingSteps.map((step, index) => {
               const currentStatusIndex = trackingSteps.indexOf(order.orderStatus);
               const thisStepIndex = trackingSteps.indexOf(step);
               const isActive = thisStepIndex <= currentStatusIndex;
-              const colors = { Received: "#3498db", Processing: "#f1c40f", Shipped: "#e67e22", Delivered: "#2ecc71" };
+              const colors = { Received: "bg-blue-500", Processing: "bg-amber-500", Shipped: "bg-orange-500", Delivered: "bg-emerald-500" };
 
               return (
-                <div key={step} style={{ display: "flex", gap: 20, position: "relative", paddingBottom: index !== trackingSteps.length - 1 ? "30px" : "0" }}>
+                <div key={step} className="flex gap-4 relative">
                   {index !== trackingSteps.length - 1 && (
-                    <div style={{ position: "absolute", left: "7px", top: "20px", bottom: "0", width: "2px", background: isActive && (thisStepIndex < currentStatusIndex) ? colors[step] : "#eee" }} />
+                    <div className={`absolute left-[7px] top-4 w-0.5 h-10 ${isActive && (thisStepIndex < currentStatusIndex) ? colors[step] : 'bg-slate-100'}`} />
                   )}
-                  <div style={{ zIndex: 2, width: 16, height: 16, borderRadius: "50%", background: isActive ? colors[step] : "#eee", boxShadow: isActive ? `0 0 12px ${colors[step]}88` : "none", marginTop: "4px" }} />
-                  <div style={{ opacity: isActive ? 1 : 0.4 }}>
-                    <span style={{ fontWeight: isActive ? 800 : 500, fontSize: "16px", color: isActive ? "#222" : "#888" }}>{step}</span>
-                    {step === order.orderStatus && <span style={{ marginLeft: "12px", fontSize: "10px", background: "#fe3d00", color: "#fff", padding: "3px 10px", borderRadius: "20px", fontWeight: "800" }}>Current</span>}
+                  <div className={`z-10 w-4 h-4 rounded-full mt-1.5 transition-all duration-500 ${isActive ? `${colors[step]} shadow-lg` : 'bg-slate-200'}`} />
+                  <div className={`transition-all ${isActive ? 'opacity-100 scale-100' : 'opacity-30 scale-95'}`}>
+                    <span className={`font-black text-sm uppercase tracking-wide ${isActive ? 'text-slate-800' : 'text-slate-400'}`}>{step}</span>
+                    {step === order.orderStatus && <span className="ml-3 text-[9px] bg-orange-600 text-white px-2 py-0.5 rounded-full font-black uppercase">Current</span>}
                   </div>
                 </div>
               );
@@ -177,38 +217,42 @@ export default function OrderDetails() {
         )}
       </div>
 
-      {/* --- Cancel Modal (Vahi original vala) --- */}
+      {/* --- Cancel Modal --- */}
       {showCancelModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(5px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
-          <div style={{ background: "white", padding: "30px", borderRadius: "25px", width: "90%", maxWidth: "450px" }}>
-            <h3 style={{ margin: "0 0 10px 0", fontWeight: "800" }}>Cancel Request</h3>
-            <p style={{ color: "#666", fontSize: "14px", marginBottom: "15px" }}>Why do you want to cancel? Admin will review this.</p>
+        <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-300">
+            <h3 className="text-2xl font-black text-slate-800 mb-2">Cancel Request</h3>
+            <p className="text-slate-500 text-sm mb-6 font-medium">Please tell us why you'd like to cancel.</p>
+            
             <select 
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #ddd", background: "#f9f9f9", outline: "none", marginBottom: "15px" }}>
+              className="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500 mb-4 font-bold text-slate-700"
+            >
               <option value="">-- Choose a reason --</option>
               {cancelOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
+
             {cancelReason === "Other" && (
               <textarea 
                 placeholder="Describe reason..."
                 value={otherReason}
                 onChange={(e) => setOtherReason(e.target.value)}
-                style={{ width: "100%", height: "80px", borderRadius: "12px", border: "1px solid #ddd", padding: "12px", outline: "none", boxSizing: "border-box", resize: "none" }}
+                className="w-full h-24 p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500 mb-4 font-medium resize-none"
               />
             )}
-            <div style={{ display: "flex", gap: "10px", marginTop: "25px" }}>
-              <button onClick={() => setShowCancelModal(false)} style={{ flex: 1, padding: "12px", borderRadius: "12px", border: "none", background: "#eee", fontWeight: "700", cursor: "pointer" }}>Close</button>
-              <button onClick={handleCancelRequest} disabled={loading} style={{ flex: 1, padding: "12px", borderRadius: "12px", border: "none", background: "#e74c3c", color: "white", fontWeight: "700", cursor: "pointer" }}>
-                {loading ? "Sending..." : "Send Request"}
+
+            <div className="flex gap-3 mt-4">
+              <button onClick={() => setShowCancelModal(false)} className="flex-1 py-4 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-all">Close</button>
+              <button onClick={handleCancelRequest} disabled={loading} className="flex-1 py-4 rounded-2xl bg-rose-500 text-white font-bold hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/30">
+                {loading ? "Sending..." : "Confirm Cancel"}
               </button>
             </div>
           </div>
         </div>
       )}
       
-      <p style={{ textAlign: "center", marginTop: "25px", color: "#888", fontSize: "14px", fontWeight: "500" }}>
+      <p className="text-center mt-8 text-slate-400 text-sm font-bold">
         Need help? Contact support with your Order ID.
       </p>
     </div>
