@@ -11,7 +11,7 @@ import MNv from "./components/Maninav";
 import CartPage from "./pages/Cart";
 import ImageDetails from "./pages/Details";
 import User from "./pages/User";
-// import SearchPage from "./pages/SearchPage";
+import SearchPage from "./pages/SearchPage";
 import SearchResults from "./pages/SearchResults";
 import ViewOrders from "./pages/ViewOrders";
 import OrderDetails from "./pages/OrderDetails";
@@ -75,13 +75,13 @@ function App() {
   const [fadeIn, setFadeIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isChecking, setIsChecking] = useState(false); // Naya logic: Screen Disable ke liye
+  const [isChecking, setIsChecking] = useState(false); 
 
   const location = useLocation();
   const navigate = useNavigate();
   const { isGlobalLoading } = useContext(CartContext);
 
-  // WAPAS ADD KIYA: Popups Logic
+  // Popups Logic
   const popupList = [
     { title: "🔥 Special Offer", text: "Buy 2 Stickers & Get 1 Free" },
     { title: "🚀 New Arrival", text: "Learning Products Now Available" },
@@ -111,25 +111,36 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // --- GAME CLICK HANDLER (Block Screen -> Check -> Open) ---
+  // --- UPDATED GAME CLICK HANDLER (STAY ON PAGE LOGIC) ---
+// --- UPDATED GAME CLICK HANDLER (Stay on page + Slim Toast) ---
   const handleGameClick = () => {
-    setIsChecking(true); // Screen block aur color change
+    const isAuthenticated = localStorage.getItem("userEmail");
     setMenuOpen(false);
 
-    setTimeout(() => {
-      const isAuthenticated = localStorage.getItem("userEmail");
-      if (!isAuthenticated) {
-        toast.error("Please login first to play! 🎮", {
-          style: { border: '1px solid #fe3d00', padding: '16px', color: '#fe3d00', background: '#fff3eb' },
-        });
-        navigate("/account");
-      } else {
+    if (!isAuthenticated) {
+      toast.error("Please login to play! 🎮", {
+        duration: 3000,
+        // Yahan styling ko slim aur modern banaya hai
+        style: { 
+          border: '1px solid rgba(254, 61, 0, 0.2)', // Halka border
+          padding: '8px 16px', // Kam padding taaki mota na lage
+          color: '#fe3d00', 
+          background: 'rgba(255, 255, 255, 0.95)', // White glass look
+          backdropFilter: 'blur(10px)',
+          fontSize: '14px', // Thoda chota font
+          fontWeight: '500',
+          borderRadius: '50px', // Full rounded (Pill shape)
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)', // Halka shadow
+        },
+      });
+    } else {
+      setIsChecking(true); 
+      setTimeout(() => {
         navigate("/memory-game");
-      }
-      setIsChecking(false); // Screen khol do
-    }, 1000); // 1 sec ka smooth delay
+        setIsChecking(false);
+      }, 1000);
+    }
   };
-
   const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game"];
   const isButtonHidden = hiddenRoutes.includes(location.pathname) || location.pathname.startsWith("/order/") || location.pathname.startsWith("/image/");
 
@@ -145,7 +156,7 @@ function App() {
   return (
     <div className={`bg-[#fff3eb] min-h-screen transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
       
-      {/* 🔥 SCREEN BLOCKER / BLUR OVERLAY */}
+      {/* SCREEN BLOCKER */}
       {isChecking && (
         <div className="fixed inset-0 bg-[#fe3d00]/30 backdrop-blur-[3px] z-[30000] flex flex-col items-center justify-center transition-all">
           <div className="w-14 h-14 border-4 border-white border-t-transparent rounded-full animate-spin" />
@@ -165,7 +176,6 @@ function App() {
       <Toaster position="top-center" containerStyle={{ zIndex: 40000 }} />
       <MNv />
 
-      {/* Popups Wapas Add Kar Diye */}
       {showPopup && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[10000] p-4">
           <div className="relative w-full max-w-sm bg-white p-8 rounded-2xl text-center shadow-2xl">
@@ -192,7 +202,7 @@ function App() {
         <Route path="/account" element={<User />} />
         <Route path="/inventory" element={<InventoryUpload />} />
         <Route path="/admin-orders" element={<AdminOrders />} />
-        {/* <Route path="/search" element={<SearchPage />} /> */}
+        <Route path="/search" element={<SearchPage />} />
         <Route path="/memory-game" element={<ProtectedRoute><MemoryGame /></ProtectedRoute>} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/view-order" element={<ViewOrders />} />
