@@ -11,7 +11,7 @@ import MNv from "./components/Maninav";
 import CartPage from "./pages/Cart";
 import ImageDetails from "./pages/Details";
 import User from "./pages/User";
-import SearchPage from "./pages/SearchPage";
+// import SearchPage from "./pages/SearchPage";
 import SearchResults from "./pages/SearchResults";
 import ViewOrders from "./pages/ViewOrders";
 import OrderDetails from "./pages/OrderDetails";
@@ -192,7 +192,7 @@ function App() {
         <Route path="/account" element={<User />} />
         <Route path="/inventory" element={<InventoryUpload />} />
         <Route path="/admin-orders" element={<AdminOrders />} />
-        <Route path="/search" element={<SearchPage />} />
+        {/* <Route path="/search" element={<SearchPage />} /> */}
         <Route path="/memory-game" element={<ProtectedRoute><MemoryGame /></ProtectedRoute>} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/view-order" element={<ViewOrders />} />

@@ -18,8 +18,9 @@ export default function SearchResults() {
   const [loading, setLoading] = useState(false);
 
   // 🔥 UPDATED: Ab ye seedha tumhare Render URL se connect karega
-  const BASE_URL = "https://serdeptry1st.onrender.com/api/products"; 
-
+  const BASE_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:3000/api/products" 
+  : "https://serdeptry1st.onrender.com/api/products";
   const query = new URLSearchParams(location.search).get("query")?.toLowerCase() || "";
 
   useEffect(() => {

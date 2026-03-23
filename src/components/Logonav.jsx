@@ -12,6 +12,41 @@ export default function TopNavbar() {
   const [pop, setPop] = useState(false); // animation state
   const navigate = useNavigate();
 
+  // 🔹 Typewriter Effect Logic 🔹
+  const [displayText, setDisplayText] = useState("");
+  const [wordIndex, setWordIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const words = ["Spider-Man", "Anime", "Marvel", "Stickers", "Goodies"];
+  const typingSpeed = 150;
+  const deletingSpeed = 70;
+  const pauseTime = 1500;
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const currentWord = words[wordIndex];
+      const shouldDelete = isDeleting;
+
+      setDisplayText(prev => 
+        shouldDelete 
+          ? currentWord.substring(0, prev.length - 1) 
+          : currentWord.substring(0, prev.length + 1)
+      );
+
+      // Agar pura word likh liya
+      if (!shouldDelete && displayText === currentWord) {
+        setTimeout(() => setIsDeleting(true), pauseTime);
+      } 
+      // Agar pura word delete kar diya
+      else if (shouldDelete && displayText === "") {
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % words.length);
+      }
+    };
+
+    const timer = setTimeout(handleTyping, isDeleting ? deletingSpeed : typingSpeed);
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, wordIndex]);
+
   // 🔹 Context se cartItems aur hamara naya Loading state nikala
   const { cartItems, setIsGlobalLoading } = useContext(CartContext);
 
@@ -81,7 +116,7 @@ export default function TopNavbar() {
           position: "fixed",
           top: 0,
           left: 0,
-          zIndex: 1,
+          zIndex: 1, // Z-index stable rakha
           boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
         }}
       >
@@ -111,7 +146,8 @@ export default function TopNavbar() {
         <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
           <input
             type="text"
-            placeholder="Search Sticker & Goodies..."
+            // 🔹 Dynamic Typewriter Placeholder yahan hai
+            placeholder={`Search ${displayText}|`} 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyPress}
