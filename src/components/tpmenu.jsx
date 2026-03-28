@@ -35,9 +35,9 @@ export default function BottomMenu({ items }) {
   }, [location.pathname]);
 
   const data = items || [
-    { label: "Trending", path: "/" },
+    { label: "Stickers", path: "/" },
     { label: "About us", path: "/about" },
-    { label: "Sticker", path: "/sticker" },
+    { label: "Explore", path: "/sticker" },
     { label: "Poster", path: "/poster" },
     { label: "Goodies", path: "/goodies" },
     { label: "Marvel", path: "/marvel" },
