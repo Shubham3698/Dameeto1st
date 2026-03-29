@@ -10,7 +10,7 @@ export default function Story() {
           Not Just Stickers
         </h1>
         <p className="mt-6 text-gray-400 max-w-2xl text-lg">
-          Every sticker is a piece of identity — a small detail that brings direction, meaning, and aesthetic to the ordinary.
+          Every sticker is a piece of identity — a small detail that brings direction, meaning, and turns ordinary into aesthetic
         </p>
       </section>
 
