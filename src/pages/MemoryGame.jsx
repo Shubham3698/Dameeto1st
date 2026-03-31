@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast"; // 1. Toast import kiya
+import { toast } from "react-hot-toast";
 import StickerAdmin from "../components/StickerAdmin"; 
 
 const MemoryGame = () => {
@@ -24,10 +24,11 @@ const MemoryGame = () => {
   const [currentTheme, setCurrentTheme] = useState("");
   const [userCredits, setUserCredits] = useState(0);
 
-  // --- LOGIN CHECK LOGIC (Naya Add Kiya) ---
+  // --- LOGIN CHECK LOGIC (FIXED) ---
   useEffect(() => {
     if (!email) {
       toast.error("Please login first to play! 🎮", {
+        id: "login-error", // Isse notifications stack nahi honge
         duration: 3000,
         style: {
           border: '1px solid #fe3d00',
@@ -36,7 +37,8 @@ const MemoryGame = () => {
           background: '#fff3eb',
         },
       });
-      // Thoda wait karke redirect karenge taaki toast dikh jaye
+      
+      // 2 second wait taaki toast dikh jaye, phir redirect
       const timer = setTimeout(() => navigate("/account"), 2000);
       return () => clearTimeout(timer);
     }
@@ -87,7 +89,7 @@ const MemoryGame = () => {
   }, [API_BASE_URL]);
 
   useEffect(() => { 
-    if (email) { // Sirf tabhi load kare jab email ho
+    if (email) { 
       initializeGame(); 
       fetchUserCredits();
     }
@@ -168,7 +170,7 @@ const MemoryGame = () => {
     modal: { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "#1e293b", padding: "30px", borderRadius: "20px", border: "2px solid #fe3d00", textAlign: "center", zIndex: 100, width: "90%", maxWidth: "340px", boxShadow: '0 0 50px rgba(0,0,0,0.8)' }
   };
 
-  if (loading) return <div style={styles.wrapper}><div style={{marginTop:'50px'}}>Loading {currentTheme} Pack...</div></div>;
+  if (loading && email) return <div style={styles.wrapper}><div style={{marginTop:'50px'}}>Loading {currentTheme} Pack...</div></div>;
 
   return (
     <div style={styles.wrapper}>
