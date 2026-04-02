@@ -17,7 +17,7 @@ export default function Story() {
       {/* ✨ BEAUTY */}
       <section className="py-24 px-6 text-center max-w-4xl mx-auto">
         <p className="text-2xl md:text-3xl font-light leading-relaxed text-gray-200">
-          There was always something magical about turning simple things into something beautiful.
+          There was always something magical about turning simple things into something AMAZING ✨.
         </p>
         <p className="mt-6 text-gray-500">
           A laptop, a bike, a phone — just objects… until you add expression.
