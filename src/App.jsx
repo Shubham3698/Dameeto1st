@@ -21,6 +21,7 @@ import InventoryUpload from "./pages/InventoryUpload";
 import AdminOrders from "./pages/AdminOrders";
 import MemoryGame from './pages/MemoryGame';
 import Story from "./pages/Story";
+import StickerPacks from "./pages/StickerPacks";
 
 import { CartProvider } from "./contexAndhooks/CartProvider";
 import { CartContext } from "./contexAndhooks/CartContext";
@@ -39,7 +40,7 @@ const Sidebar = ({ isOpen, onClose, navigate }) => {
           <button onClick={onClose} className="text-2xl text-gray-500 hover:text-black">✖</button>
         </div>
         <nav className="flex flex-col gap-2">
-          {["Sticker", "story", "Learning Products", "Goodies", "About", "View Order", "Account"].map((item) => (
+        {["Sticker", "Sticker Packs", "story", "Learning Products", "Goodies", "About", "View Order", "Account"].map((item) => (
             <div 
               key={item}
               onClick={() => { navigate(`/${item.toLowerCase().replace(" ", "-")}`); onClose(); }}
@@ -142,7 +143,7 @@ function App() {
       }, 1000);
     }
   };
-  const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game"];
+  const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game","/sticker-packs"];
   const isButtonHidden = hiddenRoutes.includes(location.pathname) || location.pathname.startsWith("/order/") || location.pathname.startsWith("/image/");
 
   if (loading) {
@@ -207,6 +208,7 @@ function App() {
         <Route path="/memory-game" element={<ProtectedRoute><MemoryGame /></ProtectedRoute>} />
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/view-order" element={<ViewOrders />} />
+        <Route path="/sticker-packs" element={<StickerPacks />} />
         <Route path="/story" element={<Story />} />
         <Route path="/order/:id" element={<OrderDetails />} />
         <Route path="*" element={<div className="text-center mt-24 text-2xl font-bold">404 - Not Found</div>} />
