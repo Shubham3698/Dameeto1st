@@ -40,7 +40,7 @@ const Sidebar = ({ isOpen, onClose, navigate }) => {
           <button onClick={onClose} className="text-2xl text-gray-500 hover:text-black">✖</button>
         </div>
         <nav className="flex flex-col gap-2">
-        {["EXPLORE", "Sticker Packs", "story",  "About", "View Order", "Account"].map((item) => (
+        {["EXPLORE", "Sticker Packs", "Our-story",  "About", "View Order", "Account"].map((item) => (
             <div 
               key={item}
               onClick={() => { navigate(`/${item.toLowerCase().replace(" ", "-")}`); onClose(); }}
@@ -209,7 +209,7 @@ function App() {
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/view-order" element={<ViewOrders />} />
         <Route path="/sticker-packs" element={<StickerPacks />} />
-        <Route path="/story" element={<Story />} />
+        <Route path="/Our-story" element={<Story />} />
         <Route path="/order/:id" element={<OrderDetails />} />
         <Route path="*" element={<div className="text-center mt-24 text-2xl font-bold">404 - Not Found</div>} />
       </Routes>
