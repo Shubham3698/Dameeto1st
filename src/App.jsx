@@ -40,7 +40,7 @@ const Sidebar = ({ isOpen, onClose, navigate }) => {
           <button onClick={onClose} className="text-2xl text-gray-500 hover:text-black">✖</button>
         </div>
         <nav className="flex flex-col gap-2">
-        {["Sticker", "Sticker Packs", "story",  "About", "View Order", "Account"].map((item) => (
+        {["EXPLORE", "Sticker Packs", "story",  "About", "View Order", "Account"].map((item) => (
             <div 
               key={item}
               onClick={() => { navigate(`/${item.toLowerCase().replace(" ", "-")}`); onClose(); }}
