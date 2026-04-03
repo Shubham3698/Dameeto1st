@@ -23,43 +23,36 @@ import MemoryGame from './pages/MemoryGame';
 import Story from "./pages/Story";
 import StickerPacks from "./pages/StickerPacks";
 
+// NEW COMPONENT IMPORT
+import PromotionalPopup from "./components/PromotionalPopup";
+
 import { CartProvider } from "./contexAndhooks/CartProvider";
 import { CartContext } from "./contexAndhooks/CartContext";
 
 // ---------------- SIDEBAR COMPONENT ----------------
-const Sidebar = ({ isOpen, onClose, navigate }) => {
-  return (
-    <>
-      <div 
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[5000] transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
-        onClick={onClose}
-      />
-      <div className={`fixed top-0 right-0 h-full w-72 bg-white z-[5001] shadow-2xl transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'} p-6 flex flex-col`}>
-        <div className="flex justify-between items-center border-b pb-4 mb-4">
-          <h3 className="text-xl font-bold text-[#fe3d00]">Menu</h3>
-          <button onClick={onClose} className="text-2xl text-gray-500 hover:text-black">✖</button>
-        </div>
-        <nav className="flex flex-col gap-2">
-        {["EXPLORE", "Sticker Packs", "Our-story",  "About", "View Order", "Account"].map((item) => (
-            <div 
-              key={item}
-              onClick={() => { navigate(`/${item.toLowerCase().replace(" ", "-")}`); onClose(); }}
-              className="p-3 text-lg font-medium text-gray-700 hover:bg-[#fff3eb] hover:text-[#fe3d00] rounded-xl cursor-pointer transition-all"
-            >
-              {item}
-            </div>
-          ))}
-        </nav>
+const Sidebar = ({ isOpen, onClose, navigate }) => (
+  <>
+    <div className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[5000] transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`} onClick={onClose} />
+    <div className={`fixed top-0 right-0 h-full w-72 bg-white z-[5001] shadow-2xl transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'} p-6 flex flex-col`}>
+      <div className="flex justify-between items-center border-b pb-4 mb-4">
+        <h3 className="text-xl font-bold text-[#fe3d00]">Menu</h3>
+        <button onClick={onClose} className="text-2xl text-gray-500 hover:text-black">✖</button>
       </div>
-    </>
-  );
-};
+      <nav className="flex flex-col gap-2">
+        {["EXPLORE", "Sticker Packs", "Our-story", "About", "View Order", "Account"].map((item) => (
+          <div key={item} onClick={() => { navigate(`/${item.toLowerCase().replace(" ", "-")}`); onClose(); }} className="p-3 text-lg font-medium text-gray-700 hover:bg-[#fff3eb] hover:text-[#fe3d00] rounded-xl cursor-pointer transition-all">
+            {item}
+          </div>
+        ))}
+      </nav>
+    </div>
+  </>
+);
 
 // ---------------- PROTECTED ROUTE ----------------
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem("userEmail"); 
-  if (!isAuthenticated) return <Navigate to="/account" replace />;
-  return children;
+  return isAuthenticated ? children : <Navigate to="/account" replace />;
 };
 
 function AppWrapper() {
@@ -83,28 +76,6 @@ function App() {
   const navigate = useNavigate();
   const { isGlobalLoading } = useContext(CartContext);
 
-  // Popups Logic
-  const popupList = [
-    { title: "🔥 Special Offer", text: "Buy 2 Stickers & Get 1 Free" },
-    { title: "🚀 New Arrival", text: "Learning Products Now Available" },
-    { title: "🎁 Combo Pack", text: "Special combo pack available!" },
-    { title: "🎁 Free Delivery", text: "Free delivery on orders above ₹499" }
-  ];
-  const [popupIndex, setPopupIndex] = useState(0);
-  const [showPopup, setShowPopup] = useState(false);
-
-  useEffect(() => {
-    if (!loading) {
-      const timer = setTimeout(() => setShowPopup(true), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [loading]);
-
-  const closePopup = () => {
-    if (popupIndex < popupList.length - 1) setPopupIndex(popupIndex + 1);
-    else setShowPopup(false);
-  };
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -113,36 +84,20 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // --- UPDATED GAME CLICK HANDLER (STAY ON PAGE LOGIC) ---
-// --- UPDATED GAME CLICK HANDLER (Stay on page + Slim Toast) ---
   const handleGameClick = () => {
     const isAuthenticated = localStorage.getItem("userEmail");
     setMenuOpen(false);
-
     if (!isAuthenticated) {
       toast.error("Please login to play! 🎮", {
         duration: 3000,
-        // Yahan styling ko slim aur modern banaya hai
-        style: { 
-          border: '1px solid rgba(254, 61, 0, 0.2)', // Halka border
-          padding: '8px 16px', // Kam padding taaki mota na lage
-          color: '#fe3d00', 
-          background: 'rgba(255, 255, 255, 0.95)', // White glass look
-          backdropFilter: 'blur(10px)',
-          fontSize: '14px', // Thoda chota font
-          fontWeight: '500',
-          borderRadius: '50px', // Full rounded (Pill shape)
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)', // Halka shadow
-        },
+        style: { border: '1px solid rgba(254, 61, 0, 0.2)', padding: '8px 16px', color: '#fe3d00', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', fontSize: '14px', fontWeight: '500', borderRadius: '50px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' },
       });
     } else {
       setIsChecking(true); 
-      setTimeout(() => {
-        navigate("/memory-game");
-        setIsChecking(false);
-      }, 1000);
+      setTimeout(() => { navigate("/memory-game"); setIsChecking(false); }, 1000);
     }
   };
+
   const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game","/sticker-packs"];
   const isButtonHidden = hiddenRoutes.includes(location.pathname) || location.pathname.startsWith("/order/") || location.pathname.startsWith("/image/");
 
@@ -159,37 +114,18 @@ function App() {
     <div className={`bg-[#fff3eb] min-h-screen transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
       
       {/* SCREEN BLOCKER */}
-      {isChecking && (
-        <div className="fixed inset-0 bg-[#fe3d00]/30 backdrop-blur-[3px] z-[30000] flex flex-col items-center justify-center transition-all">
-          <div className="w-14 h-14 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          <p className="mt-4 text-white font-bold text-xl tracking-widest animate-pulse">CHECKING ACCESS...</p>
-        </div>
-      )}
+      {isChecking && <ScreenBlocker />}
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} navigate={navigate} />
 
-      {isGlobalLoading && (
-        <div className="fixed inset-0 bg-[#fff3eb]/70 backdrop-blur-md flex flex-col justify-center items-center z-[20000]">
-          <div className="w-12 h-12 border-4 border-[#fe3d00] border-t-transparent rounded-full animate-spin" />
-          <p className="mt-4 text-[#fe3d00] font-bold">Opening Cart...</p>
-        </div>
-      )}
+      {/* GLOBAL LOADER */}
+      {isGlobalLoading && <GlobalLoader />}
 
       <Toaster position="top-center" containerStyle={{ zIndex: 40000 }} />
       <MNv />
 
-      {showPopup && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[10000] p-4">
-          <div className="relative w-full max-w-sm bg-white p-8 rounded-2xl text-center shadow-2xl">
-            <button className="absolute right-4 top-4 text-xl" onClick={closePopup}>✖</button>
-            <h2 className="text-2xl font-bold mb-2">{popupList[popupIndex].title}</h2>
-            <p className="text-gray-600 mb-6">{popupList[popupIndex].text}</p>
-            <button className="bg-[#fe3d00] text-white px-8 py-2 rounded-lg font-bold" onClick={() => { navigate("/home"); setShowPopup(false); }}>
-              Explore
-            </button>
-          </div>
-        </div>
-      )}
+      {/* CLEAN POPUP COMPONENT CALL */}
+      <PromotionalPopup loading={loading} navigate={navigate} />
 
       <Routes>
         <Route path="/" element={<Trending />} />
@@ -217,27 +153,10 @@ function App() {
       {/* FAB MENU */}
       {!isButtonHidden && (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[2000]">
-          <div 
-            onClick={handleGameClick}
-            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? '-translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
-          >
-            🎮
-          </div>
-          <div 
-            onClick={() => { navigate("/home"); setMenuOpen(false); }}
-            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-y-[-110px] scale-100' : 'scale-0'}`}
-          >
-            🏠
-          </div>
-          <div 
-            onClick={() => { setIsSidebarOpen(true); setMenuOpen(false); }}
-            className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}
-          >
-            <div className="flex flex-col gap-1">
-              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-              <div className="w-5 h-0.5 bg-[#fe3d00] rounded" />
-            </div>
+          <div onClick={handleGameClick} className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? '-translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}>🎮</div>
+          <div onClick={() => { navigate("/home"); setMenuOpen(false); }} className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg text-2xl cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-y-[-110px] scale-100' : 'scale-0'}`}>🏠</div>
+          <div onClick={() => { setIsSidebarOpen(true); setMenuOpen(false); }} className={`absolute flex items-center justify-center w-14 h-14 bg-white rounded-full shadow-lg cursor-pointer transition-all duration-300 ${menuOpen ? 'translate-x-20 -translate-y-12 scale-100' : 'scale-0'}`}>
+            <div className="flex flex-col gap-1"><div className="w-5 h-0.5 bg-[#fe3d00] rounded" /><div className="w-5 h-0.5 bg-[#fe3d00] rounded" /><div className="w-5 h-0.5 bg-[#fe3d00] rounded" /></div>
           </div>
           <button onClick={() => setMenuOpen(!menuOpen)} className="w-16 h-16 bg-[#fe3d00] rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(254,61,0,0.5)] transition-transform active:scale-90">
             <div className="grid grid-cols-2 gap-1.5 transition-transform duration-300">
@@ -252,5 +171,20 @@ function App() {
     </div>
   );
 }
+
+// --- HELPER COMPONENTS ---
+const ScreenBlocker = () => (
+  <div className="fixed inset-0 bg-[#fe3d00]/30 backdrop-blur-[3px] z-[30000] flex flex-col items-center justify-center transition-all text-white">
+    <div className="w-14 h-14 border-4 border-white border-t-transparent rounded-full animate-spin" />
+    <p className="mt-4 font-bold text-xl tracking-widest animate-pulse">CHECKING ACCESS...</p>
+  </div>
+);
+
+const GlobalLoader = () => (
+  <div className="fixed inset-0 bg-[#fff3eb]/70 backdrop-blur-md flex flex-col justify-center items-center z-[20000]">
+    <div className="w-12 h-12 border-4 border-[#fe3d00] border-t-transparent rounded-full animate-spin" />
+    <p className="mt-4 text-[#fe3d00] font-bold">Opening Cart...</p>
+  </div>
+);
 
 export default AppWrapper;
