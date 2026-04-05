@@ -146,7 +146,8 @@ export const trendingData = [
       "https://i.pinimg.com/736x/0b/e1/17/0be11763788d6da33ddc96a52e1b320b.jpg",
       "https://i.pinimg.com/736x/c7/32/e7/c732e7f11dd3c7eb110acbda090f8d5f.jpg"
     ],
-    tags: ["anime", "dark", "aesthetic"],
+    videoUrl: "https://youtu.be/VJ3SaM06I_w",
+    tags: ["anime", "dark", "aesthetic","ytt"],
   },
   {
     id: "tr-2",

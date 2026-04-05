@@ -5,7 +5,7 @@ import React, {
   useMemo
 } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { FaHeart, FaShoppingCart, FaShareAlt } from "react-icons/fa";
+import { FaHeart, FaShoppingCart, FaShareAlt, FaPlay } from "react-icons/fa"; // FaPlay add kiya
 import Nwmasonry from "../components/Nwmasonry";
 import { CartContext } from "../contexAndhooks/CartContext";
 
@@ -27,10 +27,23 @@ export default function ImageDetails() {
   const [fadeIn, setFadeIn] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  
+  const [isVideoMode, setIsVideoMode] = useState(false); // 🔥 Video mode state
+
   // 🔥 New states for DB data
   const [dbItem, setDbItem] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  /* 🔥 YouTube Embed URL Generator (Safe Logic) */
+  const getEmbedUrl = (url) => {
+    if (!url) return null;
+    let videoId = "";
+    if (url.includes("v=")) {
+      videoId = url.split("v=")[1].split("&")[0];
+    } else if (url.includes("youtu.be/")) {
+      videoId = url.split("youtu.be/")[1];
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  };
 
   /* 🔥 Decode ID safely */
   const decodedId = useMemo(() => {
@@ -65,7 +78,6 @@ export default function ImageDetails() {
   /* 🔥 2. Fetch from DB if not found in Local/State */
   useEffect(() => {
     const fetchFromDB = async () => {
-      // Agar item mil chuka hai toh DB call mat karo
       if (localItem) return;
 
       setLoading(true);
@@ -87,11 +99,12 @@ export default function ImageDetails() {
 
   /* 🔥 Final Item Selection */
   const item = localItem || dbItem;
+  const videoEmbedUrl = getEmbedUrl(item?.videoUrl);
 
   /* 🔥 Encode (For sharing) */
   const encodeId = (value) => btoa(value);
 
-  /* 🔥 Share Function (Original Functionality kept) */
+  /* 🔥 Share Function */
   const handleShare = async () => {
     if (!item) return;
     const encoded = encodeId(item.id);
@@ -129,6 +142,7 @@ export default function ImageDetails() {
   useEffect(() => {
     if (imagesArray.length > 0) {
       setSelectedImage(imagesArray[0]);
+      setIsVideoMode(false); // Reset video mode when item changes
     }
   }, [imagesArray]);
 
@@ -166,7 +180,7 @@ export default function ImageDetails() {
   const handleAddToCart = () => {
     addToCart({
       id: item.id,
-      src: selectedImage,
+      src: item.src,
       title,
       shortDesc,
       longDesc,
@@ -188,17 +202,33 @@ export default function ImageDetails() {
     >
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
 
-        <div style={{ position: "relative" }}>
-          {selectedImage && (
-            <img
-              src={selectedImage}
-              style={{
-                width: "100%",
-                borderRadius: "16px",
-                boxShadow: "0 6px 20px rgba(0,0,0,0.2)"
-              }}
-              alt={title}
-            />
+        {/* 🔥 MAIN VIEW (IMAGE OR VIDEO PLAYER) */}
+        <div style={{ position: "relative", width: "100%", borderRadius: "16px", overflow: "hidden", boxShadow: "0 6px 20px rgba(0,0,0,0.2)" }}>
+          {isVideoMode && videoEmbedUrl ? (
+            <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
+              <iframe
+                src={`${videoEmbedUrl}?autoplay=1`}
+                title="Product Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            </div>
+          ) : (
+            selectedImage && (
+              <img
+                src={selectedImage}
+                style={{ width: "100%", display: "block" }}
+                alt={title}
+              />
+            )
           )}
 
           <button
@@ -216,58 +246,79 @@ export default function ImageDetails() {
               alignItems: "center",
               justifyContent: "center",
               boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-              cursor: "pointer"
+              cursor: "pointer",
+              zIndex: 10
             }}
           >
             <FaShareAlt color="#fe3d00" />
           </button>
         </div>
 
-        {imagesArray.length > 1 && (
+        {/* 🔥 THUMBNAILS (IMAGES + VIDEO TRIGGER) */}
+        {(imagesArray.length > 1 || videoEmbedUrl) && (
           <div style={{
             display: "flex",
             gap: "10px",
             overflowX: "auto",
             padding: "15px 0"
           }}>
+            {/* Render Images */}
             {imagesArray.map((img, index) => (
               <img
                 key={index}
                 src={img}
-                onClick={() => setSelectedImage(img)}
+                onClick={() => {
+                  setSelectedImage(img);
+                  setIsVideoMode(false);
+                }}
                 style={{
                   minWidth: "70px",
                   height: "70px",
                   objectFit: "cover",
                   borderRadius: "10px",
                   cursor: "pointer",
-                  border:
-                    selectedImage === img
+                  border: (!isVideoMode && selectedImage === img)
                       ? "3px solid #fe3d00"
                       : "2px solid #ddd"
                 }}
                 alt="thumbnail"
               />
             ))}
+
+            {/* 🔥 Video Thumbnail Button */}
+            {videoEmbedUrl && (
+              <div 
+                onClick={() => setIsVideoMode(true)}
+                style={{
+                  minWidth: "70px",
+                  height: "70px",
+                  background: "#000",
+                  borderRadius: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  border: isVideoMode ? "3px solid #fe3d00" : "2px solid #333",
+                  color: "white"
+                }}
+              >
+                <FaPlay size={20} />
+                <span style={{ fontSize: "10px", marginTop: "4px" }}>VIDEO</span>
+              </div>
+            )}
           </div>
         )}
 
         <h2 className="mt-3">{title}</h2>
 
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <span style={{
-            color: "#fe3d00",
-            fontSize: "26px",
-            fontWeight: "700"
-          }}>
+          <span style={{ color: "#fe3d00", fontSize: "26px", fontWeight: "700" }}>
             ₹{price}
           </span>
 
           {originalPrice && (
-            <span style={{
-              textDecoration: "line-through",
-              color: "#777"
-            }}>
+            <span style={{ textDecoration: "line-through", color: "#777" }}>
               ₹{originalPrice}
             </span>
           )}
@@ -279,13 +330,7 @@ export default function ImageDetails() {
 
         <button
           onClick={() => setExpanded(!expanded)}
-          style={{
-            background: "transparent",
-            color: "#fe3d00",
-            border: "none",
-            fontWeight: "600",
-            cursor: "pointer"
-          }}
+          style={{ background: "transparent", color: "#fe3d00", border: "none", fontWeight: "600", cursor: "pointer" }}
         >
           {expanded ? "Show Less ▲" : "Read More ▼"}
         </button>
