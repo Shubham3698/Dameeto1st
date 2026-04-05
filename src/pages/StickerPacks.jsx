@@ -25,8 +25,8 @@ export default function StickerPacks() {
       rating: 4.8,
       stock: 15,
       wishlistCount: 15, // Default count
-      src: "https://i.pinimg.com/736x/80/07/d8/8007d8ba979d036cb1a6c18aa701f369.jpg",
-      subImages: [],
+      src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",
+      subImages: ["https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg"],
       tags: ["stickers", "dtf", "premium", "new-drop"],
     },
   ]);
@@ -78,7 +78,7 @@ export default function StickerPacks() {
           <div
             key={item.id}
             className="bg-white rounded-3xl shadow-lg overflow-hidden cursor-pointer"
-            onClick={() => handleViewDetails(item)}
+           
           >
             <div className="relative">
               <div className="aspect-[10/14] w-full overflow-hidden">
