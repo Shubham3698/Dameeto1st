@@ -118,7 +118,7 @@
       }
     };
 
-    const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game","/sticker-packs"];
+    const hiddenRoutes = ["/home", "/cart", "/search", "/search-results", "/view-order","/account","/memory-game","/sticker-packs","/collaboration"];
     const isButtonHidden = hiddenRoutes.includes(location.pathname) || location.pathname.startsWith("/order/") || location.pathname.startsWith("/image/");
 
     if (loading) {
