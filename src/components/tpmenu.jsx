@@ -37,7 +37,7 @@ export default function BottomMenu({ items }) {
   const data = items || [
     { label: "Stickers", path: "/" },
     { label: "About us", path: "/about" },
-    { label: "Explore", path: "/sticker" },
+    { label: "Explore", path: "/explore" },
     { label: "Poster", path: "/poster" },
     { label: "Goodies", path: "/goodies" },
     { label: "Marvel", path: "/marvel" },
