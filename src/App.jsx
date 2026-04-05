@@ -14,6 +14,7 @@ import User from "./pages/User";
 import SearchPage from "./pages/SearchPage";
 import SearchResults from "./pages/SearchResults";
 import ViewOrders from "./pages/ViewOrders";
+import Collaboration from "./pages/CollabPage";
 import OrderDetails from "./pages/OrderDetails";
 import HomePage from "./pages/HomePage";
 import LearningProductsPage from "./pages/LearningProductsPage";
@@ -39,7 +40,7 @@ const Sidebar = ({ isOpen, onClose, navigate }) => (
         <button onClick={onClose} className="text-2xl text-gray-500 hover:text-black">✖</button>
       </div>
       <nav className="flex flex-col gap-2">
-        {["EXPLORE", "Sticker Packs", "Our-story", "About", "View Order", "Account"].map((item) => (
+        {["EXPLORE", "Collaboration","Sticker Packs", "Our-story", "About", "View Order", "Account"].map((item) => (
           <div key={item} onClick={() => { navigate(`/${item.toLowerCase().replace(" ", "-")}`); onClose(); }} className="p-3 text-lg font-medium text-gray-700 hover:bg-[#fff3eb] hover:text-[#fe3d00] rounded-xl cursor-pointer transition-all">
             {item}
           </div>
@@ -131,7 +132,7 @@ function App() {
         <Route path="/" element={<Trending />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/about" element={<About />} />
-        <Route path="/sticker" element={<Sticker />} />
+        <Route path="/explore" element={<Sticker />} />
         <Route path="/poster" element={<Poster />} />
         <Route path="/learning-products" element={<LearningProductsPage />} />
         <Route path="/goodies" element={<Goodies />} />
@@ -146,6 +147,7 @@ function App() {
         <Route path="/view-order" element={<ViewOrders />} />
         <Route path="/sticker-packs" element={<StickerPacks />} />
         <Route path="/Our-story" element={<Story />} />
+        <Route path="/collaboration" element={<Collaboration />} />
         <Route path="/order/:id" element={<OrderDetails />} />
         <Route path="*" element={<div className="text-center mt-24 text-2xl font-bold">404 - Not Found</div>} />
       </Routes>
