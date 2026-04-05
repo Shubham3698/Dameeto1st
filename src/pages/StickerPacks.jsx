@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -6,12 +6,11 @@ import { toast } from "react-hot-toast";
 export default function StickerPacks() {
   const navigate = useNavigate();
 
-  // 🔥 DYNAMIC URL: Localhost aur Render dono pe chalega
   const API_BASE_URL = window.location.hostname === "localhost" 
     ? "http://localhost:3000" 
     : "https://serdeptry1st.onrender.com";
 
-  // State mein packs daal rahe hain taaki UI update ho sake
+  // State: Initial data wahi rahega jo aapne diya hai
   const [packs, setPacks] = useState([
     {
       id: "stk-pack-1",
@@ -24,22 +23,45 @@ export default function StickerPacks() {
       discount: 48,
       rating: 4.8,
       stock: 15,
-      wishlistCount: 15, // Default count
+      wishlistCount: 0, // Shuruat mein 0 ya loading state
       src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",
       subImages: ["https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg"],
       tags: ["stickers", "dtf", "premium", "new-drop"],
     },
   ]);
 
+  // 🔥 NEW: MongoDB se latest data fetch karne ka logic
+  useEffect(() => {
+    const fetchLatestCounts = async () => {
+      try {
+        // Hum har pack ke liye latest data mangwayenge
+        const updatedPacks = await Promise.all(
+          packs.map(async (pack) => {
+            try {
+              const res = await axios.get(`${API_BASE_URL}/api/products/single/${pack.id}`);
+              // Agar DB mein product mil gaya, toh uska wishlistCount le lo
+              return { ...pack, wishlistCount: res.data.wishlistCount || pack.wishlistCount };
+            } catch (e) {
+              return pack; // Error pe purana hi rakho
+            }
+          })
+        );
+        setPacks(updatedPacks);
+      } catch (err) {
+        console.error("Fetch Error:", err);
+      }
+    };
+
+    fetchLatestCounts();
+  }, []); // Component load hote hi chalega
+
   const handleViewDetails = (item) => {
     const encodedId = btoa(item.id.toString());
     navigate(`/image/${encodedId}`, { state: { item, category: item.category } });
   };
 
-  // 🔥 WISHLIST TOGGLE FUNCTION
   const handleWishlistClick = async (e, productId) => {
-    e.stopPropagation(); // Card click event ko rokne ke liye
-    
+    e.stopPropagation(); 
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) {
       toast.error("Please login to wishlist! ❤️");
@@ -47,7 +69,6 @@ export default function StickerPacks() {
     }
 
     try {
-      // ✅ UPDATED URL: Match with backend 'action/wishlist' route
       const res = await axios.post(`${API_BASE_URL}/api/products/action/wishlist/${productId}`, {
         email: userEmail
       });
@@ -55,7 +76,7 @@ export default function StickerPacks() {
       if (res.data.success) {
         toast.success(res.data.status === "added" ? "Wishlisted! 🔥" : "Removed! 💔");
         
-        // 🔥 UPDATE UI (15 se 16 ya wapas 15)
+        // UI ko turant update karo
         setPacks(prevPacks => 
           prevPacks.map(p => 
             p.id === productId ? { ...p, wishlistCount: res.data.count } : p
@@ -64,72 +85,67 @@ export default function StickerPacks() {
       }
     } catch (err) {
       console.error("Wishlist Error:", err);
-      // Agar abhi bhi 404 aaye toh console mein check karo URL kya ban raha hai
       toast.error("Error updating wishlist");
     }
   };
 
   return (
     <div className="p-4 bg-[#fff3eb] min-h-screen">
-      <h1 className="text-2xl font-bold text-[#fe3d00] mb-4">Sticker Packs 🔥</h1>
+      <h1 className="text-2xl font-bold text-[#fe3d00] mb-6 font-black uppercase">Sticker Packs 🔥</h1>
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-6">
         {packs.map((item) => (
           <div
             key={item.id}
-            className="bg-white rounded-3xl shadow-lg overflow-hidden cursor-pointer"
-           
+            className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100"
           >
             <div className="relative">
               <div className="aspect-[10/14] w-full overflow-hidden">
                 <img
                   src={item.src}
                   alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
-              <div className="absolute top-0 left-0 bg-[#fe3d00] text-white text-sm px-4 py-1 rounded-br-2xl font-semibold">
-                Live Now
+              <div className="absolute top-0 left-0 bg-[#fe3d00] text-white text-[10px] px-4 py-1.5 rounded-br-2xl font-black uppercase tracking-tighter">
+                Dameeto Drop
               </div>
 
-              {/* ❤️ HEART ICON */}
               <div 
-                className="absolute top-3 right-3 z-10"
+                className="absolute top-3 right-3 z-10 cursor-pointer"
                 onClick={(e) => handleWishlistClick(e, item.id)}
               >
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow active:scale-90 transition-transform">
-                  <span className="text-red-500 text-xl">❤️</span>
+                <div className="w-11 h-11 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                  <span className="text-red-500 text-2xl">❤️</span>
                 </div>
               </div>
 
-              <div className="absolute bottom-3 left-3 flex flex-col gap-1">
-                <span className="bg-[#0f2d3f] text-white text-xs px-3 py-1 rounded-full w-fit">
+              <div className="absolute bottom-3 left-3 flex flex-col gap-2">
+                <span className="bg-[#0f2d3f] text-white text-[10px] px-3 py-1 rounded-full w-fit font-bold tracking-widest">
                   {item.category.toUpperCase()}
                 </span>
-                
-                {/* 🔥 WISHLIST COUNT */}
-                <span className="bg-white/90 text-gray-800 text-xs px-3 py-1 rounded-full shadow font-bold">
-                  ❤️ {item.wishlistCount || 0} wishlisted
+                <span className="bg-white/95 text-gray-800 text-[11px] px-3 py-1 rounded-full shadow-sm font-black">
+                  ❤️ {item.wishlistCount} WISHLISTED
                 </span>
               </div>
             </div>
 
-            <div className="p-4">
-              <h2 className="text-lg font-bold text-gray-800">{item.title}</h2>
-              <p className="text-sm text-gray-500 mb-2">{item.shortDesc}</p>
+            <div className="p-5">
+              <h2 className="text-xl font-black text-gray-800 leading-tight mb-2">{item.title}</h2>
+              <p className="text-sm text-gray-500 mb-4 font-medium">{item.shortDesc}</p>
 
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xl font-black text-[#fe3d00]">₹{item.finalPrice}</span>
-                <span className="line-through text-gray-400 text-sm">₹{item.originalPrice}</span>
+              <div className="flex items-center gap-3 mb-5">
+                <span className="text-2xl font-black text-[#fe3d00]">₹{item.finalPrice}</span>
+                <span className="line-through text-gray-400 text-sm font-bold">₹{item.originalPrice}</span>
+                <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-md font-bold">
+                  -{item.discount}%
+                </span>
               </div>
 
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleViewDetails(item);
-                }}
-                className="mt-4 w-full bg-[#fe3d00] text-white py-3 rounded-xl font-bold shadow-md active:scale-95 transition-all"
+                onClick={() => handleViewDetails(item)}
+                className="w-full bg-[#fe3d00] text-white py-4 rounded-2xl font-black shadow-[0_8px_20px_rgba(254,61,0,0.3)] active:scale-95 transition-all uppercase tracking-widest text-sm"
               >
                 View Details
               </button>
