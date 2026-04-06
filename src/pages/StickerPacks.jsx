@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
+// Data import kiya
+import { stickerPacksData } from "../contexAndhooks/Ddata";
+
 export default function StickerPacks() {
   const navigate = useNavigate();
 
@@ -10,40 +13,21 @@ export default function StickerPacks() {
     ? "http://localhost:3000" 
     : "https://serdeptry1st.onrender.com";
 
-  // State: Initial data wahi rahega jo aapne diya hai
-  const [packs, setPacks] = useState([
-    {
-      id: "stk-pack-1",
-      category: "stickers",
-      title: "1st 10 DTF-Sticker Pack",
-      shortDesc: "Premium 10-piece waterproof sticker collection",
-      longDesc: "Our first exclusive premium 10 DTF-sticker pack...",
-      finalPrice: 259,
-      originalPrice: 499,
-      discount: 48,
-      rating: 4.8,
-      stock: 15,
-      wishlistCount: 0, // Shuruat mein 0 ya loading state
-      src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",
-      subImages: ["https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg"],
-      tags: ["stickers", "dtf", "premium", "new-drop"],
-      videoUrl: "https://www.youtube.com/shorts/PFQzW2oez00?feature=share",
-    },
-  ]);
+  // Initial state ab imported data se ban rahi hai
+  const [packs, setPacks] = useState(stickerPacksData);
 
-  // 🔥 NEW: MongoDB se latest data fetch karne ka logic
+  // 🔥 Database se latest wishlist counts fetch karne ka logic
   useEffect(() => {
     const fetchLatestCounts = async () => {
       try {
-        // Hum har pack ke liye latest data mangwayenge
         const updatedPacks = await Promise.all(
           packs.map(async (pack) => {
             try {
               const res = await axios.get(`${API_BASE_URL}/api/products/single/${pack.id}`);
-              // Agar DB mein product mil gaya, toh uska wishlistCount le lo
+              // Agar DB mein product hai, toh uska real-time count lo
               return { ...pack, wishlistCount: res.data.wishlistCount || pack.wishlistCount };
             } catch (e) {
-              return pack; // Error pe purana hi rakho
+              return pack; // Error par static data hi dikhao
             }
           })
         );
@@ -54,7 +38,7 @@ export default function StickerPacks() {
     };
 
     fetchLatestCounts();
-  }, []); // Component load hote hi chalega
+  }, []); 
 
   const handleViewDetails = (item) => {
     const encodedId = btoa(item.id.toString());
@@ -77,7 +61,7 @@ export default function StickerPacks() {
       if (res.data.success) {
         toast.success(res.data.status === "added" ? "Wishlisted! 🔥" : "Removed! 💔");
         
-        // UI ko turant update karo
+        // Local UI state ko DB response ke sath turant update karo
         setPacks(prevPacks => 
           prevPacks.map(p => 
             p.id === productId ? { ...p, wishlistCount: res.data.count } : p
@@ -100,6 +84,7 @@ export default function StickerPacks() {
             key={item.id}
             className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100"
           >
+            {/* Image & Badges Section */}
             <div className="relative">
               <div className="aspect-[10/14] w-full overflow-hidden">
                 <img
@@ -132,6 +117,7 @@ export default function StickerPacks() {
               </div>
             </div>
 
+            {/* Details Section */}
             <div className="p-5">
               <h2 className="text-xl font-black text-gray-800 leading-tight mb-2">{item.title}</h2>
               <p className="text-sm text-gray-500 mb-4 font-medium">{item.shortDesc}</p>

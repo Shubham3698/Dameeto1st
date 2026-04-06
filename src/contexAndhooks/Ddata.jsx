@@ -1089,3 +1089,24 @@ export const learningProducts = [
     src: "https://i.pinimg.com/736x/b7/a2/bd/b7a2bd58e7115c1bdb98eaecc0fdcb42.jpg"
   }
 ];
+
+export const stickerPacksData = [
+  {
+    id: "stk-pack-1",
+    category: "stickers",
+    title: "1st 10 DTF-Sticker Pack",
+    shortDesc: "Premium 10-piece waterproof sticker collection",
+    longDesc: "Our first exclusive premium 10 DTF-sticker pack...",
+    finalPrice: 259,
+    originalPrice: 499,
+    discount: 48,
+    rating: 4.8,
+    stock: 15,
+    wishlistCount: 0, 
+    src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",
+    subImages: ["https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg"],
+    tags: ["stickers", "dtf", "premium", "new-drop"],
+    videoUrl: "https://www.youtube.com/shorts/PFQzW2oez00?feature=share",
+  },
+  // Aap yahan aur bhi sticker packs add kar sakte hain
+];

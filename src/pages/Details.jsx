@@ -16,7 +16,9 @@ import {
   goodiesData,
   funnyData,
   hotData,
-  learningProducts
+  learningProducts,
+  stickerPacksData,
+  
 } from "../contexAndhooks/Ddata";
 
 export default function ImageDetails() {
@@ -76,7 +78,9 @@ const getEmbedUrl = (url) => {
       ...goodiesData,
       ...funnyData,
       ...hotData,
-      ...learningProducts
+      ...learningProducts,
+      ...stickerPacksData
+      
     ];
   }, []);
 
