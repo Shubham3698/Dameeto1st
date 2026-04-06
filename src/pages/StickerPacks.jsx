@@ -27,6 +27,7 @@ export default function StickerPacks() {
       src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",
       subImages: ["https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg"],
       tags: ["stickers", "dtf", "premium", "new-drop"],
+      videoUrl: "https://www.youtube.com/shorts/PFQzW2oez00?feature=share",
     },
   ]);
 

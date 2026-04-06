@@ -33,17 +33,30 @@ export default function ImageDetails() {
   const [dbItem, setDbItem] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  /* 🔥 YouTube Embed URL Generator (Safe Logic) */
-  const getEmbedUrl = (url) => {
-    if (!url) return null;
-    let videoId = "";
-    if (url.includes("v=")) {
-      videoId = url.split("v=")[1].split("&")[0];
-    } else if (url.includes("youtu.be/")) {
-      videoId = url.split("youtu.be/")[1];
-    }
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
-  };
+const getEmbedUrl = (url) => {
+  if (!url) return null;
+
+  let videoId = "";
+
+  // watch?v=
+  if (url.includes("v=")) {
+    videoId = url.split("v=")[1].split("&")[0];
+  }
+
+  // youtu.be/
+  else if (url.includes("youtu.be/")) {
+    videoId = url.split("youtu.be/")[1].split("?")[0];
+  }
+
+  // 🔥 SHORTS SUPPORT
+  else if (url.includes("/shorts/")) {
+    videoId = url.split("/shorts/")[1].split("?")[0];
+  }
+
+  return videoId
+    ? `https://www.youtube.com/embed/${videoId}`
+    : null;
+};
 
   /* 🔥 Decode ID safely */
   const decodedId = useMemo(() => {
