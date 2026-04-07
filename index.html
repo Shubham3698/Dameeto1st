@@ -1,14 +1,56 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- 🔥 Basic -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/lg.png" />
+    <link rel="icon" type="image/png" href="/lg.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dameeto</title>
+
+    <!-- 🔥 Title -->
+    <title>Dameeto - Trending Stickers & Creative Products</title>
+
+    <!-- 🔥 DESCRIPTION (MOST IMPORTANT) -->
+    <meta
+      name="description"
+      content="Dameeto offers trending sticker packs, creative goodies and unique products at affordable prices. Shop now with fast delivery."
+    />
+
+    <!-- 🔥 ROBOTS -->
+    <meta name="robots" content="index, follow" />
+
+    <!-- 🔥 KEYWORDS (optional) -->
+    <meta
+      name="keywords"
+      content="stickers, sticker packs, online shopping, creative products, india store"
+    />
+
+    <!-- 🔥 OPEN GRAPH -->
+    <meta property="og:title" content="Dameeto Store" />
+    <meta
+      property="og:description"
+      content="Buy trending sticker packs and creative products online."
+    />
+    <meta property="og:image" content="/preview.jpg" />
+    <meta property="og:type" content="website" />
+
+    <!-- 🔥 CANONICAL -->
+    <link rel="canonical" href="https://yourdomain.com/" />
+
+    <!-- Razorpay -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   </head>
+
   <body style="background-color: #fff3eb">
+    <!-- 🔥 Fallback content (SEO ke liye IMPORTANT) -->
+    <noscript>
+      <h1>Dameeto - Sticker Store</h1>
+      <p>
+        Buy trending stickers and creative products online in India at best prices.
+      </p>
+    </noscript>
+
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
