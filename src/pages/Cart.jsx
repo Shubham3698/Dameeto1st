@@ -40,19 +40,26 @@ export default function CartPage() {
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // 🔥 AUTO-REMOVE GIFT LOGIC: Agar subtotal 299 se kam ho toh gift hatao
-  useEffect(() => {
-    const threshold = 299;
-    const hasGift = cartItems.some(item => item.price === 0);
+// 🔥 REFINED AUTO-REMOVE GIFT LOGIC: Har gift ka apna threshold check hoga
+useEffect(() => {
+  // Sirf wahi items pakdo jo gifts hain (price === 0)
+  const giftsInCart = cartItems.filter(item => item.price === 0);
 
-    if (subtotal < threshold && hasGift) {
-      cartItems.forEach((item, index) => {
-        if (item.price === 0) {
-          updateQuantity(index, -item.quantity);
-        }
-      });
+  giftsInCart.forEach((gift) => {
+    // Agar gift ka threshold set nahi hai toh default 299 maan lo
+    const giftThreshold = gift.threshold || 299;
+
+    if (subtotal < giftThreshold) {
+      // Us gift ka index dhundo cart mein
+      const index = cartItems.findIndex(i => i.title === gift.title);
+      if (index !== -1) {
+        // Remove karne ke liye quantity ko minus kar do
+        updateQuantity(index, -gift.quantity);
+        console.log(`Removed ${gift.title} because subtotal is below ₹${giftThreshold}`);
+      }
     }
-  }, [subtotal, cartItems, updateQuantity]);
-
+  });
+}, [subtotal, cartItems, updateQuantity]);
   const discountAmount = (subtotal * discountPercent) / 100;
   const finalTotal = subtotal - discountAmount;
 
@@ -157,20 +164,21 @@ export default function CartPage() {
       </div>
 
       {/* 2. 🔥 GIFT CAROUSEL */}
-      <div className="my-4">
-        <GiftCarousel 
-          subtotal={subtotal} 
-          cartItems={cartItems} 
-          onAddGift={(gift) => addToCart({ ...gift, quantity: 1, src: gift.src })} 
-          onRemoveGift={(giftTitle) => {
-            const giftIndex = cartItems.findIndex(item => item.title === giftTitle);
-            if (giftIndex !== -1) {
-              updateQuantity(giftIndex, -cartItems[giftIndex].quantity);
-            }
-          }}
-        />
-      </div>
-
+{/* 2. 🔥 REFINED GIFT CAROUSEL */}
+<div className="my-4">
+  <GiftCarousel 
+    subtotal={subtotal} 
+    cartItems={cartItems} 
+    // ✅ Yahan {...gift} ka use karo taaki threshold bhi cart mein chala jaye
+    onAddGift={(gift) => addToCart({ ...gift, quantity: 1, price: 0 })} 
+    onRemoveGift={(giftTitle) => {
+      const giftIndex = cartItems.findIndex(item => item.title === giftTitle);
+      if (giftIndex !== -1) {
+        updateQuantity(giftIndex, -cartItems[giftIndex].quantity);
+      }
+    }}
+  />
+</div>
       <div ref={cartEndRef}></div>
 
       {/* 3. Order Summary Stylish Card */}

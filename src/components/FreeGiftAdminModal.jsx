@@ -3,7 +3,8 @@ import { Button, Form, Image, Tabs, Tab } from "react-bootstrap";
 import GiftCarousel from "./FreeGiftCarousel"; 
 
 const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
-  const [formData, setFormData] = useState({ title: "", description: "" });
+  // 1. Added threshold to state
+  const [formData, setFormData] = useState({ title: "", description: "", threshold: "" });
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [allGifts, setAllGifts] = useState([]);
@@ -11,8 +12,8 @@ const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
   
   // 🔥 Edit States
   const [editingId, setEditingId] = useState(null);
-  const [editData, setEditData] = useState({ title: "", description: "" });
-  const [editImage, setEditImage] = useState(null); // Nayi image ke liye
+  const [editData, setEditData] = useState({ title: "", description: "", threshold: "" });
+  const [editImage, setEditImage] = useState(null);
 
   const apiBase = API_BASE_URL.replace('/customer-orders', '') + "/free-gifts";
 
@@ -30,15 +31,22 @@ const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
     e.preventDefault();
     if (!image) return alert("Select image");
     setLoading(true);
+    
     const data = new FormData();
     data.append("title", formData.title);
     data.append("description", formData.description);
+    data.append("threshold", formData.threshold); // 🔥 New Field
     data.append("image", image);
 
     try {
       const res = await fetch(`${apiBase}/upload`, { method: "POST", body: data });
       const result = await res.json();
-      if (result.success) { alert("Gift Added!"); setKey('manage'); fetchGifts(); }
+      if (result.success) { 
+        alert("Gift Added! 🎁"); 
+        setFormData({ title: "", description: "", threshold: "" });
+        setKey('manage'); 
+        fetchGifts(); 
+      }
     } catch (err) { alert("Failed"); } finally { setLoading(false); }
   };
 
@@ -51,11 +59,14 @@ const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
     } catch (err) { alert("Failed"); }
   };
 
-  // 🔥 Edit Logic with Image Support
   const startEditing = (gift) => {
     setEditingId(gift._id);
-    setEditData({ title: gift.title, description: gift.description || "" });
-    setEditImage(null); // Reset image selection
+    setEditData({ 
+      title: gift.title, 
+      description: gift.description || "", 
+      threshold: gift.threshold || "" 
+    });
+    setEditImage(null);
   };
 
   const handleUpdate = async (id) => {
@@ -63,12 +74,13 @@ const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
     const data = new FormData();
     data.append("title", editData.title);
     data.append("description", editData.description);
-    if (editImage) data.append("image", editImage); // Nayi image agar select ki ho
+    data.append("threshold", editData.threshold); // 🔥 Update threshold
+    if (editImage) data.append("image", editImage);
 
     try {
       const res = await fetch(`${apiBase}/edit/${id}`, {
         method: "PUT",
-        body: data, // No headers needed for FormData
+        body: data,
       });
       const result = await res.json();
       if (result.success) {
@@ -94,11 +106,27 @@ const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
         <Tabs activeKey={key} onSelect={(k) => { setKey(k); setEditingId(null); }} className="mb-4 custom-tabs">
           <Tab eventKey="upload" title="Upload">
             <div className="mt-3">
-              <GiftCarousel subtotal={0} cartItems={[]} onAddGift={()=>{}} onRemoveGift={()=>{}} />
               <Form onSubmit={handleSubmit} className="mt-3">
-                <Form.Control className="mb-3" type="text" placeholder="Title" required onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-                <Form.Control className="mb-3" as="textarea" placeholder="Description" onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-                <Form.Control className="mb-4" type="file" accept="image/*" required onChange={(e) => setImage(e.target.files[0])} />
+                <Form.Group className="mb-3">
+                  <Form.Label style={{fontWeight: '700'}}>Gift Title</Form.Label>
+                  <Form.Control type="text" placeholder="e.g. Free Sticker" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label style={{fontWeight: '700'}}>Price Limit (Threshold)</Form.Label>
+                  <Form.Control type="number" placeholder="Order value to unlock (e.g. 299)" required value={formData.threshold} onChange={(e) => setFormData({ ...formData, threshold: e.target.value })} />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label style={{fontWeight: '700'}}>Description</Form.Label>
+                  <Form.Control as="textarea" rows={2} placeholder="Small note about gift" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+                </Form.Group>
+
+                <Form.Group className="mb-4">
+                  <Form.Label style={{fontWeight: '700'}}>Gift Image</Form.Label>
+                  <Form.Control type="file" accept="image/*" required onChange={(e) => setImage(e.target.files[0])} />
+                </Form.Group>
+
                 <Button type="submit" disabled={loading} style={{ width: '100%', background: '#fe3d00', border: 'none', padding: '12px', fontWeight: '700', borderRadius: '12px' }}>
                   {loading ? "Uploading..." : "Save Gift"}
                 </Button>
@@ -113,19 +141,20 @@ const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
                   <div className="d-flex align-items-start mb-2">
                     <div style={{ position: 'relative' }}>
                       <Image src={gift.src} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', marginRight: '12px' }} />
-                      {editingId === gift._id && <div style={{ fontSize: '10px', textAlign: 'center', color: '#fe3d00', fontWeight: '700' }}>New Image?</div>}
                     </div>
                     
                     <div style={{ flex: 1 }}>
                       {editingId === gift._id ? (
                         <div className="d-flex flex-column gap-2">
                           <Form.Control size="sm" value={editData.title} placeholder="New Title" onChange={(e) => setEditData({ ...editData, title: e.target.value })} />
+                          <Form.Control size="sm" type="number" value={editData.threshold} placeholder="New Limit" onChange={(e) => setEditData({ ...editData, threshold: e.target.value })} />
                           <Form.Control size="sm" as="textarea" rows={1} value={editData.description} placeholder="New Description" onChange={(e) => setEditData({ ...editData, description: e.target.value })} />
                           <Form.Control size="sm" type="file" accept="image/*" onChange={(e) => setEditImage(e.target.files[0])} />
                         </div>
                       ) : (
                         <div>
                           <h6 style={{ margin: 0, fontSize: '14px', fontWeight: '700' }}>{gift.title}</h6>
+                          <div style={{fontSize: '12px', color: '#fe3d00', fontWeight: '800'}}>Unlock: ₹{gift.threshold || 299}</div>
                           <p style={{ margin: 0, fontSize: '11px', color: '#666' }}>{gift.description}</p>
                         </div>
                       )}
@@ -136,7 +165,7 @@ const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
                     {editingId === gift._id ? (
                       <>
                         <Button variant="success" size="sm" disabled={loading} onClick={() => handleUpdate(gift._id)}>
-                          {loading ? "Saving..." : "Save Changes"}
+                          {loading ? "Saving..." : "Save"}
                         </Button>
                         <Button variant="secondary" size="sm" onClick={() => setEditingId(null)}>Cancel</Button>
                       </>
@@ -157,4 +186,5 @@ const GiftUploadModal = ({ onClose, API_BASE_URL }) => {
     </div>
   );
 };
+
 export default GiftUploadModal;
