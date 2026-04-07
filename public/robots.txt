@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dameeto.in/sitemap.xml
