@@ -1104,7 +1104,7 @@ export const stickerPacksData = [
     stock: 15,
     wishlistCount: 0, 
     src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",
-    subImages: ["https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg"],
+    subImages: ["https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg","https://i.pinimg.com/736x/4f/9c/5c/4f9c5c6b17f2c27b0b2fbdb36b9db327.jpg","https://i.pinimg.com/736x/bb/e3/dd/bbe3dd72c4aec824fa693e6ecf4f8c4b.jpg"],
     tags: ["stickers", "dtf", "premium", "new-drop"],
     videoUrl: "https://www.youtube.com/shorts/PFQzW2oez00?feature=share",
   },
