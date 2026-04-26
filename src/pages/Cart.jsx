@@ -6,6 +6,8 @@ import AddressModal from "../components/AddressModal";
 import PayModal from "../components/PayModal";
 import GiftCarousel from "../components/FreeGiftCarousel"; 
 import GiftUploadModal from "../components/FreeGiftAdminModal"; 
+import DeliveryBar from "../components/DeliveryBar";
+
 
 export default function CartPage() {
   const { cartItems, updateQuantity, clearCart, addToCart } = useContext(CartContext);
@@ -162,6 +164,7 @@ useEffect(() => {
           ))
         )}
       </div>
+      
 
       {/* 2. 🔥 GIFT CAROUSEL */}
 {/* 2. 🔥 REFINED GIFT CAROUSEL */}
@@ -180,6 +183,8 @@ useEffect(() => {
   />
 </div>
       <div ref={cartEndRef}></div>
+
+      <DeliveryBar />
 
       {/* 3. Order Summary Stylish Card */}
       {cartItems.length > 0 && (

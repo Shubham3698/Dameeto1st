@@ -364,6 +364,8 @@ Please share more details.`;
           customers={item?.customers || "5000+"}
           rating={item?.rating || "4.9"}
         />
+        
+        
 
     <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
   
@@ -477,7 +479,10 @@ Please share more details.`;
   >
     <FaWhatsapp size={22} />
   </button>
+
 </div>
+
+
 
         <h3 style={{ marginTop: "40px" }}>More from {fromCategory}</h3>
 
