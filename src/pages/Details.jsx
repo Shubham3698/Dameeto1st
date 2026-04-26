@@ -1,13 +1,11 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useMemo
-} from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { FaHeart, FaShoppingCart, FaShareAlt, FaPlay } from "react-icons/fa"; // FaPlay add kiya
 import Nwmasonry from "../components/Nwmasonry";
 import { CartContext } from "../contexAndhooks/CartContext";
+
+import CustomerProof from "../components/CustomerProof";
+import { FaWhatsapp } from "react-icons/fa";
 
 import {
   trendingData,
@@ -18,7 +16,6 @@ import {
   hotData,
   learningProducts,
   stickerPacksData,
-  
 } from "../contexAndhooks/Ddata";
 
 export default function ImageDetails() {
@@ -35,30 +32,28 @@ export default function ImageDetails() {
   const [dbItem, setDbItem] = useState(null);
   const [loading, setLoading] = useState(false);
 
-const getEmbedUrl = (url) => {
-  if (!url) return null;
+  const getEmbedUrl = (url) => {
+    if (!url) return null;
 
-  let videoId = "";
+    let videoId = "";
 
-  // watch?v=
-  if (url.includes("v=")) {
-    videoId = url.split("v=")[1].split("&")[0];
-  }
+    // watch?v=
+    if (url.includes("v=")) {
+      videoId = url.split("v=")[1].split("&")[0];
+    }
 
-  // youtu.be/
-  else if (url.includes("youtu.be/")) {
-    videoId = url.split("youtu.be/")[1].split("?")[0];
-  }
+    // youtu.be/
+    else if (url.includes("youtu.be/")) {
+      videoId = url.split("youtu.be/")[1].split("?")[0];
+    }
 
-  // 🔥 SHORTS SUPPORT
-  else if (url.includes("/shorts/")) {
-    videoId = url.split("/shorts/")[1].split("?")[0];
-  }
+    // 🔥 SHORTS SUPPORT
+    else if (url.includes("/shorts/")) {
+      videoId = url.split("/shorts/")[1].split("?")[0];
+    }
 
-  return videoId
-    ? `https://www.youtube.com/embed/${videoId}`
-    : null;
-};
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  };
 
   /* 🔥 Decode ID safely */
   const decodedId = useMemo(() => {
@@ -79,17 +74,14 @@ const getEmbedUrl = (url) => {
       ...funnyData,
       ...hotData,
       ...learningProducts,
-      ...stickerPacksData
-      
+      ...stickerPacksData,
     ];
   }, []);
 
   /* 🔥 1. Check Local/State First */
   const localItem = useMemo(() => {
     if (location.state?.item) return location.state.item;
-    return allLocalProducts.find(
-      (p) => String(p.id) === String(decodedId)
-    );
+    return allLocalProducts.find((p) => String(p.id) === String(decodedId));
   }, [decodedId, location.state, allLocalProducts]);
 
   /* 🔥 2. Fetch from DB if not found in Local/State */
@@ -99,7 +91,9 @@ const getEmbedUrl = (url) => {
 
       setLoading(true);
       try {
-        const response = await fetch(`https://serdeptry1st.onrender.com/api/products/single/${decodedId}`);
+        const response = await fetch(
+          `https://serdeptry1st.onrender.com/api/products/single/${decodedId}`,
+        );
         if (response.ok) {
           const data = await response.json();
           setDbItem(data);
@@ -166,7 +160,9 @@ const getEmbedUrl = (url) => {
   // Loading UI
   if (loading) {
     return (
-      <div style={{ textAlign: "center", marginTop: "100px", color: "#fe3d00" }}>
+      <div
+        style={{ textAlign: "center", marginTop: "100px", color: "#fe3d00" }}
+      >
         <h3>Finding your art... 🚀</h3>
       </div>
     );
@@ -181,18 +177,16 @@ const getEmbedUrl = (url) => {
     );
   }
 
-  const fromCategory = location.state?.category || item.category || "collection";
+  const fromCategory =
+    location.state?.category || item.category || "collection";
   const relatedImages = location.state?.images || [];
 
-  const {
-    title,
-    shortDesc,
-    longDesc,
-    finalPrice,
-    originalPrice
-  } = item;
+  const { title, shortDesc, longDesc, finalPrice, originalPrice } = item;
 
   const price = finalPrice ?? 199;
+  const discountPercent = originalPrice
+  ? Math.round(((originalPrice - price) / originalPrice) * 100)
+  : 0;
 
   const handleAddToCart = () => {
     addToCart({
@@ -202,9 +196,28 @@ const getEmbedUrl = (url) => {
       shortDesc,
       longDesc,
       price,
-      originalPrice
+      originalPrice,
     });
     alert(`${title} added to cart!`);
+  };
+
+  const handleWhatsApp = () => {
+    const phoneNumber = "7080981033"; // 🔥 apna number daal (91 + number)
+
+    const message = `Hello, I'm interested in this product:
+
+🛍️ ${title}
+💰 Price: ₹${price}
+
+👉 ${window.location.href}
+
+Please share more details.`;
+
+    const encodedMessage = encodeURIComponent(message);
+
+    const url = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+    window.open(url, "_blank");
   };
 
   return (
@@ -214,15 +227,28 @@ const getEmbedUrl = (url) => {
         minHeight: "100vh",
         padding: "20px",
         opacity: fadeIn ? 1 : 0,
-        transition: "opacity 0.8s ease-in"
+        transition: "opacity 0.8s ease-in",
       }}
     >
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-
         {/* 🔥 MAIN VIEW (IMAGE OR VIDEO PLAYER) */}
-        <div style={{ position: "relative", width: "100%", borderRadius: "16px", overflow: "hidden", boxShadow: "0 6px 20px rgba(0,0,0,0.2)" }}>
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            borderRadius: "16px",
+            overflow: "hidden",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+          }}
+        >
           {isVideoMode && videoEmbedUrl ? (
-            <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
+            <div
+              style={{
+                position: "relative",
+                paddingBottom: "56.25%",
+                height: 0,
+              }}
+            >
               <iframe
                 src={`${videoEmbedUrl}?autoplay=1`}
                 title="Product Video"
@@ -264,7 +290,7 @@ const getEmbedUrl = (url) => {
               justifyContent: "center",
               boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
               cursor: "pointer",
-              zIndex: 10
+              zIndex: 10,
             }}
           >
             <FaShareAlt color="#fe3d00" />
@@ -273,12 +299,14 @@ const getEmbedUrl = (url) => {
 
         {/* 🔥 THUMBNAILS (IMAGES + VIDEO TRIGGER) */}
         {(imagesArray.length > 1 || videoEmbedUrl) && (
-          <div style={{
-            display: "flex",
-            gap: "10px",
-            overflowX: "auto",
-            padding: "15px 0"
-          }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              overflowX: "auto",
+              padding: "15px 0",
+            }}
+          >
             {/* Render Images */}
             {imagesArray.map((img, index) => (
               <img
@@ -294,9 +322,10 @@ const getEmbedUrl = (url) => {
                   objectFit: "cover",
                   borderRadius: "10px",
                   cursor: "pointer",
-                  border: (!isVideoMode && selectedImage === img)
+                  border:
+                    !isVideoMode && selectedImage === img
                       ? "3px solid #fe3d00"
-                      : "2px solid #ddd"
+                      : "2px solid #ddd",
                 }}
                 alt="thumbnail"
               />
@@ -304,7 +333,7 @@ const getEmbedUrl = (url) => {
 
             {/* 🔥 Video Thumbnail Button */}
             {videoEmbedUrl && (
-              <div 
+              <div
                 onClick={() => setIsVideoMode(true)}
                 style={{
                   minWidth: "70px",
@@ -317,11 +346,13 @@ const getEmbedUrl = (url) => {
                   justifyContent: "center",
                   cursor: "pointer",
                   border: isVideoMode ? "3px solid #fe3d00" : "2px solid #333",
-                  color: "white"
+                  color: "white",
                 }}
               >
                 <FaPlay size={20} />
-                <span style={{ fontSize: "10px", marginTop: "4px" }}>VIDEO</span>
+                <span style={{ fontSize: "10px", marginTop: "4px" }}>
+                  VIDEO
+                </span>
               </div>
             )}
           </div>
@@ -329,74 +360,129 @@ const getEmbedUrl = (url) => {
 
         <h2 className="mt-3">{title}</h2>
 
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <span style={{ color: "#fe3d00", fontSize: "26px", fontWeight: "700" }}>
-            ₹{price}
-          </span>
+        <CustomerProof
+          customers={item?.customers || "5000+"}
+          rating={item?.rating || "4.9"}
+        />
 
-          {originalPrice && (
-            <span style={{ textDecoration: "line-through", color: "#777" }}>
-              ₹{originalPrice}
-            </span>
-          )}
-        </div>
+    <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+  
+  {/* 💰 Final Price */}
+  <span style={{ color: "#fe3d00", fontSize: "26px", fontWeight: "700" }}>
+    ₹{price}
+  </span>
 
-        <p style={{ marginTop: "10px" }}>
-          {expanded ? longDesc : shortDesc}
-        </p>
+  {/* ❌ Original Price */}
+  {originalPrice && (
+    <span style={{ textDecoration: "line-through", color: "#777" }}>
+      ₹{originalPrice}
+    </span>
+  )}
+
+  {/* 🔥 Discount Badge */}
+  {discountPercent > 0 && (
+    <span
+      style={{
+        background: "#e6f7ec",
+        color: "#2e7d32",
+        fontSize: "12px",
+        fontWeight: "600",
+        padding: "4px 8px",
+        borderRadius: "6px"
+      }}
+    >
+      {discountPercent}% OFF
+    </span>
+  )}
+
+</div>
+
+        <p style={{ marginTop: "10px" }}>{expanded ? longDesc : shortDesc}</p>
 
         <button
           onClick={() => setExpanded(!expanded)}
-          style={{ background: "transparent", color: "#fe3d00", border: "none", fontWeight: "600", cursor: "pointer" }}
+          style={{
+            background: "transparent",
+            color: "#fe3d00",
+            border: "none",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
         >
           {expanded ? "Show Less ▲" : "Read More ▼"}
         </button>
 
-        <div style={{ display: "flex", gap: "15px", marginTop: "20px" }}>
-          <button
-            onClick={handleAddToCart}
-            style={{
-              background: "#fe3d00",
-              color: "white",
-              padding: "12px 20px",
-              borderRadius: "50px",
-              border: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              cursor: "pointer"
-            }}
-          >
-            <FaShoppingCart /> Add to Cart
-          </button>
+<div
+  style={{
+    display: "flex",
+    gap: "12px",
+    marginTop: "20px",
+    alignItems: "center"
+  }}
+>
+  {/* 🛒 Add to Cart */}
+  <button
+    onClick={handleAddToCart}
+    style={{
+      background: "#fe3d00",
+      color: "white",
+      height: "52px",              // 🔥 fixed height
+      padding: "0 20px",
+      borderRadius: "50px",
+      border: "none",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      cursor: "pointer",
+      fontWeight: "600"
+    }}
+  >
+    <FaShoppingCart /> Add to Cart
+  </button>
 
-          <button
-            style={{
-              background: "white",
-              border: "2px solid #fe3d00",
-              color: "#fe3d00",
-              width: "55px",
-              height: "55px",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer"
-            }}
-          >
-            <FaHeart />
-          </button>
-        </div>
+  {/* ❤️ Wishlist */}
+  <button
+    style={{
+      background: "white",
+      border: "2px solid #fe3d00",
+      color: "#fe3d00",
+      width: "52px",
+      height: "52px",
+      borderRadius: "50%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer"
+    }}
+  >
+    <FaHeart size={20} />
+  </button>
 
-        <h3 style={{ marginTop: "40px" }}>
-          More from {fromCategory}
-        </h3>
+  {/* 🟢 WhatsApp */}
+  <button
+    onClick={handleWhatsApp}
+    style={{
+      background: "#25D366",
+      border: "none",
+      color: "white",
+      width: "52px",
+      height: "52px",
+      borderRadius: "50%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      boxShadow: "0 4px 10px rgba(37,211,102,0.4)" // 🔥 premium feel
+    }}
+  >
+    <FaWhatsapp size={22} />
+  </button>
+</div>
+
+        <h3 style={{ marginTop: "40px" }}>More from {fromCategory}</h3>
 
         {relatedImages.length > 0 && (
-          <Nwmasonry
-            images={relatedImages}
-            categoryName={fromCategory}
-          />
+          <Nwmasonry images={relatedImages} categoryName={fromCategory} />
         )}
       </div>
     </div>
