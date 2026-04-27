@@ -141,7 +141,7 @@ export default function ImageDetails() {
           ) : (
             selectedImage && <img src={selectedImage} style={{ width: "100%", display: "block" }} alt={title} />
           )}
-          <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "white", border: "none", width: "45px", height: "45px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", cursor: "pointer", zIndex: 10 }}>
+          <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "white", border: "none", width: "45px", height: "45px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", cursor: "pointer", zIndex: 0}}>
             <FaShareAlt color="#fe3d00" />
           </button>
         </div>
