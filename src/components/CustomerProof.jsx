@@ -1,7 +1,13 @@
 import React from "react";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaUser } from "react-icons/fa";
 
-export default function CustomerProof({ customers = "5000+", rating = "4.9" }) {
+export default function CustomerProof({
+  customers = "5000+",
+  rating = "4.9",
+  images = [],
+}) {
+  const totalSlots = 3;
+
   return (
     <div
       style={{
@@ -13,31 +19,49 @@ export default function CustomerProof({ customers = "5000+", rating = "4.9" }) {
     >
       {/* LEFT: Avatars */}
       <div style={{ display: "flex" }}>
-        {["/img1.jpg", "/img2.jpg", "/img3.jpg"].map((img, i) => (
-          <img
-            key={i}
-            src={img}
-            alt="user"
-            style={{
-              width: "28px",
-              height: "28px",
-              borderRadius: "50%",
-              border: "2px solid white",
-              marginLeft: i === 0 ? "0" : "-8px",
-            }}
-          />
-        ))}
+        {[...Array(totalSlots)].map((_, i) => {
+          const img = images[i];
+
+          return img ? (
+            <img
+              key={i}
+              src={img}
+              alt="user"
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "50%",
+                border: "2px solid white",
+                marginLeft: i === 0 ? "0" : "-8px",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <div
+              key={i}
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "50%",
+                border: "2px solid white",
+                marginLeft: i === 0 ? "0" : "-8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "#eee",
+                color: "#888",
+                fontSize: "14px",
+              }}
+            >
+              <FaUser />
+            </div>
+          );
+        })}
       </div>
 
-      {/* RIGHT: Rating + Text */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          lineHeight: "1.2",
-        }}
-      >
-        {/* ⭐ Rating */}
+      {/* RIGHT */}
+      <div style={{ display: "flex", flexDirection: "column", lineHeight: "1.2" }}>
+        
         <div
           style={{
             display: "flex",
@@ -55,7 +79,6 @@ export default function CustomerProof({ customers = "5000+", rating = "4.9" }) {
           </span>
         </div>
 
-        {/* 👇 Text */}
         <span style={{ fontSize: "12px", color: "#555" }}>
           <strong>{customers}</strong> people ordered
         </span>
