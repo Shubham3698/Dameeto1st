@@ -22,8 +22,9 @@
   import AdminOrders from "./pages/AdminOrders";
   import MemoryGame from './pages/MemoryGame';
   import Story from "./pages/Story";
+  import Wishlist from "./pages/Wishlist";
   import StickerPacks from "./pages/StickerPacks";
-
+  import { WishlistProvider } from "./contexAndhooks/WishlistContext";
   // NEW COMPONENT IMPORT
   import PromotionalPopup from "./components/PromotionalPopup";
 
@@ -48,6 +49,7 @@
     { name: "Our Story", path: "/our-story" },
     { name: "About", path: "/about" },
     { name: "View Order", path: "/view-order" },
+    { name: "My Wishlist ❤️", path: "/wishlist" },
     { name: "Account", path: "/account" }
   ].map((item) => (
 
@@ -77,11 +79,13 @@
 
   function AppWrapper() {
     return (
+      <WishlistProvider>
       <CartProvider>
         <BrowserRouter>
           <App />
         </BrowserRouter>
       </CartProvider>
+      </WishlistProvider>
     );
   }
 
@@ -168,6 +172,7 @@
           <Route path="/Our-story" element={<Story />} />
           <Route path="/collaboration" element={<Collaboration />} />
           <Route path="/order/:id" element={<OrderDetails />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="*" element={<div className="text-center mt-24 text-2xl font-bold">404 - Not Found</div>} />
         </Routes>
 
