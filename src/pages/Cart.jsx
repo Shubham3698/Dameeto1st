@@ -7,6 +7,7 @@ import PayModal from "../components/PayModal";
 import GiftCarousel from "../components/FreeGiftCarousel"; 
 import GiftUploadModal from "../components/FreeGiftAdminModal"; 
 import DeliveryBar from "../components/DeliveryBar";
+import PincodeChecker from "../components/PincodeChecker";
 
 
 export default function CartPage() {
@@ -134,7 +135,6 @@ useEffect(() => {
           </Button>
         )}
       </div>
-
       {/* 1. Cart Items List */}
       <div className="mb-4">
         {cartItems.length === 0 ? (
@@ -184,7 +184,9 @@ useEffect(() => {
 </div>
       <div ref={cartEndRef}></div>
 
+
       <DeliveryBar />
+      <PincodeChecker />
 
       {/* 3. Order Summary Stylish Card */}
       {cartItems.length > 0 && (
