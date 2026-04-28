@@ -26,12 +26,18 @@ export default function ReviewCard({ img, name, review, rating = 5 }) {
       />
 
       <Card.Body style={{ padding: "15px 10px" }}>
-        {/* Stars */}
-        <div>
-          {[...Array(rating)].map((_, i) => (
-            <FaStar key={i} color="#fe3d00" style={{ margin: "0 3px" }} />
-          ))}
-        </div>
+      {/* Stars */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  }}
+>
+  {[...Array(rating)].map((_, i) => (
+    <FaStar key={i} color="#fe3d00" style={{ margin: "0 3px" }} />
+  ))}
+</div>
 
         {/* Name */}
         <Card.Title style={{ marginTop: "10px", fontSize: "18px" }}>

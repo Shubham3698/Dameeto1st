@@ -3,9 +3,11 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import heroImg from "../assets/dmtl.jpg"; // <-- image added here
 import FAQ from "../components/Faq";
 import Slides from "../components/Slideabout"
+import { useNavigate } from "react-router-dom";
 import Reviews from "../components/Reviewsection";
 
 export default function About() {
+  const navigate = useNavigate();
   return (
     <div style={{ backgroundColor: "#fff3eb" }}>
 
@@ -31,20 +33,21 @@ export default function About() {
           />
           <FAQ/>
           <Button
-            style={{
-              background: "white",
-              color: "black",
-              border: "4px solid #fe3d00",
-              borderRadius: "6px",
-              fontFamily: "'Great Vibes', cursive",
-              fontSize: "22px",
-            }}
-            variant="danger"
-            size="lg"
-            className="px-4"
-          >
-            Explore Our Products
-          </Button>
+  onClick={() => navigate("/home")}  // 👈 yaha change
+  style={{
+    background: "white",
+    color: "black",
+    border: "4px solid #fe3d00",
+    borderRadius: "6px",
+    fontFamily: "'Great Vibes', cursive",
+    fontSize: "22px",
+  }}
+  variant="danger"
+  size="lg"
+  className="px-4"
+>
+  Explore Our Products
+</Button>
         </div>
 
         <div style={{ marginTop: "50px" }}></div>
