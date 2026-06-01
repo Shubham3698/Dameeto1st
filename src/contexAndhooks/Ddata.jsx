@@ -1094,19 +1094,22 @@ export const stickerPacksData = [
   {
     id: "stk-pack-1",
     category: "stickers",
-    title: "1st 10 DTF-Sticker Pack",
-    shortDesc: "Premium 10-piece waterproof sticker collection",
-    longDesc: "Our first exclusive premium 10 DTF-sticker pack...",
+    title: "1st-ever Exclusive 10 DTF Sticker Pack",
+    shortDesc: "Premium 3D-feel waterproof UV-DTF stickers featuring Porsche GT3 RS, GTA VI, Anime & more!",
+    longDesc: "Level up your gear with our 1st ever exclusive 10-piece sticker drop! 🔥 Crafted with ultra-premium UV-DTF technology, these stickers aren't just regular prints—they are waterproof, scratch-resistant, and pack a vibrant, raised 3D-like texture. \n\nThis viral collection includes:\n• The beastly **Porsche GT3 RS**\n• The hyped **GTA VI Protagonist Couple**\n• The smashing **Angry Hulk Face**\n• Fan-favorite **Anime Characters** in ultimate drip\n• Plus more pop-culture and super-car icons!\n\nPerfect for laptops, phones, bikes, or any smooth surface. Just peel, stick, and flex your vibe!",
     finalPrice: 259,
     originalPrice: 499,
     discount: 48,
     rating: 4.8,
     stock: 15,
     wishlistCount: 0, 
-    src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",
-    subImages: ["https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg","https://i.pinimg.com/736x/4f/9c/5c/4f9c5c6b17f2c27b0b2fbdb36b9db327.jpg","https://i.pinimg.com/736x/bb/e3/dd/bbe3dd72c4aec824fa693e6ecf4f8c4b.jpg"],
-    tags: ["stickers", "dtf", "premium", "new-drop"],
-    videoUrl: "https://www.youtube.com/shorts/PFQzW2oez00?feature=share",
+    src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg", // Yahan apni original image URL daal dena
+    subImages: [
+      "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",
+      "https://i.pinimg.com/736x/4f/9c/5c/4f9c5c6b17f2c27b0b2fbdb36b9db327.jpg",
+      "https://i.pinimg.com/736x/bb/e3/dd/bbe3dd72c4aec824fa693e6ecf4f8c4b.jpg"
+    ], // Yahan bhi apni images update kar lena
+    tags: ["stickers", "dtf", "premium", "new-drop", "gta6", "anime", "porsche"],
+    videoUrl: "https://www.youtube.com/shorts/PFQzW2oez00?feature=share", // Tumhara promo video
   },
-  // Aap yahan aur bhi sticker packs add kar sakte hain
 ];
