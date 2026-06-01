@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Container, Row, Col, Image, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Image, Button, Form, Spinner } from "react-bootstrap";
 import WhatsAppBtn from "../components/Watspp";
 import { CartContext } from "../contexAndhooks/CartContext";
 import AddressModal from "../components/AddressModal";
@@ -9,15 +9,17 @@ import GiftUploadModal from "../components/FreeGiftAdminModal";
 import DeliveryBar from "../components/DeliveryBar";
 import PincodeChecker from "../components/PincodeChecker";
 
-
 export default function CartPage() {
-  const { cartItems, updateQuantity, clearCart, addToCart } = useContext(CartContext);
+  // Achi practice: Context se loading state bhi fetch karein agar available ho
+  const { cartItems, updateQuantity, clearCart, addToCart, isLoadingCart } = useContext(CartContext);
+  
   const cartEndRef = useRef(null);
   const prevCartLengthRef = useRef(cartItems.length);
 
   const [coupon, setCoupon] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Order place karne ke liye
+  const [pageLoading, setPageLoading] = useState(true); // Page content load hone ke liye
   const [customerNote, setCustomerNote] = useState("");
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showPayModal, setShowPayModal] = useState(false);
@@ -32,7 +34,19 @@ export default function CartPage() {
     ? "http://localhost:3000/api/customer-orders" 
     : "https://serdeptry1st.onrender.com/api/customer-orders";
 
-  // 1. Scroll Effect
+  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  // 1. Initial Page Load Simulation (ya context loading)
+  useEffect(() => {
+    // Agar CartContext aapko isLoadingCart provide karta hai, toh timeout ki zaroorat nahi hai.
+    // Filhal 500ms ka buffer diya hai taaki heavy components aram se load ho jaye bina UI freeze kiye.
+    const timer = setTimeout(() => {
+      setPageLoading(false);
+    }, 500); 
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 2. Scroll Effect
   useEffect(() => {
     if (cartItems.length > prevCartLengthRef.current) {
       cartEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,29 +54,30 @@ export default function CartPage() {
     prevCartLengthRef.current = cartItems.length;
   }, [cartItems]);
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-  // 🔥 AUTO-REMOVE GIFT LOGIC: Agar subtotal 299 se kam ho toh gift hatao
-// 🔥 REFINED AUTO-REMOVE GIFT LOGIC: Har gift ka apna threshold check hoga
-useEffect(() => {
-  // Sirf wahi items pakdo jo gifts hain (price === 0)
-  const giftsInCart = cartItems.filter(item => item.price === 0);
-
-  giftsInCart.forEach((gift) => {
-    // Agar gift ka threshold set nahi hai toh default 299 maan lo
-    const giftThreshold = gift.threshold || 299;
-
-    if (subtotal < giftThreshold) {
-      // Us gift ka index dhundo cart mein
-      const index = cartItems.findIndex(i => i.title === gift.title);
-      if (index !== -1) {
-        // Remove karne ke liye quantity ko minus kar do
-        updateQuantity(index, -gift.quantity);
-        console.log(`Removed ${gift.title} because subtotal is below ₹${giftThreshold}`);
+  // 3. 🔥 REFINED AUTO-REMOVE GIFT LOGIC (Optimized to prevent UI freezing & infinite loops)
+  useEffect(() => {
+    let giftsRemoved = false;
+    
+    cartItems.forEach((item, index) => {
+      if (item.price === 0) {
+        const giftThreshold = item.threshold || 299;
+        
+        // Sirf tabhi update karo jab item galti se cart me pada ho aur threshold cross na kiya ho
+        if (subtotal < giftThreshold && item.quantity > 0) {
+          updateQuantity(index, -item.quantity);
+          console.log(`Removed ${item.title} because subtotal is below ₹${giftThreshold}`);
+          giftsRemoved = true; 
+        }
       }
+    });
+
+    // Agar humne kuch remove kiya hai, toh ek slight notification show kar sakte hain
+    if (giftsRemoved) {
+       // Optional: Set a toaster here "Gift removed as subtotal dropped"
     }
-  });
-}, [subtotal, cartItems, updateQuantity]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]); // SIRF subtotal par depend karein, cartItems ya updateQuantity par nahi taaki loop na bane
+
   const discountAmount = (subtotal * discountPercent) / 100;
   const finalTotal = subtotal - discountAmount;
 
@@ -124,6 +139,18 @@ useEffect(() => {
     } catch (err) { alert("❌ Error saving order"); } finally { setLoading(false); }
   };
 
+  // 🔥 INITIAL LOADING UI 🔥
+  if (pageLoading || isLoadingCart) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
+        <div className="text-center">
+          <Spinner animation="border" variant="dark" style={{ width: "3rem", height: "3rem" }} />
+          <h5 className="mt-3 text-muted">Loading your cart...</h5>
+        </div>
+      </Container>
+    );
+  }
+
   return (
     <Container style={{ paddingTop: "20px", maxWidth: "900px", paddingBottom: "50px" }}>
       {/* 🛒 Stylish Header */}
@@ -135,6 +162,7 @@ useEffect(() => {
           </Button>
         )}
       </div>
+
       {/* 1. Cart Items List */}
       <div className="mb-4">
         {cartItems.length === 0 ? (
@@ -165,25 +193,21 @@ useEffect(() => {
         )}
       </div>
       
-
-      {/* 2. 🔥 GIFT CAROUSEL */}
-{/* 2. 🔥 REFINED GIFT CAROUSEL */}
-<div className="my-4">
-  <GiftCarousel 
-    subtotal={subtotal} 
-    cartItems={cartItems} 
-    // ✅ Yahan {...gift} ka use karo taaki threshold bhi cart mein chala jaye
-    onAddGift={(gift) => addToCart({ ...gift, quantity: 1, price: 0 })} 
-    onRemoveGift={(giftTitle) => {
-      const giftIndex = cartItems.findIndex(item => item.title === giftTitle);
-      if (giftIndex !== -1) {
-        updateQuantity(giftIndex, -cartItems[giftIndex].quantity);
-      }
-    }}
-  />
-</div>
+      {/* 2. 🔥 REFINED GIFT CAROUSEL */}
+      <div className="my-4">
+        <GiftCarousel 
+          subtotal={subtotal} 
+          cartItems={cartItems} 
+          onAddGift={(gift) => addToCart({ ...gift, quantity: 1, price: 0 })} 
+          onRemoveGift={(giftTitle) => {
+            const giftIndex = cartItems.findIndex(item => item.title === giftTitle);
+            if (giftIndex !== -1) {
+              updateQuantity(giftIndex, -cartItems[giftIndex].quantity);
+            }
+          }}
+        />
+      </div>
       <div ref={cartEndRef}></div>
-
 
       <DeliveryBar />
       <PincodeChecker />
@@ -257,7 +281,6 @@ useEffect(() => {
         handleSave={handleAddressSave} 
       />
 
-      {/* 🔥 Updated PayModal with all props */}
       <PayModal 
         show={showPayModal} 
         handleClose={() => setShowPayModal(false)} 
@@ -272,4 +295,4 @@ useEffect(() => {
       <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage(currentOrderId, tempAddress)} />
     </Container>
   );
-}
+} 

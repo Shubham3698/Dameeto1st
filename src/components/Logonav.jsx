@@ -4,7 +4,7 @@ import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
 import Logo from "../assets/lg.png";
 import SignInModal from "./SignInModal";
 import { CartContext } from "../contexAndhooks/CartContext";
-import toast from "react-hot-toast"; // 🔹 NAYA: Toaster import kiya
+import toast from "react-hot-toast"; 
 
 export default function TopNavbar() {
   const [query, setQuery] = useState("");
@@ -47,28 +47,23 @@ export default function TopNavbar() {
     return () => clearTimeout(timer);
   }, [displayText, isDeleting, wordIndex]);
 
-  // 🔹 Context se cartItems aur hamara naya Loading state nikala
-  const { cartItems, setIsGlobalLoading } = useContext(CartContext);
+  // 🔹 Context se cartItems nikala (setIsGlobalLoading hata diya kyunki ab uski zarurat nahi)
+  const { cartItems } = useContext(CartContext);
 
-  // 🔹 Cart Click Handler: Ye screen lock karega, patti dikhayega aur fir navigate karega
-  const handleCartClick = (e) => {
-    // 1. Toaster Patti dikhao (4 seconds duration ke saath)
-    toast.loading("Fetching page... Server is waking up, pls reload page  🚀", {
-      duration: 4000, // 🔹 4 seconds tak patti dikhegi
+  // 🔹 Cart Click Handler: Instant Navigation
+  const handleCartClick = () => {
+    // 1. Turant navigate karo bina kisi delay (setTimeout) ke!
+    navigate("/cart");
+
+    // 2. Toaster patti dikhao server wake up ke liye
+    toast.loading("Waking up the server, please wait... 🚀", {
+      duration: 3000, // 3 seconds tak dikhega
       style: {
         borderRadius: "10px",
         background: "#333",
         color: "#fff",
       },
     });
-
-    setIsGlobalLoading(true); // 2. Global Screen Lock ON
-
-    setTimeout(() => {
-      navigate("/cart");
-      setIsGlobalLoading(false); // 3. Screen Lock OFF
-      // toast.dismiss() ko hata diya hai taaki patti fixed 4s tak dikhe
-    }, 400); // 0.4 second ka chota sa delay taki multiple clicks na ho
   };
 
   const handleKeyPress = (e) => {
