@@ -29,6 +29,9 @@ export default function ImageDetails() {
   const [expanded, setExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isVideoMode, setIsVideoMode] = useState(false);
+  
+  // 🔥 NEW: State to trigger animation on carousel click
+  const [mediaKey, setMediaKey] = useState(0); 
 
   const [dbItem, setDbItem] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -120,6 +123,16 @@ export default function ImageDetails() {
     }
   }, [imagesArray]);
 
+  // 🔥 NEW: Function to handle media change and trigger animation
+  const handleMediaChange = (img, isVideo) => {
+    if (!isVideo && selectedImage === img && !isVideoMode) return; // Prevent re-animating the same image
+    if (isVideo && isVideoMode) return; // Prevent re-animating the same video
+    
+    setSelectedImage(img);
+    setIsVideoMode(isVideo);
+    setMediaKey(prevKey => prevKey + 1); // Changing the key restarts the CSS animation
+  };
+
   if (loading) return <div style={{ textAlign: "center", marginTop: "100px", color: "#fe3d00" }}><h3>Finding your art... 🚀</h3></div>;
   if (!item) return <div style={{ textAlign: "center", marginTop: "100px" }}><h2>Product Not Found</h2></div>;
 
@@ -131,17 +144,32 @@ export default function ImageDetails() {
 
   return (
     <div style={{ background: "#fff3eb", minHeight: "100vh", padding: "20px", opacity: fadeIn ? 1 : 0, transition: "opacity 0.8s ease-in" }}>
+      
+      {/* 🔥 NEW: Inline CSS for smooth carousel transition animation */}
+      <style>{`
+        @keyframes mediaFadeIn {
+          0% { opacity: 0.4; transform: scale(0.98); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
+
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+        
         {/* IMAGE/VIDEO VIEWER */}
-        <div style={{ position: "relative", width: "100%", borderRadius: "16px", overflow: "hidden", boxShadow: "0 6px 20px rgba(0,0,0,0.2)" }}>
-          {isVideoMode && videoEmbedUrl ? (
-            <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
-              <iframe src={`${videoEmbedUrl}?autoplay=1`} title="Product Video" frameBorder="0" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
-            </div>
-          ) : (
-            selectedImage && <img src={selectedImage} style={{ width: "100%", display: "block" }} alt={title} />
-          )}
-          <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "white", border: "none", width: "45px", height: "45px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", cursor: "pointer", zIndex: 0}}>
+        <div style={{ position: "relative", width: "100%", borderRadius: "16px", overflow: "hidden", boxShadow: "0 6px 20px rgba(0,0,0,0.2)", background: "#fff" }}>
+          
+          {/* 🔥 NEW: Wrapper with dynamic key to re-trigger animation */}
+          <div key={mediaKey} style={{ animation: "mediaFadeIn 0.3s ease-out forwards", width: "100%", height: "100%" }}>
+            {isVideoMode && videoEmbedUrl ? (
+              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
+                <iframe src={`${videoEmbedUrl}?autoplay=1`} title="Product Video" frameBorder="0" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
+              </div>
+            ) : (
+              selectedImage && <img src={selectedImage} style={{ width: "100%", display: "block" }} alt={title} />
+            )}
+          </div>
+
+          <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "white", border: "none", width: "45px", height: "45px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", cursor: "pointer", zIndex: 10 }}>
             <FaShareAlt color="#fe3d00" />
           </button>
         </div>
@@ -150,10 +178,25 @@ export default function ImageDetails() {
         {(imagesArray.length > 1 || videoEmbedUrl) && (
           <div style={{ display: "flex", gap: "10px", overflowX: "auto", padding: "15px 0" }}>
             {imagesArray.map((img, index) => (
-              <img key={index} src={img} onClick={() => { setSelectedImage(img); setIsVideoMode(false); }} style={{ minWidth: "70px", height: "70px", objectFit: "cover", borderRadius: "10px", cursor: "pointer", border: !isVideoMode && selectedImage === img ? "3px solid #fe3d00" : "2px solid #ddd" }} alt="thumb" />
+              <img 
+                key={index} 
+                src={img} 
+                onClick={() => handleMediaChange(img, false)} // 🔥 Updated to use handler
+                style={{ 
+                  minWidth: "70px", height: "70px", objectFit: "cover", borderRadius: "10px", cursor: "pointer", transition: "0.2s", 
+                  border: !isVideoMode && selectedImage === img ? "3px solid #fe3d00" : "2px solid #ddd" 
+                }} 
+                alt="thumb" 
+              />
             ))}
             {videoEmbedUrl && (
-              <div onClick={() => setIsVideoMode(true)} style={{ minWidth: "70px", height: "70px", background: "#000", borderRadius: "10px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", border: isVideoMode ? "3px solid #fe3d00" : "2px solid #333", color: "white" }}>
+              <div 
+                onClick={() => handleMediaChange(null, true)} // 🔥 Updated to use handler
+                style={{ 
+                  minWidth: "70px", height: "70px", background: "#000", borderRadius: "10px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "0.2s",
+                  border: isVideoMode ? "3px solid #fe3d00" : "2px solid #333", color: "white" 
+                }}
+              >
                 <FaPlay size={20} />
                 <span style={{ fontSize: "10px", marginTop: "4px" }}>VIDEO</span>
               </div>
