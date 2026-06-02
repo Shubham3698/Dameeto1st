@@ -169,7 +169,7 @@ export default function ImageDetails() {
             )}
           </div>
 
-          <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "white", border: "none", width: "45px", height: "45px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", cursor: "pointer", zIndex: 10 }}>
+          <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "white", border: "none", width: "45px", height: "45px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", cursor: "pointer", zIndex: 0 }}>
             <FaShareAlt color="#fe3d00" />
           </button>
         </div>
@@ -219,9 +219,17 @@ export default function ImageDetails() {
 
         {/* BUTTONS */}
         <div style={{ display: "flex", gap: "12px", marginTop: "20px", alignItems: "center" }}>
-          <button onClick={() => addToCart(item)} style={{ background: "#fe3d00", color: "white", height: "52px", padding: "0 20px", borderRadius: "50px", border: "none", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: "600" }}>
-            <FaShoppingCart /> Add to Cart
-          </button>
+         <button 
+    // 🔥 YAHAN FIX KIYA HAI: price aur quantity explicitly add kar diye
+    onClick={() => addToCart({ 
+      ...item, 
+      price: item.finalPrice ?? 199, // Cart 'price' dhundh raha hai, 'finalPrice' nahi
+      quantity: 1 // Initial quantity 1 set karna zaroori hai
+    })} 
+    style={{ background: "#fe3d00", color: "white", height: "52px", padding: "0 20px", borderRadius: "50px", border: "none", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: "600" }}
+  >
+    <FaShoppingCart /> Add to Cart
+  </button>
 
           {/* ❤️ Wishlist Button */}
           <button

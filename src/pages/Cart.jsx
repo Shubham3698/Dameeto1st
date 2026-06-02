@@ -173,13 +173,14 @@ export default function CartPage() {
               <Col xs={3} md={2}>
                 <Image src={item.src} fluid rounded style={{ borderRadius: "12px", boxShadow: "0 4px 10px rgba(0,0,0,0.08)" }} />
               </Col>
-              <Col xs={5} md={6}>
+              <Col xs={4} md={6}>
                 <h5 style={{ fontWeight: "700", marginBottom: "5px" }}>{item.title}</h5>
                 <span style={{ fontWeight: "700", color: item.price === 0 ? "#22c55e" : "#fe3d00" }}>
                    {item.price === 0 ? "FREE GIFT 🎁" : `₹${item.price}`}
                 </span>
               </Col>
-              <Col xs={4} md={2} className="d-flex align-items-center justify-content-end">
+              {/* Added a gap-2 here to space out the + - controller and the remove button */}
+              <Col xs={5} md={4} className="d-flex align-items-center justify-content-end gap-2">
                 {item.price > 0 && (
                   <div className="d-flex align-items-center gap-2" style={{ background: "#f8f9fa", padding: "5px", borderRadius: "8px" }}>
                     <Button variant="link" className="p-0 text-dark" style={{ textDecoration: "none", fontWeight: "bold" }} onClick={() => updateQuantity(index, -1)}>−</Button>
@@ -187,6 +188,16 @@ export default function CartPage() {
                     <Button variant="link" className="p-0 text-dark" style={{ textDecoration: "none", fontWeight: "bold" }} onClick={() => updateQuantity(index, 1)}>+</Button>
                   </div>
                 )}
+                {/* 🔴 NEW REMOVE BUTTON ADDED HERE */}
+                <Button 
+                  variant="outline-danger" 
+                  className="d-flex align-items-center justify-content-center p-0"
+                  onClick={() => updateQuantity(index, -item.quantity)} 
+                  style={{ width: "30px", height: "30px", borderRadius: "50%", border: "none", backgroundColor: "#ffe6e6" }}
+                  title="Remove Item"
+                >
+                  <span style={{ color: "red", fontWeight: "bold", fontSize: "14px" }}>✕</span>
+                </Button>
               </Col>
             </Row>
           ))
@@ -295,4 +306,4 @@ export default function CartPage() {
       <WhatsAppBtn phone="7080981033" message={generateWhatsAppMessage(currentOrderId, tempAddress)} />
     </Container>
   );
-} 
+}
