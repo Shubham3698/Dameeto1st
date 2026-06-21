@@ -1103,6 +1103,26 @@ export const stickerPacksData = [
     rating: 4.8,
     stock: 15,
     wishlistCount: 0, 
+    richContent: [
+      // {
+      //   heading: "See The Product in Action! 🎬",
+      //   text: "Watch how premium these stickers look in real life.",
+      //   // 🔥 YAHAN VIDEO LINK DAAL DIJIYE:
+      //   videoUrl: "https://www.youtube.com/shorts/PFQzW2oez00?feature=share" 
+      // },
+      {
+        heading: "Spider-Man on Porsche GT3 RS",
+        text: "",
+        // 🔥 YAHAN IMAGE LINK BHI DAAL SAKTE HAIN:
+        image: "https://i.pinimg.com/1200x/8a/57/c6/8a57c6e9f49275ea3d83e6fc5238eacd.jpg"
+      },
+      {
+        heading: "most viral GTA VI Protagonist Couple",
+        text: "",
+        // 🔥 YAHAN IMAGE LINK BHI DAAL SAKTE HAIN:
+        image: "https://i.pinimg.com/1200x/de/1f/9d/de1f9d609a4fff4a52139e56fc67e89a.jpg"
+      }
+    ],
     src: "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg", // Yahan apni original image URL daal dena
     subImages: [
       "https://i.pinimg.com/736x/cb/06/9e/cb069e70b3e556abd90693efb343c87f.jpg",

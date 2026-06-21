@@ -3,7 +3,7 @@ import { useLocation, useParams } from "react-router-dom";
 import { FaHeart, FaShoppingCart, FaShareAlt, FaPlay } from "react-icons/fa";
 import Nwmasonry from "../components/Nwmasonry";
 import { CartContext } from "../contexAndhooks/CartContext";
-import { WishlistContext } from "../contexAndhooks/WishlistContext"; // 🔥 Context Import
+import { WishlistContext } from "../contexAndhooks/WishlistContext";
 
 import CustomerProof from "../components/CustomerProof";
 import { FaWhatsapp } from "react-icons/fa";
@@ -23,14 +23,13 @@ export default function ImageDetails() {
   const { id } = useParams();
   const location = useLocation();
   const { addToCart } = useContext(CartContext);
-  const { toggleWishlist, wishlist } = useContext(WishlistContext); // 🔥 Context nikaala
+  const { toggleWishlist, wishlist } = useContext(WishlistContext);
 
   const [fadeIn, setFadeIn] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isVideoMode, setIsVideoMode] = useState(false);
   
-  // 🔥 NEW: State to trigger animation on carousel click
   const [mediaKey, setMediaKey] = useState(0); 
 
   const [dbItem, setDbItem] = useState(null);
@@ -56,8 +55,12 @@ export default function ImageDetails() {
   ], []);
 
   const localItem = useMemo(() => {
+    const freshLocalItem = allLocalProducts.find((p) => String(p.id) === String(decodedId));
+    if (freshLocalItem) return freshLocalItem;
+    
     if (location.state?.item) return location.state.item;
-    return allLocalProducts.find((p) => String(p.id) === String(decodedId));
+    
+    return null;
   }, [decodedId, location.state, allLocalProducts]);
 
   // 2. Fetch Logic
@@ -77,20 +80,14 @@ export default function ImageDetails() {
     fetchFromDB();
   }, [decodedId, localItem]);
 
-  // --- 🔥 YAHAN SUDHAAR HAI (Order ka dhyan rakhein) ---
-  
-  // Pehle 'item' ko define karein
   const item = localItem || dbItem;
 
-  // Phir 'isWishlisted' check karein
   const isWishlisted = useMemo(() => {
     if (!item) return false;
     return wishlist.some((w) => String(w.id) === String(item.id));
   }, [wishlist, item]);
 
   const videoEmbedUrl = getEmbedUrl(item?.videoUrl);
-
-  // --- Sudhaar khatam ---
 
   const handleShare = async () => {
     if (!item) return;
@@ -123,14 +120,13 @@ export default function ImageDetails() {
     }
   }, [imagesArray]);
 
-  // 🔥 NEW: Function to handle media change and trigger animation
   const handleMediaChange = (img, isVideo) => {
-    if (!isVideo && selectedImage === img && !isVideoMode) return; // Prevent re-animating the same image
-    if (isVideo && isVideoMode) return; // Prevent re-animating the same video
+    if (!isVideo && selectedImage === img && !isVideoMode) return; 
+    if (isVideo && isVideoMode) return; 
     
     setSelectedImage(img);
     setIsVideoMode(isVideo);
-    setMediaKey(prevKey => prevKey + 1); // Changing the key restarts the CSS animation
+    setMediaKey(prevKey => prevKey + 1); 
   };
 
   if (loading) return <div style={{ textAlign: "center", marginTop: "100px", color: "#fe3d00" }}><h3>Finding your art... 🚀</h3></div>;
@@ -145,7 +141,6 @@ export default function ImageDetails() {
   return (
     <div style={{ background: "#fff3eb", minHeight: "100vh", padding: "20px", opacity: fadeIn ? 1 : 0, transition: "opacity 0.8s ease-in" }}>
       
-      {/* 🔥 NEW: Inline CSS for smooth carousel transition animation */}
       <style>{`
         @keyframes mediaFadeIn {
           0% { opacity: 0.4; transform: scale(0.98); }
@@ -158,7 +153,6 @@ export default function ImageDetails() {
         {/* IMAGE/VIDEO VIEWER */}
         <div style={{ position: "relative", width: "100%", borderRadius: "16px", overflow: "hidden", boxShadow: "0 6px 20px rgba(0,0,0,0.2)", background: "#fff" }}>
           
-          {/* 🔥 NEW: Wrapper with dynamic key to re-trigger animation */}
           <div key={mediaKey} style={{ animation: "mediaFadeIn 0.3s ease-out forwards", width: "100%", height: "100%" }}>
             {isVideoMode && videoEmbedUrl ? (
               <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
@@ -181,7 +175,7 @@ export default function ImageDetails() {
               <img 
                 key={index} 
                 src={img} 
-                onClick={() => handleMediaChange(img, false)} // 🔥 Updated to use handler
+                onClick={() => handleMediaChange(img, false)} 
                 style={{ 
                   minWidth: "70px", height: "70px", objectFit: "cover", borderRadius: "10px", cursor: "pointer", transition: "0.2s", 
                   border: !isVideoMode && selectedImage === img ? "3px solid #fe3d00" : "2px solid #ddd" 
@@ -191,7 +185,7 @@ export default function ImageDetails() {
             ))}
             {videoEmbedUrl && (
               <div 
-                onClick={() => handleMediaChange(null, true)} // 🔥 Updated to use handler
+                onClick={() => handleMediaChange(null, true)} 
                 style={{ 
                   minWidth: "70px", height: "70px", background: "#000", borderRadius: "10px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "0.2s",
                   border: isVideoMode ? "3px solid #fe3d00" : "2px solid #333", color: "white" 
@@ -214,24 +208,68 @@ export default function ImageDetails() {
           {discountPercent > 0 && <span style={{ background: "#e6f7ec", color: "#2e7d32", fontSize: "12px", fontWeight: "600", padding: "4px 8px", borderRadius: "6px" }}>{discountPercent}% OFF</span>}
         </div>
 
-        <p style={{ marginTop: "10px" }}>{expanded ? longDesc : shortDesc}</p>
-        <button onClick={() => setExpanded(!expanded)} style={{ background: "transparent", color: "#fe3d00", border: "none", fontWeight: "600", cursor: "pointer" }}>{expanded ? "Show Less ▲" : "Read More ▼"}</button>
+        {/* 🔥 YAHAN SE NAYA DESCRIPTION/RICH CONTENT CHALU HOTA HAI 🔥 */}
+        <div style={{ marginTop: "15px" }}>
+          {expanded ? (
+            item.richContent && item.richContent.length > 0 ? (
+              <div className="rich-description-container" style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "15px" }}>
+                {longDesc && <p style={{ color: "#444", whiteSpace: "pre-wrap" }}>{longDesc}</p>}
+
+                {item.richContent.map((section, idx) => (
+                  <div key={idx} style={{ background: "#fff", padding: "15px", borderRadius: "12px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)", border: "1px solid #f0f0f0" }}>
+                    
+                    {/* 👇 NAYA FEATURE: AGAR VIDEO DI GAYI HAI TOH YAHAN EMBED HOGI 👇 */}
+                    {section.videoUrl && getEmbedUrl(section.videoUrl) && (
+                      <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, marginBottom: "12px", borderRadius: "8px", overflow: "hidden" }}>
+                        <iframe 
+                          src={getEmbedUrl(section.videoUrl)} 
+                          title={section.heading || "Feature Video"} 
+                          frameBorder="0" 
+                          allowFullScreen 
+                          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} 
+                        />
+                      </div>
+                    )}
+
+                    {/* AGAR IMAGE DI GAYI HAI TOH YAHAN AAYEGI */}
+                    {section.image && !section.videoUrl && (
+                      <img src={section.image} alt={section.heading || "Feature"} style={{ width: "100%", borderRadius: "8px", objectFit: "cover", marginBottom: "12px" }} />
+                    )}
+
+                    {section.heading && <h4 style={{ margin: "0 0 8px 0", color: "#fe3d00" }}>{section.heading}</h4>}
+                    {section.text && <p style={{ margin: 0, fontSize: "14px", color: "#555", lineHeight: "1.6", whiteSpace: "pre-wrap" }}>{section.text}</p>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ marginTop: "10px", lineHeight: "1.6", color: "#444", whiteSpace: "pre-wrap" }}>{longDesc}</p>
+            )
+          ) : (
+            <p style={{ marginTop: "10px", color: "#444" }}>{shortDesc}</p>
+          )}
+        </div>
+
+        <button 
+          onClick={() => setExpanded(!expanded)} 
+          style={{ background: "transparent", color: "#fe3d00", border: "none", fontWeight: "600", cursor: "pointer", padding: "10px 0", fontSize: "15px", display: "block" }}
+        >
+          {expanded ? "Show Less ▲" : "Read More ▼"}
+        </button>
+        {/* 🔥 RICH CONTENT KHATAM 🔥 */}
 
         {/* BUTTONS */}
         <div style={{ display: "flex", gap: "12px", marginTop: "20px", alignItems: "center" }}>
          <button 
-    // 🔥 YAHAN FIX KIYA HAI: price aur quantity explicitly add kar diye
-    onClick={() => addToCart({ 
-      ...item, 
-      price: item.finalPrice ?? 199, // Cart 'price' dhundh raha hai, 'finalPrice' nahi
-      quantity: 1 // Initial quantity 1 set karna zaroori hai
-    })} 
-    style={{ background: "#fe3d00", color: "white", height: "52px", padding: "0 20px", borderRadius: "50px", border: "none", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: "600" }}
-  >
-    <FaShoppingCart /> Add to Cart
-  </button>
+            onClick={() => addToCart({ 
+              ...item, 
+              price: item.finalPrice ?? 199, 
+              quantity: 1 
+            })} 
+            style={{ background: "#fe3d00", color: "white", height: "52px", padding: "0 20px", borderRadius: "50px", border: "none", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: "600" }}
+          >
+            <FaShoppingCart /> Add to Cart
+          </button>
 
-          {/* ❤️ Wishlist Button */}
           <button
             onClick={() => toggleWishlist(item)}
             style={{
