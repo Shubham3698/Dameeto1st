@@ -134,19 +134,22 @@ export default function ImageDetails() {
   const discountPercent = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
 
   return (
-    <div style={{ background: "#ffffff", minHeight: "100vh", opacity: fadeIn ? 1 : 0, transition: "opacity 0.8s ease-in", fontFamily: "Inter, sans-serif", width: "100vw", overflowX: "hidden" }}>
+    /* Fix 1: Removed width: "100vw", replaced with width: "100%" to stop scrollbar width causing trim */
+    <div style={{ background: "#ffffff", minHeight: "100vh", opacity: fadeIn ? 1 : 0, transition: "opacity 0.8s ease-in", fontFamily: "Inter, sans-serif", width: "100%", maxWidth: "100%", overflowX: "hidden" }}>
       
-      {/* 🚀 FIXED MOBILE RESPONSIVE CSS (ZERO OVERFLOW) 🚀 */}
+      {/* 🚀 FIXED MOBILE RESPONSIVE CSS 🚀 */}
       <style>{`
         /* Global CSS reset for this component to prevent any horizontal scroll */
         .product-wrapper-master * { box-sizing: border-box !important; }
         
+        img, iframe, video { max-width: 100%; } /* Fixes media breaking layout */
+
         .product-container { 
           width: 100%; 
           max-width: 1200px; 
           margin: 0 auto; 
           padding: 20px 15px; 
-          overflow-x: hidden; /* Force hide horizontal overflow */
+          overflow-x: hidden;
         }
         
         .product-grid { 
@@ -180,17 +183,21 @@ export default function ImageDetails() {
         .thumb-scroll { 
           scrollbar-width: none; 
           -webkit-overflow-scrolling: touch; 
-          width: 100%; /* Fixes overflow caused by flex items */
+          width: 100%; 
         } 
 
         .btn-cart {
           background: #fe3d00; color: white; height: 56px; padding: 0 15px; border-radius: 14px;
           border: none; display: flex; align-items: center; justify-content: center; gap: 8px;
           cursor: pointer; font-weight: 700; font-size: clamp(14px, 4vw, 16px); transition: all 0.2s ease;
-          flex: 1 1 auto; /* Let it shrink and grow properly */
-          min-width: 0; /* REMOVED hardcoded width that caused mobile cutoff */
+          flex: 1 1 100%; /* Will take full width if needed on extreme small screens */
+          min-width: 0; 
           white-space: nowrap;
         }
+        @media (min-width: 360px) {
+           .btn-cart { flex: 1 1 auto; }
+        }
+
         .btn-cart:hover { background: #e03600; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(254, 61, 0, 0.2); }
 
         .btn-icon {
@@ -199,14 +206,20 @@ export default function ImageDetails() {
         }
         .btn-icon:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
 
-        .rich-section { padding-left: 12px; border-left: 3px solid #f0f0f0; margin-bottom: 20px; transition: border-color 0.3s; word-wrap: break-word; overflow-wrap: break-word; }
+        .rich-section { padding-left: 12px; border-left: 3px solid #f0f0f0; margin-bottom: 20px; transition: border-color 0.3s; width: 100%; }
         @media (min-width: 850px) {
           .rich-section { padding-left: 16px; margin-bottom: 24px; }
         }
         .rich-section:hover { border-left-color: #fe3d00; }
         
-        /* Stop text overflow in descriptions */
-        .text-wrap-fix { word-wrap: break-word; overflow-wrap: break-word; width: 100%; max-width: 100%; }
+        /* Stronger text wrap fix */
+        .text-wrap-fix { 
+          word-wrap: break-word; 
+          overflow-wrap: break-word; 
+          word-break: break-word; 
+          width: 100%; 
+          max-width: 100%; 
+        }
       `}</style>
 
       <div className="product-wrapper-master" style={{ width: "100%", overflowX: "hidden" }}>
@@ -216,8 +229,7 @@ export default function ImageDetails() {
             {/* ======================= */}
             {/* LEFT COLUMN: MEDIA      */}
             {/* ======================= */}
-            <div className="media-column" style={{ maxWidth: "100%" }}>
-              {/* Main Viewer - Seamless Background */}
+            <div className="media-column" style={{ width: "100%" }}>
               <div className="media-main">
                 <div key={mediaKey} style={{ animation: "mediaFadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
                   {isVideoMode && videoEmbedUrl ? (
@@ -229,13 +241,11 @@ export default function ImageDetails() {
                   )}
                 </div>
 
-                {/* Seamless Floating Share Button */}
-                <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "#fff", border: "1px solid #eaeaea", width: "42px", height: "42px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "0.2s", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+                <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "#fff", border: "1px solid #eaeaea", width: "42px", height: "42px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "0.2s", boxShadow: "0 4px 10px rgba(0,0,0,0.05)", zIndex: 10 }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
                   <FaShareAlt size={16} color="#fe3d00" />
                 </button>
               </div>
 
-              {/* Thumbnails - Integrated closely */}
               {(imagesArray.length > 1 || videoEmbedUrl) && (
                 <div className="thumb-scroll" style={{ display: "flex", gap: "10px", overflowX: "auto", padding: "12px 0", marginTop: "4px" }}>
                   {imagesArray.map((img, index) => (
@@ -276,29 +286,26 @@ export default function ImageDetails() {
             {/* ======================= */}
             {/* RIGHT COLUMN: DETAILS   */}
             {/* ======================= */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "100%" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
               
-              {/* Header & Flowing Info */}
-              <div style={{ maxWidth: "100%" }}>
+              <div style={{ width: "100%" }}>
                 <CustomerProof customers={item?.customers || "5000+"} rating={item?.rating || "4.9"} />
                 <h1 className="text-wrap-fix" style={{ fontSize: "clamp(24px, 6vw, 40px)", fontWeight: "800", color: "#111", margin: "12px 0 16px 0", lineHeight: "1.2", letterSpacing: "-0.5px" }}>
                   {title}
                 </h1>
                 
-                {/* Seamless Pricing */}
-                <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", maxWidth: "100%" }}>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", width: "100%" }}>
                   <span style={{ color: "#fe3d00", fontSize: "clamp(26px, 6vw, 36px)", fontWeight: "800", letterSpacing: "-1px" }}>₹{price}</span>
                   {originalPrice && <span style={{ textDecoration: "line-through", color: "#a0a0a0", fontSize: "clamp(16px, 4vw, 18px)", fontWeight: "500" }}>₹{originalPrice}</span>}
                   {discountPercent > 0 && <span style={{ background: "#fe3d0015", color: "#fe3d00", fontSize: "13px", fontWeight: "700", padding: "4px 10px", borderRadius: "6px", whiteSpace: "nowrap" }}>{discountPercent}% OFF</span>}
                 </div>
 
-                {/* Description Flow */}
                 <p className="text-wrap-fix" style={{ fontSize: "16px", color: "#4a4a4a", lineHeight: "1.6", margin: 0, fontWeight: "400" }}>
                   {shortDesc}
                 </p>
               </div>
 
-              {/* Action Buttons - Safe Wrapping */}
+              {/* Action Buttons - Fully wrapped for safety */}
               <div style={{ display: "flex", gap: "10px", marginTop: "4px", flexWrap: "wrap", width: "100%" }}>
                 <button
                   className="btn-cart"
@@ -307,7 +314,7 @@ export default function ImageDetails() {
                   <FaShoppingCart size={18} /> Add to Cart
                 </button>
 
-                <div style={{ display: "flex", gap: "10px" }}>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "nowrap" }}>
                   <button
                     className="btn-icon"
                     onClick={() => toggleWishlist(item)}
@@ -331,12 +338,12 @@ export default function ImageDetails() {
               </div>
 
               {/* 🔥 SEAMLESS RICH CONTENT SECTION 🔥 */}
-              <div style={{ marginTop: "16px", maxWidth: "100%" }}>
+              <div style={{ marginTop: "16px", width: "100%" }}>
                 
-                <div style={{ transition: "all 0.4s ease", overflow: "hidden", maxWidth: "100%" }}>
+                <div style={{ transition: "all 0.4s ease", overflow: "hidden", width: "100%" }}>
                   {expanded ? (
                     item.richContent && item.richContent.length > 0 ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "16px", maxWidth: "100%" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "16px", width: "100%" }}>
                         {longDesc && <p className="text-wrap-fix" style={{ color: "#4a4a4a", whiteSpace: "pre-wrap", lineHeight: "1.7", fontSize: "15px", marginBottom: "20px" }}>{longDesc}</p>}
 
                         {item.richContent.map((section, idx) => (
@@ -346,13 +353,13 @@ export default function ImageDetails() {
                             {section.text && <p className="text-wrap-fix" style={{ margin: "0 0 14px 0", fontSize: "15px", color: "#555", lineHeight: "1.7", whiteSpace: "pre-wrap" }}>{section.text}</p>}
                             
                             {section.videoUrl && getEmbedUrl(section.videoUrl) && (
-                              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, marginBottom: "14px", borderRadius: "12px", overflow: "hidden", background: "#000", maxWidth: "100%" }}>
+                              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, marginBottom: "14px", borderRadius: "12px", overflow: "hidden", background: "#000", width: "100%" }}>
                                 <iframe src={getEmbedUrl(section.videoUrl)} title={section.heading || "Feature Video"} frameBorder="0" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
                               </div>
                             )}
 
                             {section.image && !section.videoUrl && (
-                              <img src={section.image} alt={section.heading || "Feature"} style={{ width: "100%", borderRadius: "12px", objectFit: "cover", marginBottom: "14px", maxWidth: "100%" }} />
+                              <img src={section.image} alt={section.heading || "Feature"} style={{ width: "100%", borderRadius: "12px", objectFit: "cover", marginBottom: "14px" }} />
                             )}
                           </div>
                         ))}
@@ -384,7 +391,7 @@ export default function ImageDetails() {
           {/* BOTTOM: RELATED ITEMS   */}
           {/* ======================= */}
           {relatedImages.length > 0 && (
-            <div style={{ marginTop: "70px", maxWidth: "100%" }}>
+            <div style={{ marginTop: "70px", width: "100%" }}>
               <h3 className="text-wrap-fix" style={{ fontSize: "clamp(22px, 5vw, 28px)", fontWeight: "800", color: "#111", marginBottom: "30px", letterSpacing: "-0.5px" }}>
                 Explore More from {fromCategory}
               </h3>
