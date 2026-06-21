@@ -134,18 +134,28 @@ export default function ImageDetails() {
   const discountPercent = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
 
   return (
-    <div style={{ background: "#ffffff", minHeight: "100vh", opacity: fadeIn ? 1 : 0, transition: "opacity 0.8s ease-in", fontFamily: "Inter, sans-serif", overflowX: "hidden" }}>
+    <div style={{ background: "#ffffff", minHeight: "100vh", opacity: fadeIn ? 1 : 0, transition: "opacity 0.8s ease-in", fontFamily: "Inter, sans-serif", width: "100vw", overflowX: "hidden" }}>
       
-      {/* 🚀 FIXED MOBILE RESPONSIVE CSS 🚀 */}
+      {/* 🚀 FIXED MOBILE RESPONSIVE CSS (ZERO OVERFLOW) 🚀 */}
       <style>{`
-        /* Base box-sizing to prevent padding from expanding widths */
-        .product-container * { box-sizing: border-box; }
+        /* Global CSS reset for this component to prevent any horizontal scroll */
+        .product-wrapper-master * { box-sizing: border-box !important; }
         
-        /* Mobile-first styling */
-        .product-container { max-width: 1200px; margin: 0 auto; padding: 20px 15px; }
-        .product-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        .product-container { 
+          width: 100%; 
+          max-width: 1200px; 
+          margin: 0 auto; 
+          padding: 20px 15px; 
+          overflow-x: hidden; /* Force hide horizontal overflow */
+        }
         
-        /* Desktop styling */
+        .product-grid { 
+          display: grid; 
+          grid-template-columns: 1fr; 
+          gap: 24px; 
+          width: 100%;
+        }
+        
         @media (min-width: 850px) {
           .product-container { padding: 40px 20px; }
           .product-grid { grid-template-columns: 1fr 1fr; gap: 60px; }
@@ -159,7 +169,7 @@ export default function ImageDetails() {
 
         .media-main {
           position: relative; width: 100%; border-radius: 20px; overflow: hidden; 
-          background: #f8f9fa; /* Soft unified background */
+          background: #f8f9fa; 
         }
         
         @media (min-width: 850px) {
@@ -169,14 +179,17 @@ export default function ImageDetails() {
         .thumb-scroll::-webkit-scrollbar { height: 0px; background: transparent; }
         .thumb-scroll { 
           scrollbar-width: none; 
-          -webkit-overflow-scrolling: touch; /* smooth scrolling on mobile */
+          -webkit-overflow-scrolling: touch; 
+          width: 100%; /* Fixes overflow caused by flex items */
         } 
 
         .btn-cart {
-          background: #fe3d00; color: white; height: 56px; padding: 0 20px; border-radius: 14px;
-          border: none; display: flex; align-items: center; justify-content: center; gap: 10px;
-          cursor: pointer; font-weight: 700; font-size: 16px; transition: all 0.2s ease;
-          flex-grow: 1; min-width: 180px;
+          background: #fe3d00; color: white; height: 56px; padding: 0 15px; border-radius: 14px;
+          border: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+          cursor: pointer; font-weight: 700; font-size: clamp(14px, 4vw, 16px); transition: all 0.2s ease;
+          flex: 1 1 auto; /* Let it shrink and grow properly */
+          min-width: 0; /* REMOVED hardcoded width that caused mobile cutoff */
+          white-space: nowrap;
         }
         .btn-cart:hover { background: #e03600; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(254, 61, 0, 0.2); }
 
@@ -186,194 +199,202 @@ export default function ImageDetails() {
         }
         .btn-icon:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
 
-        .rich-section { padding-left: 12px; border-left: 3px solid #f0f0f0; margin-bottom: 20px; transition: border-color 0.3s; }
+        .rich-section { padding-left: 12px; border-left: 3px solid #f0f0f0; margin-bottom: 20px; transition: border-color 0.3s; word-wrap: break-word; overflow-wrap: break-word; }
         @media (min-width: 850px) {
           .rich-section { padding-left: 16px; margin-bottom: 24px; }
         }
         .rich-section:hover { border-left-color: #fe3d00; }
+        
+        /* Stop text overflow in descriptions */
+        .text-wrap-fix { word-wrap: break-word; overflow-wrap: break-word; width: 100%; max-width: 100%; }
       `}</style>
 
-      <div className="product-container">
-        <div className="product-grid">
-          
-          {/* ======================= */}
-          {/* LEFT COLUMN: MEDIA      */}
-          {/* ======================= */}
-          <div className="media-column">
-            {/* Main Viewer - Seamless Background */}
-            <div className="media-main">
-              <div key={mediaKey} style={{ animation: "mediaFadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                {isVideoMode && videoEmbedUrl ? (
-                  /* Fixed mobile aspect ratio from 100% to 56.25% */
-                  <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", height: 0 }}>
-                    <iframe src={`${videoEmbedUrl}?autoplay=1`} title="Product Video" frameBorder="0" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
-                  </div>
-                ) : (
-                  selectedImage && <img src={selectedImage} style={{ width: "100%", height: "auto", objectFit: "contain", maxHeight: "60vh", display: "block" }} alt={title} />
-                )}
-              </div>
-
-              {/* Seamless Floating Share Button */}
-              <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "#fff", border: "1px solid #eaeaea", width: "42px", height: "42px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "0.2s", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
-                <FaShareAlt size={16} color="#fe3d00" />
-              </button>
-            </div>
-
-            {/* Thumbnails - Integrated closely */}
-            {(imagesArray.length > 1 || videoEmbedUrl) && (
-              <div className="thumb-scroll" style={{ display: "flex", gap: "10px", overflowX: "auto", padding: "12px 0", marginTop: "4px" }}>
-                {imagesArray.map((img, index) => (
-                  <img
-                    key={index}
-                    src={img}
-                    onClick={() => handleMediaChange(img, false)}
-                    style={{
-                      minWidth: "70px", height: "70px", objectFit: "cover", borderRadius: "12px", cursor: "pointer", transition: "all 0.2s ease",
-                      border: !isVideoMode && selectedImage === img ? "2px solid #fe3d00" : "2px solid transparent",
-                      opacity: !isVideoMode && selectedImage === img ? 1 : 0.6,
-                      background: "#f8f9fa"
-                    }}
-                    onMouseOver={e => e.currentTarget.style.opacity = 1}
-                    onMouseOut={e => !(!isVideoMode && selectedImage === img) && (e.currentTarget.style.opacity = 0.6)}
-                    alt={`thumbnail ${index + 1}`}
-                  />
-                ))}
-                {videoEmbedUrl && (
-                  <div
-                    onClick={() => handleMediaChange(null, true)}
-                    style={{
-                      minWidth: "70px", height: "70px", background: "#f0f0f0", borderRadius: "12px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s ease",
-                      border: isVideoMode ? "2px solid #fe3d00" : "2px solid transparent", color: "#333",
-                      opacity: isVideoMode ? 1 : 0.7
-                    }}
-                    onMouseOver={e => e.currentTarget.style.opacity = 1}
-                    onMouseOut={e => !isVideoMode && (e.currentTarget.style.opacity = 0.7)}
-                  >
-                    <FaPlay size={16} color={isVideoMode ? "#fe3d00" : "#555"} />
-                    <span style={{ fontSize: "10px", marginTop: "6px", fontWeight: "700", letterSpacing: "0.5px" }}>VIDEO</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* ======================= */}
-          {/* RIGHT COLUMN: DETAILS   */}
-          {/* ======================= */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div className="product-wrapper-master" style={{ width: "100%", overflowX: "hidden" }}>
+        <div className="product-container">
+          <div className="product-grid">
             
-            {/* Header & Flowing Info */}
-            <div style={{ maxWidth: "100%" }}>
-              <CustomerProof customers={item?.customers || "5000+"} rating={item?.rating || "4.9"} />
-              <h1 style={{ fontSize: "clamp(24px, 6vw, 40px)", fontWeight: "800", color: "#111", margin: "12px 0 16px 0", lineHeight: "1.2", letterSpacing: "-0.5px" }}>
-                {title}
-              </h1>
-              
-              {/* Seamless Pricing (Added flex-wrap to prevent overflow) */}
-              <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap" }}>
-                <span style={{ color: "#fe3d00", fontSize: "clamp(28px, 6vw, 36px)", fontWeight: "800", letterSpacing: "-1px" }}>₹{price}</span>
-                {originalPrice && <span style={{ textDecoration: "line-through", color: "#a0a0a0", fontSize: "18px", fontWeight: "500" }}>₹{originalPrice}</span>}
-                {discountPercent > 0 && <span style={{ background: "#fe3d0015", color: "#fe3d00", fontSize: "13px", fontWeight: "700", padding: "4px 10px", borderRadius: "6px" }}>{discountPercent}% OFF</span>}
-              </div>
-
-              {/* Description Flow */}
-              <p style={{ fontSize: "16px", color: "#4a4a4a", lineHeight: "1.6", margin: 0, fontWeight: "400" }}>
-                {shortDesc}
-              </p>
-            </div>
-
-            {/* Action Buttons - Grouped together closely */}
-            <div style={{ display: "flex", gap: "10px", marginTop: "4px", flexWrap: "wrap", alignItems: "center" }}>
-              <button
-                className="btn-cart"
-                onClick={() => addToCart({ ...item, price: item.finalPrice ?? 199, quantity: 1 })}
-              >
-                <FaShoppingCart size={18} /> Add to Cart
-              </button>
-
-              <button
-                className="btn-icon"
-                onClick={() => toggleWishlist(item)}
-                style={{
-                  background: isWishlisted ? "#fe3d00" : "#fff",
-                  border: isWishlisted ? "1px solid #fe3d00" : "1px solid #ddd",
-                  color: isWishlisted ? "white" : "#555",
-                }}
-              >
-                <FaHeart size={20} />
-              </button>
-
-              <button
-                className="btn-icon"
-                onClick={() => window.open(`https://wa.me/7080981033?text=${encodeURIComponent('Hi, interested in: ' + title)}`, "_blank")}
-                style={{ background: "#fff", color: "#25D366", border: "1px solid #ddd" }}
-              >
-                <FaWhatsapp size={24} />
-              </button>
-            </div>
-
-            {/* 🔥 SEAMLESS RICH CONTENT SECTION 🔥 */}
-            <div style={{ marginTop: "16px" }}>
-              
-              <div style={{ transition: "all 0.4s ease", overflow: "hidden" }}>
-                {expanded ? (
-                  item.richContent && item.richContent.length > 0 ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "16px" }}>
-                      {longDesc && <p style={{ color: "#4a4a4a", whiteSpace: "pre-wrap", lineHeight: "1.7", fontSize: "15px", marginBottom: "20px" }}>{longDesc}</p>}
-
-                      {item.richContent.map((section, idx) => (
-                        <div key={idx} className="rich-section">
-                          {section.heading && <h4 style={{ margin: "0 0 10px 0", color: "#111", fontSize: "18px", fontWeight: "700" }}>{section.heading}</h4>}
-                          
-                          {section.text && <p style={{ margin: "0 0 14px 0", fontSize: "15px", color: "#555", lineHeight: "1.7", whiteSpace: "pre-wrap" }}>{section.text}</p>}
-                          
-                          {section.videoUrl && getEmbedUrl(section.videoUrl) && (
-                            <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, marginBottom: "14px", borderRadius: "12px", overflow: "hidden", background: "#000" }}>
-                              <iframe src={getEmbedUrl(section.videoUrl)} title={section.heading || "Feature Video"} frameBorder="0" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
-                            </div>
-                          )}
-
-                          {section.image && !section.videoUrl && (
-                            <img src={section.image} alt={section.heading || "Feature"} style={{ width: "100%", borderRadius: "12px", objectFit: "cover", marginBottom: "14px" }} />
-                          )}
-                        </div>
-                      ))}
+            {/* ======================= */}
+            {/* LEFT COLUMN: MEDIA      */}
+            {/* ======================= */}
+            <div className="media-column" style={{ maxWidth: "100%" }}>
+              {/* Main Viewer - Seamless Background */}
+              <div className="media-main">
+                <div key={mediaKey} style={{ animation: "mediaFadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards", width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  {isVideoMode && videoEmbedUrl ? (
+                    <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", height: 0 }}>
+                      <iframe src={`${videoEmbedUrl}?autoplay=1`} title="Product Video" frameBorder="0" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
                     </div>
                   ) : (
-                    <p style={{ marginTop: "16px", lineHeight: "1.7", color: "#4a4a4a", whiteSpace: "pre-wrap", fontSize: "15px" }}>{longDesc}</p>
-                  )
-                ) : null}
+                    selectedImage && <img src={selectedImage} style={{ width: "100%", height: "auto", objectFit: "contain", maxHeight: "60vh", display: "block" }} alt={title} />
+                  )}
+                </div>
+
+                {/* Seamless Floating Share Button */}
+                <button onClick={handleShare} style={{ position: "absolute", top: "15px", right: "15px", background: "#fff", border: "1px solid #eaeaea", width: "42px", height: "42px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "0.2s", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+                  <FaShareAlt size={16} color="#fe3d00" />
+                </button>
               </div>
 
-              <button
-                onClick={() => setExpanded(!expanded)}
-                style={{ 
-                  background: "transparent", color: "#fe3d00", border: "none", fontWeight: "600", 
-                  cursor: "pointer", padding: "8px 0", fontSize: "15px", display: "inline-flex", alignItems: "center", gap: "8px",
-                  borderBottom: "2px solid transparent", transition: "all 0.2s ease"
-                }}
-                onMouseOver={e => e.currentTarget.style.borderBottom = "2px solid #fe3d00"}
-                onMouseOut={e => e.currentTarget.style.borderBottom = "2px solid transparent"}
-              >
-                {expanded ? "Show Less ▲" : "Read Full Description ▼"}
-              </button>
+              {/* Thumbnails - Integrated closely */}
+              {(imagesArray.length > 1 || videoEmbedUrl) && (
+                <div className="thumb-scroll" style={{ display: "flex", gap: "10px", overflowX: "auto", padding: "12px 0", marginTop: "4px" }}>
+                  {imagesArray.map((img, index) => (
+                    <img
+                      key={index}
+                      src={img}
+                      onClick={() => handleMediaChange(img, false)}
+                      style={{
+                        minWidth: "70px", height: "70px", objectFit: "cover", borderRadius: "12px", cursor: "pointer", transition: "all 0.2s ease",
+                        border: !isVideoMode && selectedImage === img ? "2px solid #fe3d00" : "2px solid transparent",
+                        opacity: !isVideoMode && selectedImage === img ? 1 : 0.6,
+                        background: "#f8f9fa"
+                      }}
+                      onMouseOver={e => e.currentTarget.style.opacity = 1}
+                      onMouseOut={e => !(!isVideoMode && selectedImage === img) && (e.currentTarget.style.opacity = 0.6)}
+                      alt={`thumbnail ${index + 1}`}
+                    />
+                  ))}
+                  {videoEmbedUrl && (
+                    <div
+                      onClick={() => handleMediaChange(null, true)}
+                      style={{
+                        minWidth: "70px", height: "70px", background: "#f0f0f0", borderRadius: "12px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s ease",
+                        border: isVideoMode ? "2px solid #fe3d00" : "2px solid transparent", color: "#333",
+                        opacity: isVideoMode ? 1 : 0.7
+                      }}
+                      onMouseOver={e => e.currentTarget.style.opacity = 1}
+                      onMouseOut={e => !isVideoMode && (e.currentTarget.style.opacity = 0.7)}
+                    >
+                      <FaPlay size={16} color={isVideoMode ? "#fe3d00" : "#555"} />
+                      <span style={{ fontSize: "10px", marginTop: "6px", fontWeight: "700", letterSpacing: "0.5px" }}>VIDEO</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-          </div>
-        </div>
+            {/* ======================= */}
+            {/* RIGHT COLUMN: DETAILS   */}
+            {/* ======================= */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "100%" }}>
+              
+              {/* Header & Flowing Info */}
+              <div style={{ maxWidth: "100%" }}>
+                <CustomerProof customers={item?.customers || "5000+"} rating={item?.rating || "4.9"} />
+                <h1 className="text-wrap-fix" style={{ fontSize: "clamp(24px, 6vw, 40px)", fontWeight: "800", color: "#111", margin: "12px 0 16px 0", lineHeight: "1.2", letterSpacing: "-0.5px" }}>
+                  {title}
+                </h1>
+                
+                {/* Seamless Pricing */}
+                <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", maxWidth: "100%" }}>
+                  <span style={{ color: "#fe3d00", fontSize: "clamp(26px, 6vw, 36px)", fontWeight: "800", letterSpacing: "-1px" }}>₹{price}</span>
+                  {originalPrice && <span style={{ textDecoration: "line-through", color: "#a0a0a0", fontSize: "clamp(16px, 4vw, 18px)", fontWeight: "500" }}>₹{originalPrice}</span>}
+                  {discountPercent > 0 && <span style={{ background: "#fe3d0015", color: "#fe3d00", fontSize: "13px", fontWeight: "700", padding: "4px 10px", borderRadius: "6px", whiteSpace: "nowrap" }}>{discountPercent}% OFF</span>}
+                </div>
 
-        {/* ======================= */}
-        {/* BOTTOM: RELATED ITEMS   */}
-        {/* ======================= */}
-        {relatedImages.length > 0 && (
-          <div style={{ marginTop: "70px" }}>
-            <h3 style={{ fontSize: "clamp(22px, 5vw, 28px)", fontWeight: "800", color: "#111", marginBottom: "30px", letterSpacing: "-0.5px" }}>
-              Explore More from {fromCategory}
-            </h3>
-            <Nwmasonry images={relatedImages} categoryName={fromCategory} />
+                {/* Description Flow */}
+                <p className="text-wrap-fix" style={{ fontSize: "16px", color: "#4a4a4a", lineHeight: "1.6", margin: 0, fontWeight: "400" }}>
+                  {shortDesc}
+                </p>
+              </div>
+
+              {/* Action Buttons - Safe Wrapping */}
+              <div style={{ display: "flex", gap: "10px", marginTop: "4px", flexWrap: "wrap", width: "100%" }}>
+                <button
+                  className="btn-cart"
+                  onClick={() => addToCart({ ...item, price: item.finalPrice ?? 199, quantity: 1 })}
+                >
+                  <FaShoppingCart size={18} /> Add to Cart
+                </button>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button
+                    className="btn-icon"
+                    onClick={() => toggleWishlist(item)}
+                    style={{
+                      background: isWishlisted ? "#fe3d00" : "#fff",
+                      border: isWishlisted ? "1px solid #fe3d00" : "1px solid #ddd",
+                      color: isWishlisted ? "white" : "#555",
+                    }}
+                  >
+                    <FaHeart size={20} />
+                  </button>
+
+                  <button
+                    className="btn-icon"
+                    onClick={() => window.open(`https://wa.me/7080981033?text=${encodeURIComponent('Hi, interested in: ' + title)}`, "_blank")}
+                    style={{ background: "#fff", color: "#25D366", border: "1px solid #ddd" }}
+                  >
+                    <FaWhatsapp size={24} />
+                  </button>
+                </div>
+              </div>
+
+              {/* 🔥 SEAMLESS RICH CONTENT SECTION 🔥 */}
+              <div style={{ marginTop: "16px", maxWidth: "100%" }}>
+                
+                <div style={{ transition: "all 0.4s ease", overflow: "hidden", maxWidth: "100%" }}>
+                  {expanded ? (
+                    item.richContent && item.richContent.length > 0 ? (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "16px", maxWidth: "100%" }}>
+                        {longDesc && <p className="text-wrap-fix" style={{ color: "#4a4a4a", whiteSpace: "pre-wrap", lineHeight: "1.7", fontSize: "15px", marginBottom: "20px" }}>{longDesc}</p>}
+
+                        {item.richContent.map((section, idx) => (
+                          <div key={idx} className="rich-section">
+                            {section.heading && <h4 className="text-wrap-fix" style={{ margin: "0 0 10px 0", color: "#111", fontSize: "18px", fontWeight: "700" }}>{section.heading}</h4>}
+                            
+                            {section.text && <p className="text-wrap-fix" style={{ margin: "0 0 14px 0", fontSize: "15px", color: "#555", lineHeight: "1.7", whiteSpace: "pre-wrap" }}>{section.text}</p>}
+                            
+                            {section.videoUrl && getEmbedUrl(section.videoUrl) && (
+                              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, marginBottom: "14px", borderRadius: "12px", overflow: "hidden", background: "#000", maxWidth: "100%" }}>
+                                <iframe src={getEmbedUrl(section.videoUrl)} title={section.heading || "Feature Video"} frameBorder="0" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} />
+                              </div>
+                            )}
+
+                            {section.image && !section.videoUrl && (
+                              <img src={section.image} alt={section.heading || "Feature"} style={{ width: "100%", borderRadius: "12px", objectFit: "cover", marginBottom: "14px", maxWidth: "100%" }} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-wrap-fix" style={{ marginTop: "16px", lineHeight: "1.7", color: "#4a4a4a", whiteSpace: "pre-wrap", fontSize: "15px" }}>{longDesc}</p>
+                    )
+                  ) : null}
+                </div>
+
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  style={{ 
+                    background: "transparent", color: "#fe3d00", border: "none", fontWeight: "600", 
+                    cursor: "pointer", padding: "8px 0", fontSize: "15px", display: "inline-flex", alignItems: "center", gap: "8px",
+                    borderBottom: "2px solid transparent", transition: "all 0.2s ease"
+                  }}
+                  onMouseOver={e => e.currentTarget.style.borderBottom = "2px solid #fe3d00"}
+                  onMouseOut={e => e.currentTarget.style.borderBottom = "2px solid transparent"}
+                >
+                  {expanded ? "Show Less ▲" : "Read Full Description ▼"}
+                </button>
+              </div>
+
+            </div>
           </div>
-        )}
-        
+
+          {/* ======================= */}
+          {/* BOTTOM: RELATED ITEMS   */}
+          {/* ======================= */}
+          {relatedImages.length > 0 && (
+            <div style={{ marginTop: "70px", maxWidth: "100%" }}>
+              <h3 className="text-wrap-fix" style={{ fontSize: "clamp(22px, 5vw, 28px)", fontWeight: "800", color: "#111", marginBottom: "30px", letterSpacing: "-0.5px" }}>
+                Explore More from {fromCategory}
+              </h3>
+              <div style={{ width: "100%", overflowX: "hidden" }}>
+                <Nwmasonry images={relatedImages} categoryName={fromCategory} />
+              </div>
+            </div>
+          )}
+          
+        </div>
       </div>
     </div>
   );
