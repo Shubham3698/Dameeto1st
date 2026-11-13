@@ -65,7 +65,7 @@ const MemoryGame = () => {
       if (data.success) {
         // Agar usne koi free order book kiya hoga toh uska ye status set hua tha backend me
         const alreadyClaimed = data.data.some(order => 
-          order.paymentStatus === "Game Reward (Paid via 200 Coins)"
+          order.paymentStatus === "Game Reward (Paid via 1000 Coins)"
         );
         setHasClaimedReward(alreadyClaimed);
       }
@@ -167,12 +167,12 @@ const MemoryGame = () => {
   };
 
   // --- REWARD CLAIMING LOGIC ---
-  const TARGET_COINS = 200;
+  const TARGET_COINS = 1000; // 🔥 Target updated to 1000 coins
   const rewardProgress = Math.min((userCredits / TARGET_COINS) * 100, 100);
   const isRewardUnlocked = userCredits >= TARGET_COINS;
 
-  // 🔥 Yahan ek CORS-friendly aur fast loading image set ki hai
-  const spidermanStickerImg = "https://i.pinimg.com/736x/a8/15/0d/a8150d75d4442a115b0ec3679daacc7a.jpg";
+  // 🔥 CORS-friendly Image URL
+  const spidermanStickerImg = "https://i.pinimg.com/736x/a8/15/0d/a8150d75d4442a115b0ec3679daacc7a.jpg"; 
 
   const handleClaimPhysicalStickerClick = () => {
     if (hasClaimedReward) return;
@@ -193,6 +193,7 @@ const MemoryGame = () => {
           userName: userName,
           userEmail: email,
           address: addressData,
+          // 🔥 Backend (Admin) ke liye Spiderman image bheji jaa rahi hai
           products: [{ 
             title: "Spiderman 6x6cm Sticker (Reward)", 
             price: 0, 
@@ -200,7 +201,7 @@ const MemoryGame = () => {
             image: spidermanStickerImg 
           }],
           subtotal: 0, total: 0,
-          paymentStatus: "Game Reward (Paid via 200 Coins)",
+          paymentStatus: "Game Reward (Paid via 1000 Coins)",
           customerNote: "Claimed through Memory Game Credits"
         }),
       });
@@ -262,20 +263,19 @@ const MemoryGame = () => {
 
       {/* --- REWARD BANNER --- */}
       <div style={styles.rewardBox}>
+        {/* 🔥 Spiderman Image hamesha yahan dikhegi */}
+        <div style={{ margin: "0 auto 10px auto", width: "70px", height: "70px", borderRadius: "8px", overflow: "hidden", border: "2px solid #fe3d00", backgroundColor: "white" }}>
+          <img 
+            src={spidermanStickerImg} 
+            alt="Spiderman Sticker" 
+            style={{ width: "100%", height: "100%", objectFit: "contain" }} 
+          />
+        </div>
+
         {hasClaimedReward ? (
-          // 🔥 AGAR REWARD LE CHUKA HAI TOH YEH DIKHEGA (WITH IMAGE)
+          // 🔥 AGAR REWARD LE CHUKA HAI TOH YEH DIKHEGA
           <>
             <div style={{color: '#10b981', fontWeight: 'bold', fontSize: '16px'}}>🎉 Reward Claimed!</div>
-            
-            {/* Added Image here */}
-            <div style={{ margin: "10px auto", width: "80px", height: "80px", borderRadius: "8px", overflow: "hidden", border: "2px solid #10b981", backgroundColor: "white" }}>
-              <img 
-                src={spidermanStickerImg} 
-                alt="Spiderman Sticker" 
-                style={{ width: "100%", height: "100%", objectFit: "contain" }} 
-              />
-            </div>
-            
             <div style={{fontSize: '12px', color: '#cbd5e1', marginTop: '5px'}}>
               You've successfully claimed your free Spiderman sticker. Keep playing for fun! 🎮
             </div>
@@ -284,19 +284,9 @@ const MemoryGame = () => {
             </div>
           </>
         ) : isRewardUnlocked ? (
-          // AGAR 200 COINS HO GAYE AUR CLAIM NAHI KIYA TOH YEH DIKHEGA
+          // AGAR 1000 COINS HO GAYE AUR CLAIM NAHI KIYA TOH YEH DIKHEGA
           <>
             <div style={{color: '#10b981', fontWeight: 'bold', fontSize: '16px'}}>🎉 Target Reached!</div>
-            
-             {/* Unclaimed lekin ready pe bhi Image dikhate hain */}
-            <div style={{ margin: "10px auto", width: "80px", height: "80px", borderRadius: "8px", overflow: "hidden", border: "2px dashed #10b981", backgroundColor: "white" }}>
-              <img 
-                src={spidermanStickerImg} 
-                alt="Spiderman Sticker" 
-                style={{ width: "100%", height: "100%", objectFit: "contain" }} 
-              />
-            </div>
-
             <div style={{fontSize: '12px', color: '#cbd5e1', marginTop: '5px'}}>
               Your FREE 6x6cm Spiderman sticker is ready for doorstep delivery! 🕷️
             </div>
@@ -308,13 +298,13 @@ const MemoryGame = () => {
           // AGAR TARGET COMPLETE NAHI HUA TOH YEH DIKHEGA
           <>
             <div style={{fontSize: '13px', color: '#f8fafc', marginBottom: '8px'}}>
-              🕷️ Reach <b>200 🪙</b> for a FREE 6x6cm Spiderman Sticker delivered to your doorstep!
+              🕷️ Reach <b>1000 🪙</b> for a FREE 6x6cm Spiderman Sticker delivered to your doorstep!
             </div>
             <div style={styles.progressBarBg}>
               <div style={{...styles.progressBarFill, width: `${rewardProgress}%`}}></div>
             </div>
             <div style={{fontSize: '11px', textAlign: 'right', marginTop: '6px', color: '#94a3b8'}}>
-              <span style={{color: '#fe3d00', fontWeight: 'bold'}}>{userCredits}</span> / 200 🪙
+              <span style={{color: '#fe3d00', fontWeight: 'bold'}}>{userCredits}</span> / 1000 🪙
             </div>
           </>
         )}
